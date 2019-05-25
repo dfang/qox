@@ -1,0 +1,62 @@
+version: '3.6'
+
+services:
+
+  db:
+    image: postgres:10.4
+    restart: always
+    environment:
+      # POSTGRES_PASSWORD: example
+      POSTGRES_DB: qor_example
+      POSTGRES_USER: adminer
+      POSTGRES_PASSWORD: adminer
+    volumes:
+      - ./data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 8080:8080
+
+  graphql-engine:
+    image: hasura/graphql-engine:v1.0.0-alpha41
+    ports:
+      - "18080:8080"
+    depends_on:
+      - db
+    restart: always
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:@postgres:5432/xsjd
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_ADMIN_SECRET: "admin"
+    command:
+      - graphql-engine
+      - serve
+      - --enable-console
+
+  qor:
+    image: dfang/qor-example:latest
+    # build:
+    #   context: .
+    command: ["./qor-example"]
+    # command: ["./seeds"]
+    # command: [ "go", "run", "config/db/seeds/main.go", "config/db/seeds/seeds.go" ]
+    restart: always
+    depends_on:
+      - db
+    # environment:
+    #   QOR_AWS_ACCESS_KEY_ID: AKIAI3Z7SFTABSJQSLDQ
+    #   QOR_AWS_SECRET_ACCESS_KEY: secret
+    #   QOR_AWS_BUCKET: qor-1234
+    #   QOR_AWS_REGION: ap-northeast-1
+    env_file:
+      - .env
+    volumes:
+      - ./config/database.yml:/go-app/config/database.yml
+    ports:
+      - 7000:7000

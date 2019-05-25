@@ -1,0 +1,96 @@
+users:
+    - name: 朱春辉
+      role: delivery_man
+      gender: 男
+      identitycardnum: 360424198701261758
+      mobilephone: 13808871176
+      carlicenceplatenum: 赣•G1J785
+      cartype: 东风小货
+      carlicensetype: C1
+      iscasual: false
+      jdappuser: jd_53738ee350f81
+    - name: 童辉恩
+      role: delivery_man
+      gender: 男
+      identitycardnum: 36042419920203431X
+      mobilephone: 15070208220
+      carlicenceplatenum: 赣•G558P8
+      cartype: 长安小货
+      carlicensetype: C1
+      iscasual: false
+      jdappuser: badong504809789
+    - name: 童慧
+      role: delivery_man
+      gender: 男
+      identitycardnum: 360424199005224317
+      mobilephone: 15797985894
+      carlicenceplatenum: 赣•G5Q053
+      cartype: 长安小货
+      carlicensetype: C1
+      iscasual: false
+      jdappuser: 时尚女人美容美发
+    - name: 贺长石
+      role: delivery_man
+      gender: 男
+      identitycardnum: 360424198903145894
+      mobilephone: 13207027859
+      carlicenceplatenum: 赣•G87D32
+      cartype: 长安小货
+      carlicensetype: C1
+      iscasual: false
+      jdappuser: 贺长石
+    - name: 吴成伙
+      role: delivery_man
+      gender: 男
+      identitycardnum: 36042419881128431X
+      mobilephone: 15070262473
+      carlicenceplatenum: 赣•G7068C
+      cartype: 长安小货
+      carlicensetype: C1
+      iscasual: false
+      jdappuser: 吴成伙
+    - name: 曾德亮
+      role: delivery_man
+      gender: 男
+      identitycardnum: 36042419881128431X
+      mobilephone: 17379233688
+      carlicenceplatenum: 赣•G511T7
+      cartype: 4米2箱式
+      carlicensetype: B2
+      iscasual: true
+      jdappuser:
+    - name: 李军
+      role: delivery_man
+      gender: 男
+      identitycardnum: 360424198108014596
+      mobilephone: 18379293991
+      carlicenceplatenum: 赣•G9005H
+      cartype: 3米8箱式
+      carlicensetype: C1
+      iscasual: true
+      jdappuser:
+    - name: 朱建辉
+      role: setup_man
+      gender: 男
+      identitycardnum: 360424198812211737
+      mobilephone: 15170274753
+      carlicenceplatenum: 赣•G581L9
+      cartype: 东风面包
+      carlicensetype: C1
+      iscasual: false
+      jdappuser:
+    - name: 卢贵
+      role: setup_man
+      gender: 男
+      identitycardnum: 360424198404014718
+      mobilephone: 18000235388
+      carlicenceplatenum: 赣•G86U13
+      cartype: 东风面包
+      carlicensetype: C1
+      iscasual: true
+      jdappuser:
+
+
+
+
+

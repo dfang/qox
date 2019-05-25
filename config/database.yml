@@ -1,0 +1,9 @@
+db:
+  adapter: postgres
+  name: qor_example
+  user: adminer
+  password: adminer
+  port: 5432
+  # host: db
+  host: localhost
+  # host: 192.168.66.182

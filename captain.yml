@@ -1,0 +1,7 @@
+qor-example:
+  build: Dockerfile
+  image: dfang/qor-example
+  pre:
+    - echo "Preparing qor-example"
+  post:
+    - echo "Finished qor-example"
