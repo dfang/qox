@@ -4,8 +4,8 @@
   "description": "QOR example",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack -d --watch --progress --colors",
-    "dist": "rimraf public/dist/* && NODE_ENV=production webpack -p"
+    "dev": "gulp watch",
+    "dist": "rimraf public/dist/* && NODE_ENV=production gulp"
   },
   "author": "Jason weng",
   "repository": "https://github.com/dfang/qor-demo",
@@ -19,8 +19,7 @@
     "gulp-clean-css": "^3.4.2",
     "gulp-sass": "3.1.0",
     "gulp-uglify": "^2.1.2",
-    "material-design-icons": "^2.2.3",
-    "webpack": "^3.0.0"
+    "material-design-icons": "^2.2.3"
   },
   "dependencies": {
     "babel-loader": "^7.1.0",
