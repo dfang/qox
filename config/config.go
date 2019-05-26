@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -75,7 +76,8 @@ var Config = struct {
 }{}
 
 var (
-	Root           = os.Getenv("GOPATH") + "/src/github.com/dfang/qor-demo"
+	// Root           = os.Getenv("GOPATH") + "/src/github.com/dfang/qor-demo"
+	Root, _        = os.Getwd()
 	Mailer         *mailer.Mailer
 	Render         = render.New()
 	AmazonPay      amazonpay.AmazonPayService
@@ -87,6 +89,10 @@ var (
 )
 
 func init() {
+
+	fmt.Println("ROOT .....")
+	fmt.Println(Root)
+
 	if err := configor.Load(&Config, "config/database.yml", "config/smtp.yml", "config/application.yml"); err != nil {
 		panic(err)
 	}
