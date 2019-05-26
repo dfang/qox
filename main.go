@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net/http"
@@ -11,8 +12,13 @@ import (
 
 	"github.com/dfang/qor-demo/app/account"
 	adminapp "github.com/dfang/qor-demo/app/admin"
+	"github.com/dfang/qor-demo/app/api"
 	"github.com/dfang/qor-demo/app/home"
+	"github.com/dfang/qor-demo/app/orders"
+	"github.com/dfang/qor-demo/app/pages"
+	"github.com/dfang/qor-demo/app/products"
 	"github.com/dfang/qor-demo/app/static"
+	"github.com/dfang/qor-demo/app/stores"
 	"github.com/dfang/qor-demo/config"
 	"github.com/dfang/qor-demo/config/application"
 	"github.com/dfang/qor-demo/config/auth"
@@ -22,6 +28,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/qor/admin"
 	"github.com/qor/publish2"
+	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 )
 
@@ -52,30 +59,33 @@ func main() {
 	Router.Use(middleware.RealIP)
 	Router.Use(middleware.Logger)
 	Router.Use(middleware.Recoverer)
-	// Router.Use(func(next http.Handler) http.Handler {
-	// 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-	// 		var (
-	// 			tx         = db.DB
-	// 			qorContext = &qor.Context{Request: req, Writer: w}
-	// 		)
+	Router.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			var (
+				tx         = db.DB
+				qorContext = &qor.Context{Request: req, Writer: w}
+			)
 
-	// 		if locale := utils.GetLocale(qorContext); locale != "" {
-	// 			tx = tx.Set("l10n:locale", locale)
-	// 		}
+			if locale := utils.GetLocale(qorContext); locale != "" {
+				tx = tx.Set("l10n:locale", locale)
+			}
 
-	// 		ctx := context.WithValue(req.Context(), utils.ContextDBName, publish2.PreviewByDB(tx, qorContext))
-	// 		next.ServeHTTP(w, req.WithContext(ctx))
-	// 	})
-	// })
+			ctx := context.WithValue(req.Context(), utils.ContextDBName, publish2.PreviewByDB(tx, qorContext))
+			next.ServeHTTP(w, req.WithContext(ctx))
+		})
+	})
 
-	// Application.Use(api.New(&api.Config{}))
+	Application.Use(api.New(&api.Config{}))
 	Application.Use(adminapp.New(&adminapp.Config{}))
 	Application.Use(home.New(&home.Config{}))
-	// Application.Use(products.New(&products.Config{}))
-	Application.Use(account.New(&account.Config{}))
-	// Application.Use(orders.New(&orders.Config{}))
-	// Application.Use(pages.New(&pages.Config{}))
+	Application.Use(account.NewWithDefault())
+	Application.Use(home.NewWithDefault())
+	Application.Use(products.NewWithDefault())
+	Application.Use(orders.NewWithDefault())
+	Application.Use(pages.NewWithDefault())
+	Application.Use(stores.NewWithDefault())
 	// Application.Use(enterprise.New(&enterprise.Config{}))
+
 	Application.Use(static.New(&static.Config{
 		Prefixs: []string{"/system"},
 		Handler: utils.FileServer(http.Dir(filepath.Join(config.Root, "public"))),

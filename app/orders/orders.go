@@ -6,12 +6,11 @@ import (
 	"html/template"
 
 	// "net/http"
-	"strconv"
+
 	"strings"
 
 	"github.com/dfang/qor-demo/config/application"
 	"github.com/dfang/qor-demo/models/orders"
-	"github.com/dfang/qor-demo/models/products"
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/dfang/qor-demo/utils/funcmapmaker"
 	"github.com/jinzhu/gorm"
@@ -415,9 +414,9 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 }
 
 func sizeVariationCollection(resource interface{}, context *qor.Context) (results [][]string) {
-	for _, sizeVariation := range products.SizeVariations() {
-		results = append(results, []string{strconv.Itoa(int(sizeVariation.ID)), sizeVariation.Stringify()})
-	}
+	// for _, sizeVariation := range products.SizeVariations() {
+	// 	results = append(results, []string{strconv.Itoa(int(sizeVariation.ID)), sizeVariation.Stringify()})
+	// }
 	return
 }
 

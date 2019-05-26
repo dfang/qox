@@ -1,2 +1,4 @@
 tmp/
 data/
+*.sh
+node_modules

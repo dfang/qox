@@ -23,6 +23,11 @@ func New(config *Config) *App {
 	return &App{Config: config}
 }
 
+// NewWithDefault New App With No Config
+func NewWithDefault() *App {
+	return &App{Config: &Config{}}
+}
+
 // App home app
 type App struct {
 	Config *Config

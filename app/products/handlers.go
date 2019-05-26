@@ -1,6 +1,7 @@
 package products
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -21,9 +22,8 @@ func (ctrl Controller) Index(w http.ResponseWriter, req *http.Request) {
 		tx       = utils.GetDB(req)
 	)
 
-	tx.Preload("Category").Find(&Products)
-
-	ctrl.View.Execute("index", map[string]interface{}{}, req, w)
+	tx.Preload("Category").Preload("ColorVariations").Find(&Products)
+	ctrl.View.Execute("index", map[string]interface{}{"Products": Products}, req, w)
 }
 
 // Gender products gender page
@@ -33,33 +33,49 @@ func (ctrl Controller) Gender(w http.ResponseWriter, req *http.Request) {
 		tx       = utils.GetDB(req)
 	)
 
-	tx.Where(&products.Product{Gender: utils.URLParam("gender", req)}).Preload("Category").Find(&Products)
-
+	tx.Where(&products.Product{Gender: strings.Title(utils.URLParam("gender", req))}).Preload("Category").Preload("ColorVariations").Find(&Products)
 	ctrl.View.Execute("gender", map[string]interface{}{"Products": Products}, req, w)
 }
 
 // Show product show page
 func (ctrl Controller) Show(w http.ResponseWriter, req *http.Request) {
 	var (
-		product        products.Product
-		colorVariation products.ColorVariation
-		codes          = strings.Split(utils.URLParam("code", req), "_")
-		productCode    = codes[0]
-		colorCode      string
-		tx             = utils.GetDB(req)
+		product         products.Product
+		variations      []products.ProductVariation
+		colorVariations []products.ColorVariation
+		sizeVariations  []products.SizeVariation
+		colorVariation  products.ColorVariation
+		codes           = strings.Split(utils.URLParam("code", req), "_")
+		productCode     = codes[0]
+		// colorCode      string
+		tx = utils.GetDB(req)
 	)
 
+	fmt.Println(codes)
+
 	if len(codes) > 1 {
-		colorCode = codes[1]
+		// colorCode = codes[1]
+		fmt.Println(codes[1])
 	}
 
 	if tx.Preload("Category").Where(&products.Product{Code: productCode}).First(&product).RecordNotFound() {
 		http.Redirect(w, req, "/", http.StatusFound)
 	}
 
-	tx.Preload("Product").Preload("Color").Preload("ColorVariations").Preload("SizeVariations.Size").Where(&products.ColorVariation{ProductID: product.ID, ColorCode: colorCode}).First(&colorVariation)
+	// tx.Preload("Product").Preload("Color").Preload("SizeVariations.Size").Where(&products.ColorVariation{ProductID: product.ID, ColorCode: colorCode}).First(&colorVariation)
 
-	ctrl.View.Execute("show", map[string]interface{}{"CurrentColorVariation": colorVariation, "CurrentProduct": product}, req, w)
+	// tx.Preload("Product").Preload("Variations").Where(&products.Product{Code: productCode})
+	tx.Where(&products.Product{Code: productCode}).Find(&product)
+
+	// SizeVariants
+	tx.Where(&products.SizeVariation{ProductID: product.ID}).Preload("Size").Find(&sizeVariations)
+
+	// ColorVariants
+	tx.Where(&products.ColorVariation{ProductID: product.ID}).Preload("Color").Find(&colorVariations)
+
+	tx.Where(&products.ProductVariation{ProductID: &product.ID}).Find(&variations)
+
+	ctrl.View.Execute("show", map[string]interface{}{"CurrentColorVariation": colorVariation, "CurrentProduct": product, "Variations": variations, "SizeVariations": sizeVariations, "ColorVariations": colorVariations}, req, w)
 }
 
 // Category category show page
@@ -75,6 +91,5 @@ func (ctrl Controller) Category(w http.ResponseWriter, req *http.Request) {
 	}
 
 	tx.Where(&products.Product{CategoryID: category.ID}).Preload("ColorVariations").Find(&Products)
-
 	ctrl.View.Execute("category", map[string]interface{}{"CategoryName": category.Name, "Products": Products}, req, w)
 }

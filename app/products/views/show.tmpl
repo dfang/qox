@@ -2,7 +2,24 @@
 <link type="text/css" rel="stylesheet" href="/dist/home_products.css" />
 
 <div class="container products__details">
-  {{with .CurrentColorVariation }}
+  {{range .Variations}}
+  11111
+  {{end}}
+  <br />
+
+  Sizes: <br />
+  {{ range .SizeVariations}}
+  {{.Size.Name}}
+  <br />
+  {{ end }}
+
+  Colors: <br />
+  {{ range .ColorVariations}}
+  {{.Color.Name}}
+  <br />
+  {{ end }}
+
+
   <div class="grid">
     <div class="grid__col is-5 products__gallery">
 
@@ -27,7 +44,6 @@
       <form id="products__addtocart" action="/cart">
         <input name="product_id" type="hidden" value="{{.ProductID}}" />
         <input name="color_variation_id" type="hidden" value="{{.ID}}" />
-
         <h1>{{.Product.Name}}</h1>
         <p class="products__meta--price">${{.Product.Price}}</p>
         <div class="products__meta--divider"></div>
@@ -47,12 +63,12 @@
           <li>
             <strong>{{ t "product.color" }}</strong>
             <select name="color_variation_id" style="display: none;">
-              {{range $index, $sv := .Product.ColorVariations }}
+              {{range $index, $sv := .ColorVariations }}
               <option value="{{$sv.ID}}" {{if eq $index 0}}selected{{end}}>{{$sv.Color.Name}}</option>
               {{end}}
             </select>
             <ul class="products__meta--color">
-              {{range $index, $sv := .Product.ColorVariations }}
+              {{range $index, $sv := .ColorVariations }}
               <li value="{{$sv.ID}}" {{if eq $index 0}}class="current selected" {{end}}>{{$sv.Color.Name}}</li>
               {{end}}
             </ul>
@@ -103,13 +119,13 @@
 
     <div class="grid__col is-12">
       <h6>{{ t "product.description" }}</h6>
-      <p>{{raw .Product.Description}}</p>
+      <p>{{raw .CurrentProduct.Description}}</p>
     </div>
 
     <div class="grid__col is-12">
       <h6>{{ t "product.specs" }}</h6>
       <div>
-        <p>{{ t "product.made_in" }} {{.Product.MadeCountry}}</p>
+        <p>{{ t "product.made_in" }} {{.CurrentProduct.MadeCountry}}</p>
       </div>
       <div>
         <p>{{ t "product.materials" }} Rubber soles, fabric uppers, plastic & metal zipper</p>
@@ -124,7 +140,6 @@
     </div>
   </div>
 
-  {{end}}
 
 
 

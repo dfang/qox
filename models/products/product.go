@@ -28,22 +28,25 @@ type Product struct {
 	l10n.Locale
 	sorting.SortingDESC
 
-	Name                  string
-	NameWithSlug          slug.Slug `l10n:"sync"`
-	Featured              bool
-	Code                  string       `l10n:"sync"`
-	CategoryID            uint         `l10n:"sync"`
-	Category              Category     `l10n:"sync"`
-	Collections           []Collection `l10n:"sync" gorm:"many2many:product_collections;"`
-	MadeCountry           string       `l10n:"sync"`
-	Gender                string       `l10n:"sync"`
-	MainImage             media_library.MediaBox
-	Price                 float32          `l10n:"sync"`
-	Description           string           `sql:"size:2000"`
-	ColorVariations       []ColorVariation `l10n:"sync"`
+	Name            string
+	NameWithSlug    slug.Slug `l10n:"sync"`
+	Featured        bool
+	Code            string       `l10n:"sync"`
+	CategoryID      uint         `l10n:"sync"`
+	Category        Category     `l10n:"sync"`
+	Collections     []Collection `l10n:"sync" gorm:"many2many:product_collections;"`
+	MadeCountry     string       `l10n:"sync"`
+	Gender          string       `l10n:"sync"`
+	MainImage       media_library.MediaBox
+	Price           float32          `l10n:"sync"`
+	Description     string           `sql:"size:2000"`
+	ColorVariations []ColorVariation `l10n:"sync"`
+
 	ColorVariationsSorter sorting.SortableCollection
 	ProductProperties     ProductProperties `sql:"type:text"`
 	Seo                   qor_seo.Setting
+
+	SizeVariations []SizeVariation `l10n:"sync"`
 
 	Variations []ProductVariation
 
@@ -231,6 +234,9 @@ func (ColorVariationImageStorage) GetSizes() map[string]*media.Size {
 
 type SizeVariation struct {
 	gorm.Model
+	ProductID uint
+	Product   Product
+
 	ColorVariationID  uint
 	ColorVariation    ColorVariation
 	SizeID            uint
