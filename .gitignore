@@ -1,4 +1,8 @@
+.vscode/
 tmp/
 data/
 *.sh
 node_modules
+qor-demo
+qor-example
+gin-bin
