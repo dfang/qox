@@ -2,7 +2,10 @@
 tmp/
 data/
 *.sh
-node_modules
+gin-bin
 qor-demo
 qor-example
-gin-bin
+config/db/seeds/enterprise
+config/db/seeds/main
+public/dist
+node_modules
