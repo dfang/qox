@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -89,9 +88,6 @@ var (
 )
 
 func init() {
-
-	fmt.Println("ROOT .....")
-	fmt.Println(Root)
 
 	if err := configor.Load(&Config, "config/database.yml", "config/smtp.yml", "config/application.yml"); err != nil {
 		panic(err)

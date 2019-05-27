@@ -42,7 +42,7 @@ func init() {
 			DB.LogMode(true)
 		}
 
-		// l10n.Global = "zh-CN"
+		l10n.Global = "zh-CN"
 
 		l10n.RegisterCallbacks(DB)
 		sorting.RegisterCallbacks(DB)
