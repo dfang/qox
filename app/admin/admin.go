@@ -1,14 +1,14 @@
 package admin
 
 import (
+	"github.com/dfang/qor-demo/config/application"
+	"github.com/dfang/qor-demo/config/i18n"
+	"github.com/dfang/qor-demo/models/settings"
 	"github.com/qor/action_bar"
 	"github.com/qor/admin"
 	"github.com/qor/help"
 	"github.com/qor/media/asset_manager"
 	"github.com/qor/media/media_library"
-	"github.com/dfang/qor-demo/config/application"
-	"github.com/dfang/qor-demo/config/i18n"
-	"github.com/dfang/qor-demo/models/settings"
 )
 
 // ActionBar admin action bar
@@ -57,6 +57,9 @@ func (app App) ConfigureApplication(application *application.Application) {
 
 	// Add Setting
 	Admin.AddResource(&settings.Setting{}, &admin.Config{Name: "Shop Setting", Menu: []string{"Site Management"}, Singleton: true, Priority: 1})
+
+	// Add Help
+	Admin.AddResource(&help.QorHelpEntry{}, &admin.Config{Name: "Help", Menu: []string{"Site Management"}, Singleton: true, Priority: 1})
 
 	SetupNotification(Admin)
 	SetupWorker(Admin)
