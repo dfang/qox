@@ -9,6 +9,7 @@ en-US:
       accessories: 'ACCESSORIES'
       help: 'HELP'
       sign_in: 'SIGN IN'
+      register: 'REGISTER'
       cart: 'CART'
       logout: "Logout"
       my_account: "MY ACCOUNT"

@@ -38,10 +38,11 @@ type Config struct {
 // ConfigureApplication configure application
 func (app App) ConfigureApplication(application *application.Application) {
 	controller := &Controller{View: render.New(&render.Config{AssetFileSystem: application.AssetFS.NameSpace("blog")}, "app/pages/views")}
-
 	funcmapmaker.AddFuncMapMaker(controller.View)
 	app.ConfigureAdmin(application.Admin)
+
 	application.Router.Get("/blog", controller.Index)
+	application.Router.Get("/{article}", controller.Show)
 }
 
 // ConfigureAdmin configure admin interface
