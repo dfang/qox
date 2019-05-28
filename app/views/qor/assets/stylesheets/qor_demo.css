@@ -61,7 +61,7 @@
 }
 
 [qor-icon-name*="Site"] > a::before {
-  content: "\e051";
+  content: "\e8b8";
 }
 
 /* Add margin to qor admin actions, see /orders */
