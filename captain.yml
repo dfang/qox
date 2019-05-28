@@ -3,5 +3,9 @@ qor-example:
   image: dfang/qor-example
   pre:
     - echo "Preparing qor-example"
+    - echo "compile templates ..."
+    - go run main.go -compile-templates=true
   post:
     - echo "Finished qor-example"
+    - echo "pushing to docker hub ..."
+    - docker push dfang/qor-example
