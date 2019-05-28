@@ -19,6 +19,7 @@ require (
 	github.com/google/go-github v17.0.0+incompatible // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/gorilla/schema v1.1.0
+	github.com/gorilla/sessions v1.1.3 // indirect
 	github.com/gosimple/slug v1.5.0 // indirect
 	github.com/headzoo/surf v1.0.0 // indirect
 	github.com/headzoo/ut v0.0.0-20181013193318-a13b5a7a02ca // indirect
@@ -26,6 +27,7 @@ require (
 	github.com/jinzhu/copier v0.0.0-20180308034124-7e38e58719c3 // indirect
 	github.com/jinzhu/gorm v1.9.8
 	github.com/jinzhu/now v1.0.0
+	github.com/joho/godotenv v1.3.0
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/manveru/gobdd v0.0.0-20131210092515-f1a17fdd710b // indirect
@@ -36,7 +38,6 @@ require (
 	github.com/qor/action_bar v0.0.0-20190314070413-136e5e2c5b8c
 	github.com/qor/activity v0.0.0-20190515035752-9e0f0a3a3da9
 	github.com/qor/admin v0.0.0-20190329022438-b2f472167d02
-	github.com/qor/amazon-pay-sdk-go v0.0.0-20181224022705-3dab13bad5fd
 	github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14
 	github.com/qor/audited v0.0.0-20171228121055-b52c9c2f0571 // indirect
 	github.com/qor/banner_editor v0.0.0-20181014061955-007b0b21481e
@@ -75,7 +76,11 @@ require (
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 // indirect
 	github.com/theplant/testingutils v0.0.0-20181126090146-80e83e84b643 // indirect
+	github.com/uber-go/zap v1.10.0
 	github.com/unrolled/render v1.0.0
 	github.com/yosssi/gohtml v0.0.0-20190128141317-9b7db94d32d9 // indirect
+	go.uber.org/atomic v1.4.0 // indirect
+	go.uber.org/multierr v1.1.0 // indirect
+	go.uber.org/zap v1.10.0
 	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
 )
