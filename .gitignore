@@ -5,6 +5,8 @@ data/
 gin-bin
 qor-demo
 qor-example
+main
+.realize.yaml
 config/db/seeds/enterprise
 config/db/seeds/main
 config/database.yml
