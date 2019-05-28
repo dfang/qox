@@ -9,13 +9,13 @@
 
   Sizes: <br />
   {{ range .SizeVariations}}
-  {{.Size.Name}}
+  {{.Size}}
   <br />
   {{ end }}
 
   Colors: <br />
   {{ range .ColorVariations}}
-  {{.Color.Name}}
+  {{.Color}}
   <br />
   {{ end }}
 
@@ -42,24 +42,11 @@
 
     <div class="grid__col is-7 products__meta">
       <form id="products__addtocart" action="/cart">
-        <input name="product_id" type="hidden" value="{{.ProductID}}" />
-        <input name="color_variation_id" type="hidden" value="{{.ID}}" />
+        <input name="product_id" type="hidden" value="{{.CurrentProduct.ID}}" />
         <h1>{{.Product.Name}}</h1>
         <p class="products__meta--price">${{.Product.Price}}</p>
         <div class="products__meta--divider"></div>
         <ul>
-          <!-- <li>
-                <strong>{{ t "product.color" }}</strong>
-                <div class="products__meta--color">
-                  <span class="selected" style="background: #F6841C"></span>
-                  <span style="background: #25A5DF"></span>
-                  <span style="background: #80DA7A"></span>
-                  <span style="background: #FFD322"></span>
-                  <span style="background: #77969E"></span>
-                  <span style="background: #2F2F2F"></span>
-                </div>
-              </li> -->
-
           <li>
             <strong>{{ t "product.color" }}</strong>
             <select name="color_variation_id" style="display: none;">

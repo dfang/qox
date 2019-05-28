@@ -187,28 +187,6 @@ func (productProperties ProductProperties) Value() (driver.Value, error) {
 	return json.Marshal(productProperties)
 }
 
-type ColorVariation struct {
-	gorm.Model
-	ProductID      uint
-	Product        Product
-	ColorID        uint
-	Color          Color
-	ColorCode      string
-	Images         media_library.MediaBox
-	SizeVariations []SizeVariation
-	publish2.SharedVersion
-}
-
-// ViewPath view path of color variation
-func (colorVariation ColorVariation) ViewPath() string {
-	defaultPath := ""
-	var product Product
-	if !db.DB.First(&product, "id = ?", colorVariation.ProductID).RecordNotFound() {
-		defaultPath = fmt.Sprintf("/products/%s_%s", product.Code, colorVariation.ColorCode)
-	}
-	return defaultPath
-}
-
 type ColorVariationImage struct {
 	gorm.Model
 	ColorVariationID uint
@@ -232,19 +210,6 @@ func (ColorVariationImageStorage) GetSizes() map[string]*media.Size {
 	}
 }
 
-type SizeVariation struct {
-	gorm.Model
-	ProductID uint
-	Product   Product
-
-	ColorVariationID  uint
-	ColorVariation    ColorVariation
-	SizeID            uint
-	Size              Size
-	AvailableQuantity uint
-	publish2.SharedVersion
-}
-
 func SizeVariations() []SizeVariation {
 	sizeVariations := []SizeVariation{}
 	if err := db.DB.Preload("ColorVariation.Color").Preload("ColorVariation.Product").Preload("Size").Find(&sizeVariations).Error; err != nil {
@@ -255,9 +220,9 @@ func SizeVariations() []SizeVariation {
 }
 
 func (sizeVariation SizeVariation) Stringify() string {
-	if colorVariation := sizeVariation.ColorVariation; colorVariation.ID != 0 {
-		product := colorVariation.Product
-		return fmt.Sprintf("%s (%s-%s-%s)", product.Name, product.Code, colorVariation.Color.Code, sizeVariation.Size.Code)
-	}
+	// if colorVariation := sizeVariation.ColorVariation; colorVariation.ID != 0 {
+	// 	product := colorVariation.Product
+	// 	return fmt.Sprintf("%s (%s-%s-%s)", product.Name, product.Code, colorVariation.Color.Code, sizeVariation.Size.Code)
+	// }
 	return fmt.Sprint(sizeVariation.ID)
 }

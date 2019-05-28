@@ -1,7 +1,8 @@
 package orders
 
 import (
-	"fmt"
+	// "fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -9,7 +10,8 @@ import (
 	"github.com/dfang/qor-demo/models/orders"
 	"github.com/dfang/qor-demo/utils"
 	"github.com/gorilla/schema"
-	amazonpay "github.com/qor/amazon-pay-sdk-go"
+
+	// amazonpay "github.com/qor/amazon-pay-sdk-go"
 	"github.com/qor/gomerchant"
 	qorrender "github.com/qor/render"
 	"github.com/qor/responder"
@@ -25,8 +27,18 @@ var decoder = schema.NewDecoder()
 
 // Cart shopping cart
 func (ctrl Controller) Cart(w http.ResponseWriter, req *http.Request) {
+	tx := utils.GetDB(req)
 	order := getCurrentOrderWithItems(w, req)
-	ctrl.View.Execute("cart", map[string]interface{}{"Order": order}, req, w)
+	log.Println("Order ID is ", order.ID)
+
+	var orderItems []orders.OrderItem
+	// tx.Where("order_id = ?", order.ID).Preload("SizeVariation").Find(&orderItems)
+	tx.Model(&order).Preload("SizeVariation.Size").Preload("ColorVariation").Find(&orderItems)
+	// tx.Model(&order).Association("SizeVariation").Find(&orderItems)
+	// tx.Where("order_id = ?", order.ID).Association("ColorVariation").Find(&orderItems)
+	log.Println("order.OrderItems count is", len(orderItems))
+
+	ctrl.View.Execute("cart", map[string]interface{}{"Order": order, "OrderItems": orderItems}, req, w)
 }
 
 // Checkout checkout shopping cart
@@ -117,11 +129,19 @@ func (ctrl Controller) UpdateCart(w http.ResponseWriter, req *http.Request) {
 	order := getCurrentOrder(w, req)
 
 	if input.Quantity > 0 {
-		tx.Where(&orders.OrderItem{OrderID: order.ID, SizeVariationID: input.SizeVariationID}).
+		tx.Where(&orders.OrderItem{
+			OrderID:          order.ID,
+			SizeVariationID:  input.SizeVariationID,
+			ColorVariationID: input.ColorVariationID,
+		}).
 			Assign(&orders.OrderItem{Quantity: input.Quantity}).
 			FirstOrCreate(&orders.OrderItem{})
 	} else {
-		tx.Where(&orders.OrderItem{OrderID: order.ID, SizeVariationID: input.SizeVariationID}).
+		tx.Where(&orders.OrderItem{
+			OrderID:          order.ID,
+			SizeVariationID:  input.SizeVariationID,
+			ColorVariationID: input.ColorVariationID,
+		}).
 			Delete(&orders.OrderItem{})
 	}
 
@@ -134,9 +154,9 @@ func (ctrl Controller) UpdateCart(w http.ResponseWriter, req *http.Request) {
 
 // AmazonCallback amazon callback
 func (ctrl Controller) AmazonCallback(w http.ResponseWriter, req *http.Request) {
-	ipn, ok := amazonpay.VerifyIPNRequest(req)
-	fmt.Printf("%#v\n", ipn)
-	fmt.Printf("%#v\n", ok)
+	// ipn, ok := amazonpay.VerifyIPNRequest(req)
+	// fmt.Printf("%#v\n", ipn)
+	// fmt.Printf("%#v\n", ok)
 }
 
 func getCurrentOrder(w http.ResponseWriter, req *http.Request) *orders.Order {

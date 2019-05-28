@@ -68,10 +68,9 @@ func (ctrl Controller) Show(w http.ResponseWriter, req *http.Request) {
 	tx.Where(&products.Product{Code: productCode}).Find(&product)
 
 	// SizeVariants
-	tx.Where(&products.SizeVariation{ProductID: product.ID}).Preload("Size").Find(&sizeVariations)
-
+	tx.Preload("Size").Where(&products.SizeVariation{ProductID: product.ID}).Find(&sizeVariations)
 	// ColorVariants
-	tx.Where(&products.ColorVariation{ProductID: product.ID}).Preload("Color").Find(&colorVariations)
+	tx.Preload("Color").Where(&products.ColorVariation{ProductID: product.ID}).Find(&colorVariations)
 
 	tx.Where(&products.ProductVariation{ProductID: &product.ID}).Find(&variations)
 

@@ -45,7 +45,8 @@ func (app App) ConfigureApplication(application *application.Application) {
 	ColorVariation.IndexAttrs("ID", "Color", "Images", "SizeVariations")
 	ColorVariation.ShowAttrs("Color", "Images", "SizeVariations")
 
-	SizeVariationMeta := ColorVariation.Meta(&admin.Meta{Name: "SizeVariations"})
+	// SizeVariationMeta := ColorVariation.Meta(&admin.Meta{Name: "SizeVariations"})
+	SizeVariationMeta := Product.Meta(&admin.Meta{Name: "SizeVariations"})
 	SizeVariation := SizeVariationMeta.Resource
 	SizeVariation.IndexAttrs("ID", "Size", "AvailableQuantity")
 	SizeVariation.ShowAttrs("ID", "Size", "AvailableQuantity")

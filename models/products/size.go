@@ -5,6 +5,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/l10n"
+	"github.com/qor/publish2"
 	"github.com/qor/sorting"
 	"github.com/qor/validations"
 )
@@ -15,6 +16,10 @@ type Size struct {
 	sorting.Sorting
 	Name string
 	Code string `l10n:"sync"`
+
+	publish2.Version
+	publish2.Schedule
+	publish2.Visible
 }
 
 func (size Size) Validate(db *gorm.DB) {

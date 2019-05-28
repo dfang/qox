@@ -225,7 +225,8 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	colorVariation.NewAttrs("-Product", "-ColorCode")
 	colorVariation.EditAttrs("-Product", "-ColorCode")
 
-	sizeVariationMeta := colorVariation.Meta(&admin.Meta{Name: "SizeVariations"})
+	// sizeVariationMeta := colorVariation.Meta(&admin.Meta{Name: "SizeVariations"})
+	sizeVariationMeta := product.Meta(&admin.Meta{Name: "SizeVariations"})
 	sizeVariation := sizeVariationMeta.Resource
 	sizeVariation.EditAttrs(
 		&admin.Section{
