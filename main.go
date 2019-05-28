@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
+	_ "github.com/joho/godotenv/autoload"
+
 	"github.com/dfang/qor-demo/config/bindatafs"
 
 	"github.com/dfang/qor-demo/app/account"
