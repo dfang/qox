@@ -9,7 +9,8 @@ import (
 	"github.com/dfang/auth/providers/google"
 	"github.com/dfang/auth/providers/twitter"
 	"github.com/jinzhu/configor"
-	amazonpay "github.com/qor/amazon-pay-sdk-go"
+
+	// amazonpay "github.com/qor/amazon-pay-sdk-go"
 	"github.com/qor/gomerchant"
 	"github.com/qor/location"
 	"github.com/qor/mailer"
@@ -32,12 +33,12 @@ type SMTPConfig struct {
 
 var Config = struct {
 	HTTPS bool `default:"false" env:"HTTPS"`
-	Port  uint `default:"8989" env:"PORT"`
+	Port  uint `default:"7000" env:"PORT"`
 	DB    struct {
 		Name     string `env:"DBName" default:"qor_example"`
-		Adapter  string `env:"DBAdapter" default:"mysql"`
+		Adapter  string `env:"DBAdapter" default:"postgres"`
 		Host     string `env:"DBHost" default:"localhost"`
-		Port     string `env:"DBPort" default:"3306"`
+		Port     string `env:"DBPort" default:"5432"`
 		User     string `env:"DBUser"`
 		Password string `env:"DBPassword"`
 	}
@@ -76,10 +77,10 @@ var Config = struct {
 
 var (
 	// Root           = os.Getenv("GOPATH") + "/src/github.com/dfang/qor-demo"
-	Root, _        = os.Getwd()
-	Mailer         *mailer.Mailer
-	Render         = render.New()
-	AmazonPay      amazonpay.AmazonPayService
+	Root, _ = os.Getwd()
+	Mailer  *mailer.Mailer
+	Render  = render.New()
+	// AmazonPay      amazonpay.AmazonPayService
 	PaymentGateway gomerchant.PaymentGateway
 	RedirectBack   = redirect_back.New(&redirect_back.Config{
 		SessionManager:  manager.SessionManager,
@@ -135,13 +136,13 @@ func init() {
 	// 	Endpoint:  Config.Qiniu.Endpoint,
 	// })
 
-	AmazonPay = amazonpay.New(&amazonpay.Config{
-		MerchantID: Config.AmazonPay.MerchantID,
-		AccessKey:  Config.AmazonPay.AccessKey,
-		SecretKey:  Config.AmazonPay.SecretKey,
-		Sandbox:    true,
-		Region:     "jp",
-	})
+	// AmazonPay = amazonpay.New(&amazonpay.Config{
+	// 	MerchantID: Config.AmazonPay.MerchantID,
+	// 	AccessKey:  Config.AmazonPay.AccessKey,
+	// 	SecretKey:  Config.AmazonPay.SecretKey,
+	// 	Sandbox:    true,
+	// 	Region:     "jp",
+	// })
 
 	// dialer := gomail.NewDialer(Config.SMTP.Host, Config.SMTP.Port, Config.SMTP.User, Config.SMTP.Password)
 	// sender, err := dialer.Dial()
