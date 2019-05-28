@@ -29,22 +29,31 @@
   text-align: center;
 }
 
-.reports .yesterday-reports, .reports .last-week-reports, .reports .this-week-reports {
+.reports .yesterday-reports,
+.reports .last-week-reports,
+.reports .this-week-reports {
   font-weight: normal;
   color: #666;
 }
 
-
 /* select many */
 
-.qor-field__selectmany .qor-microsite__containers>li .qor-microsite__containers-image span {
+.qor-field__selectmany
+  .qor-microsite__containers
+  > li
+  .qor-microsite__containers-image
+  span {
   width: calc(100% - 54px) !important;
 }
 
-.qor-field__selectmany .qor-microsite__containers>li .qor-microsite__containers-image img {
-    max-width: 42px;
-    max-height: 30px;
-    margin-right: 8px;
+.qor-field__selectmany
+  .qor-microsite__containers
+  > li
+  .qor-microsite__containers-image
+  img {
+  max-width: 42px;
+  max-height: 30px;
+  margin-right: 8px;
 }
 
 [qor-icon-name*="Pages"] > a::before {
@@ -53,4 +62,13 @@
 
 [qor-icon-name*="Site"] > a::before {
   content: "\e051";
+}
+
+/* Add margin to qor admin actions, see /orders */
+.qor-actions .qor-action--button,
+.qor-actions .qor-action--label,
+.qor-actions .qor-action--select,
+.qor-actions .qor-action--text,
+.qor-actions .qor-selector {
+  margin-right: 10px !important;
 }
