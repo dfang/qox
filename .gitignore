@@ -7,5 +7,9 @@ qor-demo
 qor-example
 config/db/seeds/enterprise
 config/db/seeds/main
+config/database.yml
+config/application.yml
+config/smtp.yml
 public/dist
 node_modules
+.env
