@@ -165,6 +165,7 @@ github.com/qor/activity v0.0.0-20190515035752-9e0f0a3a3da9 h1:hvHZYEhwMdyspYNlT1
 github.com/qor/activity v0.0.0-20190515035752-9e0f0a3a3da9/go.mod h1:qs5+ZsItuTY2atj5JS4q6yJDW9R2Fso+85pskjsQ44w=
 github.com/qor/admin v0.0.0-20190329022438-b2f472167d02 h1:SigTCCSsWEu4hNCq7gEaQ6caY/uMTS5yArPpCHsMkgk=
 github.com/qor/admin v0.0.0-20190329022438-b2f472167d02/go.mod h1:Sm5kX+Hkq1LKiFyqZJLnncUg8dWM/2roOEiy98NOUzA=
+github.com/qor/application v0.0.0-20180116135125-c0a4eb95b92f/go.mod h1:lNSPrFbu0LALcJgRFOg3l6+mKELLwzbZ6/HYa8+LYkE=
 github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14 h1:JRpyNNSRAkwNHd4WgyPcalTAhxOCh3eFNMoQkxWhjSw=
 github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14/go.mod h1:GZSCP3jIneuPsav3pXmpmJwz9ES+Fuq4ZPOUC3wwckQ=
 github.com/qor/audited v0.0.0-20171228121055-b52c9c2f0571 h1:87fy9oxrDUTN77K9VwHkmyNynRYl+Kn7HkX2HZbQYrE=

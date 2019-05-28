@@ -1,12 +1,12 @@
 package api
 
 import (
-	"github.com/dfang/qor-demo/config/application"
 	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/models/orders"
 	"github.com/dfang/qor-demo/models/products"
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/qor/admin"
+	"github.com/qor/application"
 	"github.com/qor/qor"
 )
 

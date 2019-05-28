@@ -3,13 +3,13 @@ package account
 import (
 	"strconv"
 
-	"github.com/dfang/qor-demo/config/application"
 	"github.com/dfang/qor-demo/config/auth"
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/dfang/qor-demo/utils/funcmapmaker"
 	"github.com/go-chi/chi"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
+	"github.com/qor/application"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
 	qorutils "github.com/qor/qor/utils"

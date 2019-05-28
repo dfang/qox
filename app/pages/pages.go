@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	adminapp "github.com/dfang/qor-demo/app/admin"
-	"github.com/dfang/qor-demo/config/application"
+	"github.com/qor/application"
 	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/models/blogs"
 	"github.com/dfang/qor-demo/utils/funcmapmaker"

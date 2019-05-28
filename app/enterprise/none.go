@@ -5,7 +5,7 @@ package enterprise
 import (
 	"fmt"
 
-	"github.com/dfang/qor-demo/config/application"
+	"github.com/qor/application"
 )
 
 // New new home app

@@ -9,7 +9,7 @@ import (
 
 	"strings"
 
-	"github.com/dfang/qor-demo/config/application"
+	"github.com/qor/application"
 	"github.com/dfang/qor-demo/models/orders"
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/dfang/qor-demo/utils/funcmapmaker"

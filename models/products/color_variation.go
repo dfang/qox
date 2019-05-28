@@ -1,11 +1,12 @@
 package products
 
 import (
-  "fmt"
+	"fmt"
+
+	"github.com/dfang/qor-demo/config/db"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/media/media_library"
-  "github.com/qor/publish2"
-  "github.com/dfang/qor-demo/config/db"
+	"github.com/qor/publish2"
 )
 
 type ColorVariation struct {

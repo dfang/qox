@@ -5,15 +5,15 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/dfang/qor-demo/config/db"
+	"github.com/dfang/qor-demo/config/i18n"
+	"github.com/dfang/qor-demo/models/products"
 	"github.com/qor/admin"
 	"github.com/qor/exchange"
 	"github.com/qor/exchange/backends/csv"
 	"github.com/qor/i18n/exchange_actions"
 	"github.com/qor/media/oss"
 	"github.com/qor/qor"
-	"github.com/dfang/qor-demo/config/db"
-	"github.com/dfang/qor-demo/config/i18n"
-	"github.com/dfang/qor-demo/models/products"
 	"github.com/qor/worker"
 )
 

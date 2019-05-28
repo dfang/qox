@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"html/template"
 
-	"github.com/dfang/qor-demo/config/application"
+	"github.com/qor/application"
 	"github.com/dfang/qor-demo/models/products"
 	"github.com/dfang/qor-demo/utils/funcmapmaker"
 	"github.com/jinzhu/gorm"

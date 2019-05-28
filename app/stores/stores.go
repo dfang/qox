@@ -3,7 +3,7 @@ package stores
 import (
 	"strings"
 
-	"github.com/dfang/qor-demo/config/application"
+	"github.com/qor/application"
 	"github.com/dfang/qor-demo/models/stores"
 	"github.com/qor/admin"
 	"github.com/qor/qor"

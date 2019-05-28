@@ -1,7 +1,7 @@
 package home
 
 import (
-	"github.com/dfang/qor-demo/config/application"
+	"github.com/qor/application"
 	"github.com/dfang/qor-demo/utils/funcmapmaker"
 	"github.com/qor/render"
 )

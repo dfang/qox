@@ -1,11 +1,11 @@
 package admin
 
 import (
-	"github.com/dfang/qor-demo/config/application"
 	"github.com/dfang/qor-demo/config/i18n"
 	"github.com/dfang/qor-demo/models/settings"
 	"github.com/qor/action_bar"
 	"github.com/qor/admin"
+	"github.com/qor/application"
 	"github.com/qor/help"
 	"github.com/qor/media/asset_manager"
 	"github.com/qor/media/media_library"

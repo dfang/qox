@@ -1,9 +1,9 @@
 package blogs
 
 import (
+	"github.com/dfang/qor-demo/models/users"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/publish2"
-	"github.com/dfang/qor-demo/models/users"
 )
 
 type Article struct {

@@ -38,6 +38,7 @@ require (
 	github.com/qor/action_bar v0.0.0-20190314070413-136e5e2c5b8c
 	github.com/qor/activity v0.0.0-20190515035752-9e0f0a3a3da9
 	github.com/qor/admin v0.0.0-20190329022438-b2f472167d02
+	github.com/qor/application v0.0.0-20180116135125-c0a4eb95b92f
 	github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14
 	github.com/qor/audited v0.0.0-20171228121055-b52c9c2f0571 // indirect
 	github.com/qor/banner_editor v0.0.0-20181014061955-007b0b21481e
