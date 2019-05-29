@@ -9,9 +9,13 @@ main
 .realize.yaml
 config/db/seeds/enterprise
 config/db/seeds/main
-config/database.yml
-config/application.yml
-config/smtp.yml
+
+config/*.*.yml
+config/*.yml
+!config/database.example.yml
+!config/application.example.yml
+!config/smtp.example.yml
+
 public/dist
 node_modules
 .env
