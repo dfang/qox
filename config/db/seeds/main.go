@@ -22,7 +22,8 @@ import (
 	"github.com/dfang/qor-demo/app/admin"
 	"github.com/dfang/qor-demo/config/auth"
 	"github.com/dfang/qor-demo/config/db"
-	_ "github.com/dfang/qor-demo/config/db/migrations"
+
+	// _ "github.com/dfang/qor-demo/config/db/migrations"
 	"github.com/dfang/qor-demo/models/blogs"
 	"github.com/dfang/qor-demo/models/orders"
 	"github.com/dfang/qor-demo/models/products"
@@ -64,8 +65,10 @@ var (
 	Tables       = []interface{}{
 		&auth_identity.AuthIdentity{},
 		&users.User{}, &users.Address{},
+
 		&products.Category{}, &products.Color{}, &products.Size{}, &products.Material{}, &products.Collection{},
 		&products.Product{}, &products.ProductImage{}, &products.ColorVariation{}, &products.SizeVariation{},
+
 		&stores.Store{},
 		&orders.Order{}, &orders.OrderItem{},
 		&settings.Setting{},
@@ -86,16 +89,13 @@ func main() {
 	Notification.RegisterChannel(database.New(&database.Config{}))
 	fmt.Println("Truncate tables .....")
 	TruncateTables(Tables...)
+
+	importUsers()
+
 	createRecords()
-	createRecords2()
 }
 
-func createRecords2() {
-	fmt.Println("Start create sample data...")
-	createDeliveryMen()
-}
-
-func createDeliveryMen() {
+func importUsers() {
 	for _, s := range Seeds.Users {
 		user := users.User{}
 		user.Name = s.Name
@@ -162,7 +162,6 @@ func createRecords() {
 	fmt.Println("--> Created categories.")
 	createCollections()
 	fmt.Println("--> Created collections.")
-
 	createColors()
 	fmt.Println("--> Created colors.")
 	createSizes()
@@ -365,6 +364,7 @@ func createColors() {
 		color := products.Color{}
 		color.Name = c.Name
 		color.Code = c.Code
+		color.PublishReady = true
 		if err := DraftDB.Create(&color).Error; err != nil {
 			log.Fatalf("create color (%v) failure, got err %v", color, err)
 		}
@@ -376,6 +376,7 @@ func createSizes() {
 		size := products.Size{}
 		size.Name = s.Name
 		size.Code = s.Code
+		size.PublishReady = true
 		if err := DraftDB.Create(&size).Error; err != nil {
 			log.Fatalf("create size (%v) failure, got err %v", size, err)
 		}
@@ -429,6 +430,7 @@ func createProducts() {
 				if file, err := openFileByURL(i.URL); err != nil {
 					fmt.Printf("open file (%q) failure, got err %v", i.URL, err)
 				} else {
+					fmt.Printf("file downloaded to")
 					defer file.Close()
 					image.File.Scan(file)
 				}
@@ -468,17 +470,18 @@ func createProducts() {
 			if err := DraftDB.Create(&colorVariation).Error; err != nil {
 				log.Fatalf("create color_variation (%v) failure, got err %v", colorVariation, err)
 			}
+		}
 
-			for _, sv := range p.SizeVariations {
-				size := findSizeByName(sv.SizeName)
+		for _, cv := range p.SizeVariations {
+			size := findSizeByName(cv.SizeName)
 
-				sizeVariation := products.SizeVariation{}
-				sizeVariation.ColorVariationID = colorVariation.ID
-				sizeVariation.SizeID = size.ID
-				sizeVariation.AvailableQuantity = 20
-				if err := DraftDB.Create(&sizeVariation).Error; err != nil {
-					log.Fatalf("create size_variation (%v) failure, got err %v", sizeVariation, err)
-				}
+			sizeVariation := products.SizeVariation{}
+			sizeVariation.ProductID = product.ID
+			sizeVariation.SizeID = size.ID
+			// sizeVariation.Name = size.Name
+
+			if err := DraftDB.Create(&sizeVariation).Error; err != nil {
+				log.Fatalf("create color_variation (%v) failure, got err %v", sizeVariation, err)
 			}
 		}
 
@@ -545,7 +548,14 @@ func createOrders() {
 	if err := DraftDB.Find(&sizeVariations).Error; err != nil {
 		log.Fatalf("query sizeVariations (%v) failure, got err %v", sizeVariations, err)
 	}
+
+	var colorVariations []products.ColorVariation
+	if err := DraftDB.Find(&colorVariations).Error; err != nil {
+		log.Fatalf("query colorVariations (%v) failure, got err %v", colorVariations, err)
+	}
+
 	var sizeVariationsCount = len(sizeVariations)
+	var colorVariationsCount = len(colorVariations)
 
 	for _, user := range Users {
 		count := 5
@@ -579,13 +589,16 @@ func createOrders() {
 			}
 
 			sizeVariation := sizeVariations[rand.Intn(sizeVariationsCount)]
-			product := findProductByColorVariationID(sizeVariation.ColorVariationID)
+			colorVariation := colorVariations[rand.Intn(colorVariationsCount)]
+
+			product := findProductByColorVariationID(colorVariation.ID)
 			quantity := []uint{1, 2, 3, 4, 5}[rand.Intn(10)%5]
 			discountRate := []uint{0, 5, 10, 15, 20, 25}[rand.Intn(10)%6]
 
 			orderItem := orders.OrderItem{}
 			orderItem.OrderID = order.ID
 			orderItem.SizeVariationID = sizeVariation.ID
+			orderItem.ColorVariationID = colorVariation.ID
 			orderItem.Quantity = quantity
 			orderItem.Price = product.Price
 			orderItem.State = state
@@ -765,7 +778,7 @@ func createWidgets() {
 	menCollectionWidget.Name = "men collection"
 	menCollectionWidget.Description = "Men collection baner"
 	menCollectionWidget.WidgetType = "FullWidthBannerEditor"
-	menCollectionWidget.Value.SerializedValue = `{"Value":"%3Cdiv%20class%3D%22qor-bannereditor__html%22%20style%3D%22position%3A%20relative%3B%20height%3A%20100%25%3B%22%20data-image-width%3D%221280%22%20data-image-height%3D%22480%22%3E%3Cspan%20class%3D%22qor-bannereditor-image%22%3E%3Cimg%20src%3D%22http%3A%2F%2Fqor3.s3.amazonaws.com%2Fmedialibrary%2Fmen-collection.jpg%22%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%22%20data-edit-id%3D%2212%22%20style%3D%22position%3A%20absolute%3B%20left%3A%2010.0781%25%3B%20top%3A%2018.125%25%3B%20right%3A%20auto%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%22129%22%20data-position-top%3D%2287%22%3E%3Ch1%20class%3D%22banner-title%22%20style%3D%22color%3A%20%3B%22%3EMEN%20COLLECTION%3C%2Fh1%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%22%20data-edit-id%3D%2210%22%20style%3D%22position%3A%20absolute%3B%20left%3A%209.92188%25%3B%20top%3A%2029.7917%25%3B%20right%3A%20auto%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%22127%22%20data-position-top%3D%22143%22%3E%3Ch2%20class%3D%22banner-sub-title%22%20style%3D%22color%3A%20%3B%22%3ECheck%20the%20newcomming%20collection%3C%2Fh2%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%20qor-bannereditor__draggable-left%22%20data-edit-id%3D%2211%22%20style%3D%22position%3A%20absolute%3B%20left%3A%209.92188%25%3B%20top%3A%2047.0833%25%3B%20right%3A%20auto%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%22127%22%20data-position-top%3D%22226%22%3E%3Ca%20class%3D%22button%20button__primary%20banner-button%22%20href%3D%22%23%22%3Eview%20more%3C%2Fa%3E%3C%2Fspan%3E%3C%2Fdiv%3E"}`
+	menCollectionWidget.Value.SerializedValue = `{"Value":"%3Cdiv+class%3D%22qor-bannereditor__html%22+style%3D%22position%3A+relative%3B+height%3A+100%25%3B%22+data-image-width%3D%221280%22+data-image-height%3D%22480%22%3E%3Cspan+class%3D%22qor-bannereditor-image%22%3E%3Cimg+src%3D%22http%3A%2F%2Fqor3.s3.amazonaws.com%2Fmedialibrary%2Fmen-collection.jpg%22%3E%3C%2Fspan%3E%3Cspan+class%3D%22qor-bannereditor__draggable%22+data-edit-id%3D%2212%22+style%3D%22position%3A+absolute%3B+left%3A+10.0781%25%3B+top%3A+18.125%25%3B+right%3A+auto%3B+bottom%3A+auto%3B%22+data-position-left%3D%22129%22+data-position-top%3D%2287%22%3E%3Ch1+class%3D%22banner-title%22+style%3D%22color%3A+%3B%22%3EMEN+COLLECTION%3C%2Fh1%3E%3C%2Fspan%3E%3Cspan+class%3D%22qor-bannereditor__draggable%22+data-edit-id%3D%2210%22+style%3D%22position%3A+absolute%3B+left%3A+9.92188%25%3B+top%3A+29.7917%25%3B+right%3A+auto%3B+bottom%3A+auto%3B%22+data-position-left%3D%22127%22+data-position-top%3D%22143%22%3E%3Ch2+class%3D%22banner-sub-title%22+style%3D%22color%3A+%3B%22%3ECheck+the+newcomming+collection%3C%2Fh2%3E%3C%2Fspan%3E%3Cspan+class%3D%22qor-bannereditor__draggable+qor-bannereditor__draggable-left%22+data-edit-id%3D%2211%22+style%3D%22position%3A+absolute%3B+left%3A+9.92188%25%3B+top%3A+47.0833%25%3B+right%3A+auto%3B+bottom%3A+auto%3B%22+data-position-left%3D%22127%22+data-position-top%3D%22226%22%3E%3Ca+class%3D%22button+button__primary+banner-button%22+href%3D%22%2Fmen%22%3Eview+more%3C%2Fa%3E%3C%2Fspan%3E%3C%2Fdiv%3E"}`
 	if err := DraftDB.Create(&menCollectionWidget).Error; err != nil {
 		log.Fatalf("Save widget (%v) failure, got err %v", menCollectionWidget, err)
 	}
@@ -775,7 +788,7 @@ func createWidgets() {
 	womenCollectionWidget.Name = "women collection"
 	womenCollectionWidget.Description = "Women collection banner"
 	womenCollectionWidget.WidgetType = "FullWidthBannerEditor"
-	womenCollectionWidget.Value.SerializedValue = `{"Value":"%3Cdiv%20class%3D%22qor-bannereditor__html%22%20style%3D%22position%3A%20relative%3B%20height%3A%20100%25%3B%22%20data-image-width%3D%221280%22%20data-image-height%3D%22480%22%3E%3Cspan%20class%3D%22qor-bannereditor-image%22%3E%3Cimg%20src%3D%22http%3A%2F%2Fqor3.s3.amazonaws.com%2Fmedialibrary%2Fwomen-collection.jpg%22%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%22%20data-edit-id%3D%2223%22%20style%3D%22position%3A%20absolute%3B%20left%3A%2010.0781%25%3B%20top%3A%2018.125%25%3B%20right%3A%20auto%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%22129%22%20data-position-top%3D%2287%22%3E%3Ch1%20class%3D%22banner-title%22%20style%3D%22color%3A%20%3B%22%3EWOMEN%20COLLECTION%3C%2Fh1%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%22%20data-edit-id%3D%2221%22%20style%3D%22position%3A%20absolute%3B%20left%3A%209.92188%25%3B%20top%3A%2029.7917%25%3B%20right%3A%20auto%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%22127%22%20data-position-top%3D%22143%22%3E%3Ch2%20class%3D%22banner-sub-title%22%20style%3D%22color%3A%20%3B%22%3ECheck%20the%20newcomming%20collection%3C%2Fh2%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%20qor-bannereditor__draggable-left%22%20data-edit-id%3D%2222%22%20style%3D%22position%3A%20absolute%3B%20left%3A%209.92188%25%3B%20top%3A%2047.0833%25%3B%20right%3A%20auto%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%22127%22%20data-position-top%3D%22226%22%3E%3Ca%20class%3D%22button%20button__primary%20banner-button%22%20href%3D%22%23%22%3Eview%20more%3C%2Fa%3E%3C%2Fspan%3E%3C%2Fdiv%3E"}`
+	womenCollectionWidget.Value.SerializedValue = `{"Value":"%3Cdiv+class%3D%22qor-bannereditor__html%22+style%3D%22position%3A+relative%3B+height%3A+100%25%3B%22+data-image-width%3D%221280%22+data-image-height%3D%22480%22%3E%3Cspan+class%3D%22qor-bannereditor-image%22%3E%3Cimg+src%3D%22http%3A%2F%2Fqor3.s3.amazonaws.com%2Fmedialibrary%2Fwomen-collection.jpg%22%3E%3C%2Fspan%3E%3Cspan+class%3D%22qor-bannereditor__draggable%22+data-edit-id%3D%2223%22+style%3D%22position%3A+absolute%3B+left%3A+10.0781%25%3B+top%3A+18.125%25%3B+right%3A+auto%3B+bottom%3A+auto%3B%22+data-position-left%3D%22129%22+data-position-top%3D%2287%22%3E%3Ch1+class%3D%22banner-title%22+style%3D%22color%3A+%3B%22%3EWOMEN+COLLECTION%3C%2Fh1%3E%3C%2Fspan%3E%3Cspan+class%3D%22qor-bannereditor__draggable%22+data-edit-id%3D%2221%22+style%3D%22position%3A+absolute%3B+left%3A+9.92188%25%3B+top%3A+29.7917%25%3B+right%3A+auto%3B+bottom%3A+auto%3B%22+data-position-left%3D%22127%22+data-position-top%3D%22143%22%3E%3Ch2+class%3D%22banner-sub-title%22+style%3D%22color%3A+%3B%22%3ECheck+the+newcomming+collection%3C%2Fh2%3E%3C%2Fspan%3E%3Cspan+class%3D%22qor-bannereditor__draggable+qor-bannereditor__draggable-left%22+data-edit-id%3D%2222%22+style%3D%22position%3A+absolute%3B+left%3A+9.92188%25%3B+top%3A+47.0833%25%3B+right%3A+auto%3B+bottom%3A+auto%3B%22+data-position-left%3D%22127%22+data-position-top%3D%22226%22%3E%3Ca+class%3D%22button+button__primary+banner-button%22+href%3D%22%2Fwomen%22%3Eview+more%3C%2Fa%3E%3C%2Fspan%3E%3C%2Fdiv%3E"}`
 	if err := DraftDB.Create(&womenCollectionWidget).Error; err != nil {
 		log.Fatalf("Save widget (%v) failure, got err %v", womenCollectionWidget, err)
 	}
@@ -918,6 +931,7 @@ func openFileByURL(rawURL string) (*os.File, error) {
 		fileName := segments[len(segments)-1]
 
 		filePath := filepath.Join(os.TempDir(), fileName)
+		fmt.Println("filepath for openFileByURL is ", filePath)
 
 		if _, err := os.Stat(filePath); err == nil {
 			return os.Open(filePath)
