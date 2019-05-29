@@ -40,7 +40,7 @@ require (
 	github.com/qor/admin v0.0.0-20190329022438-b2f472167d02
 	github.com/qor/application v0.0.0-20180116135125-c0a4eb95b92f
 	github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14
-	github.com/qor/audited v0.0.0-20171228121055-b52c9c2f0571 // indirect
+	github.com/qor/audited v0.0.0-20171228121055-b52c9c2f0571
 	github.com/qor/banner_editor v0.0.0-20181014061955-007b0b21481e
 	github.com/qor/cache v0.0.0-20171031031927-c9d48d1f13ba // indirect
 	github.com/qor/exchange v0.0.0-20190327035204-59574e5febf0
@@ -51,7 +51,7 @@ require (
 	github.com/qor/location v0.0.0-20181014061834-8c618bfef8ed
 	github.com/qor/mailer v0.0.0-20180329083248-0555e49f99ac
 	github.com/qor/media v0.0.0-20190416085522-c3220db68c4b
-	github.com/qor/middlewares v0.0.0-20170822143614-781378b69454
+	github.com/qor/middlewares v0.0.0-20170822143614-781378b69454 // indirect
 	github.com/qor/notification v0.0.0-20181014061619-c4c002490b78
 	github.com/qor/oss v0.0.0-20190402010455-71d287b85d1e
 	github.com/qor/page_builder v0.0.0-20181014061530-387c92091d7b
@@ -70,7 +70,7 @@ require (
 	github.com/qor/transition v0.0.0-20171031101107-4015a3eee19c
 	github.com/qor/validations v0.0.0-20171228122639-f364bca61b46
 	github.com/qor/widget v0.0.0-20190314070448-e280f6f16615
-	github.com/qor/wildcard_router v0.0.0-20171031035524-56710e5bb5a4
+	github.com/qor/wildcard_router v0.0.0-20171031035524-56710e5bb5a4 // indirect
 	github.com/qor/worker v0.0.0-20190409083615-5c9381791cdc
 	github.com/rainycape/unidecode v0.0.0-20150907023854-cb7f23ec59be // indirect
 	github.com/tealeg/xlsx v1.0.3 // indirect

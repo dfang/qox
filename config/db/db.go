@@ -7,11 +7,12 @@ import (
 
 	"github.com/jinzhu/gorm"
 
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	// _ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	// _ "github.com/jinzhu/gorm/dialects/sqlite"
 
 	"github.com/dfang/qor-demo/config"
+	"github.com/qor/audited"
 	"github.com/qor/l10n"
 	"github.com/qor/media"
 	"github.com/qor/publish2"
@@ -74,6 +75,7 @@ func init() {
 		l10n.RegisterCallbacks(DB)
 		sorting.RegisterCallbacks(DB)
 		validations.RegisterCallbacks(DB)
+		audited.RegisterCallbacks(DB)
 		media.RegisterCallbacks(DB)
 		publish2.RegisterCallbacks(DB)
 	} else {

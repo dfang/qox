@@ -7,6 +7,7 @@ import (
 
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/jinzhu/gorm"
+	"github.com/qor/audited"
 	"github.com/qor/transition"
 )
 
@@ -20,6 +21,8 @@ const (
 
 type Order struct {
 	gorm.Model
+	audited.AuditedModel
+
 	UserID            *uint
 	User              users.User
 	PaymentAmount     float32
