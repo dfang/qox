@@ -9,13 +9,13 @@ import (
 
 	"strings"
 
-	"github.com/qor/application"
 	"github.com/dfang/qor-demo/models/orders"
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/dfang/qor-demo/utils/funcmapmaker"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/activity"
 	"github.com/qor/admin"
+	"github.com/qor/application"
 	"github.com/qor/qor"
 	"github.com/qor/render"
 	"github.com/qor/transition"
@@ -103,9 +103,10 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	}
 
 	order.Scope(&admin.Scope{
-		Name:  "Today",
-		Label: "Today",
-		Group: "Filter By Date",
+		Name:    "Today",
+		Label:   "Today",
+		Default: true,
+		Group:   "Filter By Date",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 			return db.Where(orders.Order{})
 		},
