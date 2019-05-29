@@ -15,7 +15,12 @@ import (
 var I18n *i18n.I18n
 
 func init() {
-	I18n = i18n.New(database.New(db.DB), yaml.New(filepath.Join(config.Root, "config/locales")))
+	// I18n will look up the translation in order
+	// I18n = i18n.New(database.New(db.DB), yaml.New(filepath.Join(config.Root, "config/locales")))
+	I18n = i18n.New(
+		database.New(db.DB),
+		yaml.New(filepath.Join(config.Root, "config/locales")),
+	)
 	// I18n.AddTranslation(&i18n.Translation{Key: "qor_admin.menus.Dashboard", Locale: "en-US", Value: "dashbord"})
 	// I18n.AddTranslation(&i18n.Translation{Key: "qor_admin.menus.Dashboard", Locale: "zh-CN", Value: "控制面板"})
 }
