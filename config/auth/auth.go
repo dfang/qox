@@ -1,18 +1,25 @@
 package auth
 
-import "github.com/dfang/qor-demo/config/bindatafs"
-
 import (
 	"time"
 
-	"github.com/dfang/qor-demo/config"
-	"github.com/dfang/qor-demo/config/db"
-	"github.com/dfang/qor-demo/models/users"
 	"github.com/dfang/auth"
 	"github.com/dfang/auth/authority"
 	"github.com/dfang/auth_themes/clean"
+	"github.com/dfang/qor-demo/config"
+	"github.com/dfang/qor-demo/config/bindatafs"
+	"github.com/dfang/qor-demo/config/db"
+	"github.com/dfang/qor-demo/models/users"
 	"github.com/qor/render"
 )
+
+// // AdminRedirector redirector
+// type AdminRedirector struct{}
+
+// // Redirect always redirect to /admin
+// func (cr AdminRedirector) Redirect(w http.ResponseWriter, req *http.Request, action string) {
+// 	http.Redirect(w, req, "/admin", 301)
+// }
 
 var (
 	// Auth initialize Auth for Authentication
@@ -22,6 +29,7 @@ var (
 		Render:     render.New(&render.Config{AssetFileSystem: bindatafs.AssetFS.NameSpace("auth")}),
 		UserModel:  users.User{},
 		Redirector: auth.Redirector{RedirectBack: config.RedirectBack},
+		// Redirector: AdminRedirector{},
 	})
 
 	// Authority initialize Authority for Authorization
