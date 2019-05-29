@@ -2,6 +2,7 @@ package account
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/dfang/qor-demo/config/auth"
 	"github.com/dfang/qor-demo/models/users"
@@ -85,10 +86,22 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	user.Meta(&admin.Meta{Name: "DefaultBillingAddress", Config: &admin.SelectOneConfig{Collection: userAddressesCollection}})
 	user.Meta(&admin.Meta{Name: "DefaultShippingAddress", Config: &admin.SelectOneConfig{Collection: userAddressesCollection}})
 
+	for _, role := range []string{"admin", "operator", "setup_man", "delivery_man"} {
+		var role = role
+		user.Scope(&admin.Scope{
+			Name:  role,
+			Label: strings.Title(strings.Replace(role, "_", " ", -1)),
+			Group: "Filter By Role",
+			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+				return db.Where(users.User{Role: role})
+			},
+		})
+	}
+
 	user.Filter(&admin.Filter{
 		Name: "Role",
 		Config: &admin.SelectOneConfig{
-			Collection: []string{"Admin", "Maintainer", "Member"},
+			Collection: []string{"admin", "operator", "setup_man", "delivery_man"},
 		},
 	})
 
@@ -127,8 +140,9 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	)
 	user.EditAttrs(user.ShowAttrs())
 
-	// Add deliveryMen menu
-	// Admin.AddMenu(&admin.Menu{Name: "User Management", Priority: 3})
+	// user.UseTheme("grid")
+
+	// Add deliveryMen submenu
 	deliveryMan := Admin.AddResource(&users.User{}, &admin.Config{Name: "Delivery Men", Menu: []string{"User Management"}})
 	deliveryMan.Scope(&admin.Scope{
 		Default: true,
@@ -137,11 +151,21 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		},
 	})
 
+	// Add  submenu
 	setupMan := Admin.AddResource(&users.User{}, &admin.Config{Name: "Setup Men", Menu: []string{"User Management"}})
 	setupMan.Scope(&admin.Scope{
 		Default: true,
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 			return db.Where("role = ?", "setup_man")
+		},
+	})
+
+	// Add  submenu
+	operator := Admin.AddResource(&users.User{}, &admin.Config{Name: "Operator", Menu: []string{"User Management"}})
+	operator.Scope(&admin.Scope{
+		Default: true,
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("role = ?", "operator")
 		},
 	})
 
