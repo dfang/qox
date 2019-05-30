@@ -89,7 +89,16 @@ users:
       carlicensetype: C1
       iscasual: true
       jdappuser:
-
+    - name: 朱大平
+      role: operator
+      gender: 男
+      identitycardnum: 360424198404014718
+      mobilephone: 18000235388
+      carlicenceplatenum: 赣•G86U13
+      cartype: 东风面包
+      carlicensetype: C1
+      iscasual: true
+      jdappuser:
 
 
 
