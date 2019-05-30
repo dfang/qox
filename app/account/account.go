@@ -61,7 +61,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	user := Admin.AddResource(&users.User{}, &admin.Config{Menu: []string{"User Management"}})
 	user.Meta(&admin.Meta{Name: "Gender", Config: &admin.SelectOneConfig{Collection: []string{"Male", "Female", "Unknown"}}})
 	user.Meta(&admin.Meta{Name: "Birthday", Type: "date"})
-	user.Meta(&admin.Meta{Name: "Role", Config: &admin.SelectOneConfig{Collection: []string{"Admin", "Maintainer", "Member"}}})
+	user.Meta(&admin.Meta{Name: "Role", Config: &admin.SelectOneConfig{Collection: []string{"admin", "operator", "setup_man", "delivery_man"}}})
 	user.Meta(&admin.Meta{Name: "Password",
 		Type:   "password",
 		Valuer: func(interface{}, *qor.Context) interface{} { return "" },
