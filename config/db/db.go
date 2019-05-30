@@ -12,6 +12,7 @@ import (
 	// _ "github.com/jinzhu/gorm/dialects/sqlite"
 
 	"github.com/dfang/qor-demo/config"
+	// "github.com/dfang/qor-demo/config/logger"
 	"github.com/qor/audited"
 	"github.com/qor/l10n"
 	"github.com/qor/media"
@@ -30,6 +31,7 @@ func init() {
 
 	// logger, _ := zap.NewDevelopment()
 	// logger.Info("Hello zap", zap.String("key", "value"), zap.Time("now", time.Now()))
+	// logger.Logger.Info("Hello zap", zap.String("key", "value"), zap.Time("now", time.Now()))
 
 	dbConfig := config.Config.DB
 	Logger, _ := zap.NewDevelopment()
