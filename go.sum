@@ -249,8 +249,6 @@ github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 h1:yPrgt
 github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967/go.mod h1:86iN4EAYaQbx1VTW5uPslTIviRkYH8CzslMC//g+BgY=
 github.com/theplant/testingutils v0.0.0-20181126090146-80e83e84b643 h1:IivHPVtkegTYZlK856QRSsRgWnwGq/0mAv4mUWEEE30=
 github.com/theplant/testingutils v0.0.0-20181126090146-80e83e84b643/go.mod h1:p22Q3Bg5ML+hdI3QSQkB/pZ2+CjfOnGugoQIoyE2Ub8=
-github.com/uber-go/zap v1.10.0 h1:4pFX6Frb+nVIH8QS73XEiyPcKrJ/C25Z2xpudBIlOnE=
-github.com/uber-go/zap v1.10.0/go.mod h1:GY+83l3yxBcBw2kmHu/sAWwItnTn+ynxHCRo+WiIQOY=
 github.com/ugorji/go v1.1.4 h1:j4s+tAvLfL3bZyefP2SEWmhBzmuIlH/eqNuPdFPgngw=
 github.com/ugorji/go v1.1.4/go.mod h1:uQMGLiO92mf5W77hV/PUCpI3pbzQx3CRekS0kk+RGrc=
 github.com/unrolled/render v1.0.0 h1:XYtvhA3UkpB7PqkvhUFYmpKD55OudoIeygcfus4vcd4=

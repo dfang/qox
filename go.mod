@@ -77,7 +77,6 @@ require (
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 // indirect
 	github.com/theplant/testingutils v0.0.0-20181126090146-80e83e84b643 // indirect
-	github.com/uber-go/zap v1.10.0
 	github.com/unrolled/render v1.0.0
 	github.com/yosssi/gohtml v0.0.0-20190128141317-9b7db94d32d9 // indirect
 	go.uber.org/atomic v1.4.0 // indirect
