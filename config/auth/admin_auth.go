@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/dfang/qor-demo/models/users"
 	"github.com/qor/admin"
 	"github.com/qor/qor"
-	"github.com/dfang/qor-demo/models/users"
 	"github.com/qor/roles"
 )
 
