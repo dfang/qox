@@ -5,6 +5,7 @@ qor-example:
     - echo "Preparing qor-example"
     - echo "compile templates ..."
     - go run main.go -compile-templates=true
+    - npm run build
   post:
     - echo "Finished qor-example"
     - echo "pushing to docker hub ..."

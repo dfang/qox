@@ -66,6 +66,11 @@ func (app App) ConfigureApplication(application *application.Application) {
 	SetupSEO(Admin)
 	SetupWidget(Admin)
 	SetupDashboard(Admin)
-
 	application.Router.Mount(app.Config.Prefix, Admin.NewServeMux(app.Config.Prefix))
+
+	// TODO: Investigate why Admin.MountTo not works
+	// mux := http.NewServeMux()
+	// Admin.MountTo("/admin", mux)
+	// Admin.MountTo("/admin", application.Router)
+	// application.Router.Mount("/admin", Admin.NewServeMux("/admin"))
 }

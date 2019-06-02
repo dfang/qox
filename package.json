@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "gulp watch",
-    "dist": "rimraf public/dist/* && NODE_ENV=production gulp"
+    "build": "rimraf public/dist/* && NODE_ENV=production gulp build"
   },
   "author": "Jason weng",
   "repository": "https://github.com/dfang/qor-demo",
