@@ -23,6 +23,8 @@ RUN mkdir /go-app
 WORKDIR /go-app
 COPY --from=build-step /go/bin/qor-example /go-app/qor-example
 COPY --from=build-step /go/bin/seeds /go-app/seeds
-
+EXPOSE 7000
+COPY app ./app
+COPY config/locales ./config/locales
 CMD ["/go-app/qor-example"]
 

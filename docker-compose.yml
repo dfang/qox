@@ -2,36 +2,24 @@ version: '3.6'
 
 services:
 
-  db:
+  postgres:
     image: postgres:10.4
     restart: always
     environment:
-      # POSTGRES_PASSWORD: example
-      POSTGRES_DB: qor_example
-      POSTGRES_USER: adminer
-      POSTGRES_PASSWORD: adminer
+      POSTGRES_DB: qor-demo
     volumes:
-      - ./data:/var/lib/postgresql/data/
-    ports:
-      - 5432:5432
-
-  adminer:
-    image: adminer
-    restart: always
-    depends_on:
-      - db
-    ports:
-      - 8080:8080
+      - ./data:/var/lib/postgresql/data
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   graphql-engine:
     image: hasura/graphql-engine:v1.0.0-alpha41
     ports:
       - "18080:8080"
     depends_on:
-      - db
+      - "postgres"
     restart: always
     environment:
-      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:@postgres:5432/xsjd
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:@postgres:5432/qor-demo
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
       HASURA_GRAPHQL_ADMIN_SECRET: "admin"
     command:
@@ -39,8 +27,16 @@ services:
       - serve
       - --enable-console
 
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+
   qor:
-    image: dfang/qor-example:latest
+    image: dfang/qor-demo:develop
     # build:
     #   context: .
     command: ["./qor-example"]
@@ -48,7 +44,7 @@ services:
     # command: [ "go", "run", "config/db/seeds/main.go", "config/db/seeds/seeds.go" ]
     restart: always
     depends_on:
-      - db
+      - postgres
     # environment:
     #   QOR_AWS_ACCESS_KEY_ID: AKIAI3Z7SFTABSJQSLDQ
     #   QOR_AWS_SECRET_ACCESS_KEY: secret
