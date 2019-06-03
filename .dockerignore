@@ -15,5 +15,9 @@ public/downloads
 node_modules
 data
 
+config/database.yml
+config/database.prod.yml
+config/application.yml
+
 Dockerfile
 captain.yml
