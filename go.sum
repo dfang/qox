@@ -167,8 +167,6 @@ github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14 h1:JRpyNNSRAkwNHd4WgyP
 github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14/go.mod h1:GZSCP3jIneuPsav3pXmpmJwz9ES+Fuq4ZPOUC3wwckQ=
 github.com/qor/audited v0.0.0-20171228121055-b52c9c2f0571 h1:87fy9oxrDUTN77K9VwHkmyNynRYl+Kn7HkX2HZbQYrE=
 github.com/qor/audited v0.0.0-20171228121055-b52c9c2f0571/go.mod h1:XQ/SY+Bgd2pHTAQhsSwN7KoCJSr8jJVnUqDMPk9rhYk=
-github.com/qor/auth_themes v0.0.0-20190103025702-000e8ac9b42d h1:Dp3/5A9jw3G56Pc40QSrcW8NlHYEBE0EFZImsqSqwDQ=
-github.com/qor/auth_themes v0.0.0-20190103025702-000e8ac9b42d/go.mod h1:sbQN/eJ8JzTcYRoFlgzuf7UeEfqqpvCYDBHOveC+Ktw=
 github.com/qor/cache v0.0.0-20171031031927-c9d48d1f13ba h1:XBEqqX1xirq3pYMGw8Jr0urCfhPXbJEh1KPwKLd24MM=
 github.com/qor/cache v0.0.0-20171031031927-c9d48d1f13ba/go.mod h1:DvjFc9BNYPuokuaZVaXvVukLqqkYDlToNC+Gszv3oRs=
 github.com/qor/exchange v0.0.0-20190327035204-59574e5febf0 h1:hbIcWpUU+dmYS+oba+tcmng6Hf7q7bR2v/n/FcfcMfM=
@@ -237,6 +235,8 @@ gitlab.com/qor2/admin v0.0.0-20190603120644-fda02ae33deb h1:UUMl8ocv81DHKIG46gt6
 gitlab.com/qor2/admin v0.0.0-20190603120644-fda02ae33deb/go.mod h1:ny4bcpRWM/KtyRSPewOhUisgkhFpS0BJdbMrQzKDUKo=
 gitlab.com/qor2/auth v0.0.0-20190603032202-1797e2b5fa11 h1:TaiAjO2Pntu70DBTcet0Feb6jpqGsRY3Uu/1QqNFoj4=
 gitlab.com/qor2/auth v0.0.0-20190603032202-1797e2b5fa11/go.mod h1:YxCUckwV5zSJl6Oiu8jWffiOV0e0DaFnaKsUB2qS8WE=
+gitlab.com/qor2/auth_themes v0.0.0-20190603145640-1e6527d4761a h1:6l2Um+hY7iUHGIZfBK0aQqL65fIEZ78jGdyswsbmje0=
+gitlab.com/qor2/auth_themes v0.0.0-20190603145640-1e6527d4761a/go.mod h1:d1RPkyBxNKuBsHFN7DG1NQZmNRwNIy6rzmVEO5NnP2A=
 gitlab.com/qor2/banner_editor v0.0.0-20190603113758-d987fd7c3c72 h1:LtL6WacaKFCYQQw9hoXdpqyEIS+xB3m+Nowuo7Y/zII=
 gitlab.com/qor2/banner_editor v0.0.0-20190603113758-d987fd7c3c72/go.mod h1:a+MxgQCRzkSenzBSnZ2t65vi+dCEH3vJQ3vmUz6M/Fw=
 gitlab.com/qor2/help v0.0.0-20190603113808-4e14e68ed597 h1:YjrY9vLtLWq5aCWKjkFHwbaigvDS9/eQmOYMoBOZPEM=

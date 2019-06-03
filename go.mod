@@ -90,6 +90,8 @@ replace github.com/qor/admin v0.0.0-20190525133731-6329506ec305 => gitlab.com/qo
 
 replace github.com/qor/auth v0.0.0-20190103025640-46aae9fa92fa => gitlab.com/qor2/auth v0.0.0-20190603032202-1797e2b5fa11
 
+replace github.com/qor/auth_themes v0.0.0-20190103025702-000e8ac9b42d => gitlab.com/qor2/auth_themes v0.0.0-20190603145640-1e6527d4761a
+
 replace github.com/qor/banner_editor v0.0.0-20181014061955-007b0b21481e => gitlab.com/qor2/banner_editor v0.0.0-20190603113758-d987fd7c3c72
 
 replace github.com/qor/help v0.0.0-20171031093129-202965d1156a => gitlab.com/qor2/help v0.0.0-20190603113808-4e14e68ed597
