@@ -17,11 +17,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qor/auth/auth_identity"
-	"github.com/qor/auth/providers/password"
 	"github.com/dfang/qor-demo/app/admin"
 	"github.com/dfang/qor-demo/config/auth"
 	"github.com/dfang/qor-demo/config/db"
+	"github.com/qor/auth/auth_identity"
+	"github.com/qor/auth/providers/password"
 
 	// _ "github.com/dfang/qor-demo/config/db/migrations"
 	"github.com/dfang/qor-demo/models/blogs"
@@ -557,6 +557,9 @@ func createOrders() {
 
 	var sizeVariationsCount = len(sizeVariations)
 	var colorVariationsCount = len(colorVariations)
+
+	fmt.Println("sizeVariationsCount", sizeVariationsCount)
+	fmt.Println("colorVariationsCount", colorVariationsCount)
 
 	for _, user := range Users {
 		count := 5
