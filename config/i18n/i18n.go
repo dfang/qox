@@ -21,8 +21,8 @@ func init() {
 	log.Debug().Str("locales", "locales").Msg(filepath.Join(config.Root, "config/locales"))
 
 	I18n = i18n.New(
-		database.New(db.DB),
 		yaml.New(filepath.Join(config.Root, "config/locales")),
+		database.New(db.DB),
 	)
 	// I18n.AddTranslation(&i18n.Translation{Key: "qor_admin.menus.Dashboard", Locale: "en-US", Value: "dashbord"})
 	// I18n.AddTranslation(&i18n.Translation{Key: "qor_admin.menus.Dashboard", Locale: "zh-CN", Value: "控制面板"})
