@@ -3,7 +3,7 @@ package migrations
 import (
 	"fmt"
 
-	"github.com/dfang/auth/auth_identity"
+	"github.com/qor/auth/auth_identity"
 	"github.com/dfang/qor-demo/app/admin"
 	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/models/blogs"

@@ -4,10 +4,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/dfang/auth/providers/facebook"
-	"github.com/dfang/auth/providers/github"
-	"github.com/dfang/auth/providers/google"
-	"github.com/dfang/auth/providers/twitter"
+	"github.com/qor/auth/providers/facebook"
+	"github.com/qor/auth/providers/github"
+	"github.com/qor/auth/providers/google"
+	"github.com/qor/auth/providers/twitter"
 	"github.com/jinzhu/configor"
 
 	// amazonpay "github.com/qor/amazon-pay-sdk-go"
@@ -16,9 +16,9 @@ import (
 	"github.com/qor/mailer"
 	"github.com/qor/mailer/logger"
 	"github.com/qor/media/oss"
-	"github.com/qor/oss/s3"
 
 	// "github.com/qor/oss/qiniu"
+	"github.com/qor/oss/s3"
 	"github.com/qor/redirect_back"
 	"github.com/qor/session/manager"
 	"github.com/unrolled/render"
@@ -97,27 +97,27 @@ func init() {
 	location.GoogleAPIKey = Config.GoogleAPIKey
 	location.BaiduAPIKey = Config.BaiduAPIKey
 
-	// log.Println(Config.S3)
+	log.Println(Config.Qiniu)
 
-	if Config.S3.AccessKeyID == "" {
-		log.Println("Please set env QOR_AWS_ACCESS_KEY_ID")
-		os.Exit(1)
-	}
+	// if Config.S3.AccessKeyID == "" {
+	// 	log.Println("Please set env QOR_AWS_ACCESS_KEY_ID")
+	// 	os.Exit(1)
+	// }
 
-	if Config.S3.SecretAccessKey == "" {
-		log.Println("Please set env QOR_AWS_SECRET_ACCESS_KEY")
-		os.Exit(1)
-	}
+	// if Config.S3.SecretAccessKey == "" {
+	// 	log.Println("Please set env QOR_AWS_SECRET_ACCESS_KEY")
+	// 	os.Exit(1)
+	// }
 
-	if Config.S3.Region == "" {
-		log.Println("Please set env QOR_AWS_REGION")
-		os.Exit(1)
-	}
+	// if Config.S3.Region == "" {
+	// 	log.Println("Please set env QOR_AWS_REGION")
+	// 	os.Exit(1)
+	// }
 
-	if Config.S3.S3Bucket == "" {
-		log.Println("Please set env QOR_AWS_BUCKET")
-		os.Exit(1)
-	}
+	// if Config.S3.S3Bucket == "" {
+	// 	log.Println("Please set env QOR_AWS_BUCKET")
+	// 	os.Exit(1)
+	// }
 
 	if Config.S3.AccessKeyID != "" {
 		oss.Storage = s3.New(&s3.Config{

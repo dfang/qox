@@ -3,9 +3,9 @@ package auth
 import (
 	"time"
 
-	"github.com/dfang/auth"
-	"github.com/dfang/auth/authority"
-	"github.com/dfang/auth_themes/clean"
+	"github.com/qor/auth"
+	"github.com/qor/auth/authority"
+	"github.com/qor/auth_themes/clean"
 	"github.com/dfang/qor-demo/config"
 	"github.com/dfang/qor-demo/config/bindatafs"
 	"github.com/dfang/qor-demo/config/db"
