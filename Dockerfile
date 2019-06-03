@@ -5,8 +5,24 @@ FROM golang:1.12.5 as build-step
 
 RUN mkdir /go-app
 WORKDIR /go-app
+COPY go.mod .
+COPY go.sum .
+ENV GOPROXY=https://goproxy.io
+RUN go mod download
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags 'bindatafs' -o /go-app/qor-example
-# RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/bin/seeds config/db/seeds/main.go config/db/seeds/seeds.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags 'bindatafs' -o /go/bin/qor-example
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/bin/seeds config/db/seeds/main.go config/db/seeds/seeds.go
+
+# -----------------------------------------------------------------------------
+# step 2: exec
+FROM phusion/baseimage:0.11
+# FROM golang:1.12.5
+
+RUN mkdir /go-app
+WORKDIR /go-app
+COPY --from=build-step /go/bin/qor-example /go-app/qor-example
+COPY --from=build-step /go/bin/seeds /go-app/seeds
+
 CMD ["/go-app/qor-example"]
+
