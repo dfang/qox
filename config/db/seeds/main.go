@@ -17,8 +17,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dfang/auth/auth_identity"
-	"github.com/dfang/auth/providers/password"
+	"github.com/qor/auth/auth_identity"
+	"github.com/qor/auth/providers/password"
 	"github.com/dfang/qor-demo/app/admin"
 	"github.com/dfang/qor-demo/config/auth"
 	"github.com/dfang/qor-demo/config/db"
@@ -87,10 +87,9 @@ var (
 
 func main() {
 	Notification.RegisterChannel(database.New(&database.Config{}))
+
 	fmt.Println("Truncate tables .....")
 	TruncateTables(Tables...)
-
-	importUsers()
 
 	createRecords()
 }
@@ -152,6 +151,9 @@ func createRecords() {
 
 	createAdminUsers()
 	fmt.Println("--> Created admin users.")
+
+	importUsers()
+	fmt.Println("--> Imported users from yaml.")
 
 	createUsers()
 	fmt.Println("--> Created users.")
@@ -430,7 +432,6 @@ func createProducts() {
 				if file, err := openFileByURL(i.URL); err != nil {
 					fmt.Printf("open file (%q) failure, got err %v", i.URL, err)
 				} else {
-					fmt.Printf("file downloaded to")
 					defer file.Close()
 					image.File.Scan(file)
 				}
