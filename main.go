@@ -48,11 +48,6 @@ func main() {
 
 	flag.Parse()
 
-	if *compileTemplate {
-		bindatafs.AssetFS.Compile()
-		os.Exit(1)
-	}
-
 	if *debug {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
@@ -112,14 +107,19 @@ func main() {
 		Handler: bindatafs.AssetFS.FileServer(http.Dir("public"), "javascripts", "stylesheets", "images", "dist", "fonts", "vendors", "favicon.ico"),
 	}))
 
-	fmt.Printf("Listening on: %v\n", config.Config.Port)
-	if config.Config.HTTPS {
-		if err := http.ListenAndServeTLS(fmt.Sprintf(":%d", config.Config.Port), "config/local_certs/server.crt", "config/local_certs/server.key", Application.NewServeMux()); err != nil {
-			panic(err)
-		}
+	if *compileTemplate {
+		bindatafs.AssetFS.Compile()
+		os.Exit(1)
 	} else {
-		if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
-			panic(err)
+		fmt.Printf("Listening on: %v\n", config.Config.Port)
+		if config.Config.HTTPS {
+			if err := http.ListenAndServeTLS(fmt.Sprintf(":%d", config.Config.Port), "config/local_certs/server.crt", "config/local_certs/server.key", Application.NewServeMux()); err != nil {
+				panic(err)
+			}
+		} else {
+			if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
+				panic(err)
+			}
 		}
 	}
 }
