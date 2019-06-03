@@ -1,7 +1,6 @@
 package i18n
 
 import (
-	"log"
 	"path/filepath"
 
 	"github.com/qor/i18n"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/dfang/qor-demo/config"
 	"github.com/dfang/qor-demo/config/db"
+	"github.com/rs/zerolog/log"
 )
 
 // I18n i18n.I18n
@@ -18,7 +18,7 @@ var I18n *i18n.I18n
 func init() {
 	// I18n will look up the translation in order
 	// I18n = i18n.New(database.New(db.DB), yaml.New(filepath.Join(config.Root, "config/locales")))
-	log.Println(filepath.Join(config.Root, "config/locales"))
+	log.Debug().Str("locales", "locales").Msg(filepath.Join(config.Root, "config/locales"))
 
 	I18n = i18n.New(
 		database.New(db.DB),

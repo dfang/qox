@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 
 	"github.com/dfang/qor-demo/config/bindatafs"
 
@@ -38,9 +40,22 @@ import (
 // _ "github.com/dfang/qor-demo/config/db/migrations"
 
 func main() {
-	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
-	compileTemplate := cmdLine.Bool("compile-templates", false, "Compile Templates")
-	cmdLine.Parse(os.Args[1:])
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+
+	compileTemplate := flag.Bool("compile-templates", false, "Compile Templates")
+	debug := flag.Bool("debug", false, "Set log level to debug")
+
+	flag.Parse()
+
+	if *compileTemplate {
+		bindatafs.AssetFS.Compile()
+		os.Exit(1)
+	}
+
+	if *debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
 
 	var (
 		Router = chi.NewRouter()
@@ -97,18 +112,14 @@ func main() {
 		Handler: bindatafs.AssetFS.FileServer(http.Dir("public"), "javascripts", "stylesheets", "images", "dist", "fonts", "vendors", "favicon.ico"),
 	}))
 
-	if *compileTemplate {
-		bindatafs.AssetFS.Compile()
+	fmt.Printf("Listening on: %v\n", config.Config.Port)
+	if config.Config.HTTPS {
+		if err := http.ListenAndServeTLS(fmt.Sprintf(":%d", config.Config.Port), "config/local_certs/server.crt", "config/local_certs/server.key", Application.NewServeMux()); err != nil {
+			panic(err)
+		}
 	} else {
-		fmt.Printf("Listening on: %v\n", config.Config.Port)
-		if config.Config.HTTPS {
-			if err := http.ListenAndServeTLS(fmt.Sprintf(":%d", config.Config.Port), "config/local_certs/server.crt", "config/local_certs/server.key", Application.NewServeMux()); err != nil {
-				panic(err)
-			}
-		} else {
-			if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
-				panic(err)
-			}
+		if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
+			panic(err)
 		}
 	}
 }
