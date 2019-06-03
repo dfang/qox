@@ -52,7 +52,7 @@ require (
 	github.com/qor/media v0.0.0-20190416085522-c3220db68c4b
 	github.com/qor/middlewares v0.0.0-20170822143614-781378b69454 // indirect
 	github.com/qor/notification v0.0.0-20181014061619-c4c002490b78
-	github.com/qor/oss v0.0.0-20190402010455-71d287b85d1e
+	github.com/qor/oss v0.0.0-20190603071501-90a5bbaee07c
 	github.com/qor/page_builder v0.0.0-20181014061530-387c92091d7b
 	github.com/qor/publish v0.0.0-20181014061411-abfbacee9e0d // indirect
 	github.com/qor/publish2 v0.0.0-20190307014056-64962b1c0536
@@ -72,10 +72,11 @@ require (
 	github.com/qor/wildcard_router v0.0.0-20171031035524-56710e5bb5a4 // indirect
 	github.com/qor/worker v0.0.0-20190409083615-5c9381791cdc
 	github.com/rainycape/unidecode v0.0.0-20150907023854-cb7f23ec59be // indirect
+	github.com/rs/zerolog v1.14.3
 	github.com/tealeg/xlsx v1.0.3 // indirect
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 // indirect
-	github.com/theplant/testingutils v0.0.0-20181126090146-80e83e84b643 // indirect
+	github.com/theplant/testingutils v0.0.0-20190603093022-26d8b4d95c61 // indirect
 	github.com/unrolled/render v1.0.0
 	github.com/yosssi/gohtml v0.0.0-20190128141317-9b7db94d32d9 // indirect
 	go.uber.org/atomic v1.4.0 // indirect
@@ -84,8 +85,42 @@ require (
 	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f
 )
 
-replace github.com/qor/oss v0.0.0-20190402010455-71d287b85d1e => gitlab.com/qor2/oss v0.0.0-20190603041449-6d57adca2cd6
+replace github.com/qor/action_bar v0.0.0-20190314070413-136e5e2c5b8c => gitlab.com/qor2/action_bar v0.0.0-20190603113738-6cef4983ea67
+
+replace github.com/qor/activity v0.0.0-20190529070945-bb9925f02ffb => gitlab.com/qor2/activity v0.0.0-20190603113744-a77a8d222ceb
+
+replace github.com/qor/admin v0.0.0-20190525133731-6329506ec305 => gitlab.com/qor2/admin v0.0.0-20190603120644-fda02ae33deb
 
 replace github.com/qor/auth v0.0.0-20190103025640-46aae9fa92fa => gitlab.com/qor2/auth v0.0.0-20190603032202-1797e2b5fa11
 
+replace github.com/qor/banner_editor v0.0.0-20181014061955-007b0b21481e => gitlab.com/qor2/banner_editor v0.0.0-20190603113758-d987fd7c3c72
+
+replace github.com/qor/help v0.0.0-20171031093129-202965d1156a => gitlab.com/qor2/help v0.0.0-20190603113808-4e14e68ed597
+
+replace github.com/qor/i18n v0.0.0-20181014061908-f7206d223bcd => gitlab.com/qor2/i18n v0.0.0-20190603113814-3c74e642319e
+
+replace github.com/qor/l10n v0.0.0-20181031091737-2ca95fb3b4dd => gitlab.com/qor2/l10n v0.0.0-20190603113820-810ae9c84a46
+
+replace github.com/qor/location v0.0.0-20181014061834-8c618bfef8ed => gitlab.com/qor2/location v0.0.0-20190603113827-baeb0645b58b
+
+replace github.com/qor/media v0.0.0-20190416085522-c3220db68c4b => gitlab.com/qor2/media v0.0.0-20190603113832-d82531f5271f
+
+replace github.com/qor/notification v0.0.0-20181014061619-c4c002490b78 => gitlab.com/qor2/notification v0.0.0-20190603113838-ef1516112cd8
+
+replace github.com/qor/oss v0.0.0-20190402010455-71d287b85d1e => gitlab.com/qor2/oss v0.0.0-20190603041449-6d57adca2cd6
+
+replace github.com/qor/publish2 v0.0.0-20190307014056-64962b1c0536 => gitlab.com/qor2/publish2 v0.0.0-20190603113850-56886060a37f
+
 replace github.com/qor/render v0.0.0-20171201033449-63566e46f01b => github.com/dfang/render v0.0.0-20190601083323-c410f4728d31
+
+replace github.com/qor/seo v0.0.0-20190524094310-001af8201818 => gitlab.com/qor2/seo v0.0.0-20190603113855-9c659b7e3428
+
+replace github.com/qor/serializable_meta v0.0.0-20180510060738-5fd8542db417 => gitlab.com/qor2/serializable_meta v0.0.0-20190603113902-c04a7f28c31c
+
+replace github.com/qor/slug v0.0.0-20171031101006-545ed2e36452 => gitlab.com/qor2/slug v0.0.0-20190603113911-70d6d398026f
+
+replace github.com/qor/sorting v0.0.0-20181014060451-128455f72088 => gitlab.com/qor2/sorting v0.0.0-20190603113918-bb760d7a0fb1
+
+replace github.com/qor/widget v0.0.0-20190314070448-e280f6f16615 => gitlab.com/qor2/widget v0.0.0-20190603113924-07316cb15633
+
+replace github.com/qor/worker v0.0.0-20190409083615-5c9381791cdc => gitlab.com/qor2/worker v0.0.0-20190603113931-2fa032a3ccdf
