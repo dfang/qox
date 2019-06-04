@@ -16,6 +16,7 @@ services:
       PGDATA: /data
     volumes:
       # - pg_data:/var/lib/postgresql/data
+      - ./data:/data
       - ./init.sh:/docker-entrypoint-initdb.d/init.sh
       # - ./pg_hba.conf:/data/pg_hba.conf
 
@@ -48,10 +49,11 @@ services:
       - 17080:8080
 
   qor:
-    image: dfang/qor-demo:develop
-    # build:
-    #   context: .
-    command: ["./qor-example", "-debug"]
+    # image: dfang/qor-demo:develop
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    # command: ["./qor-example", "-debug"]
     # command: ["./seeds"]
     # command: [ "go", "run", "config/db/seeds/main.go", "config/db/seeds/seeds.go" ]
     # restart: always
@@ -65,7 +67,7 @@ services:
     #   QOR_AWS_BUCKET: qor-1234
     #   QOR_AWS_REGION: ap-northeast-1
     env_file:
-      - tmp/.env
+      - .env
     volumes:
       - ./config/database.yml:/go-app/config/database.yml
     ports:
