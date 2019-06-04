@@ -12,6 +12,7 @@ gin-bin
 
 tmp
 public/downloads
+public/system
 node_modules
 data
 
