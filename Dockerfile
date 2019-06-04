@@ -25,6 +25,9 @@ COPY --from=build-step /go/bin/qor-example /go-app/qor-example
 COPY --from=build-step /go/bin/seeds /go-app/seeds
 EXPOSE 7000
 COPY app ./app
+RUN rm app/*/*.go
 COPY config/locales ./config/locales
+COPY config/db/seeds/data ./config/db/seeds/data
+
 CMD ["/go-app/qor-example"]
 
