@@ -16,9 +16,9 @@ type Controller struct {
 
 // Index home index page
 func (ctrl Controller) Index(w http.ResponseWriter, req *http.Request) {
-	log.Info().Msg("viewpaths for home/index")
+	log.Debug().Msg("viewpaths for home/index")
 	for _, v := range ctrl.View.ViewPaths {
-		log.Info().Msg(v)
+		log.Debug().Msg(v)
 	}
 	ctrl.View.Execute("index", map[string]interface{}{}, req, w)
 }
