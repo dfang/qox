@@ -1,12 +1,12 @@
-qor-example:
+qor-demo:
   build: Dockerfile
-  image: dfang/qor-example
+  image: dfang/qor-demo
   pre:
-    - echo "Preparing qor-example"
+    - echo "Preparing qor-demo"
     - echo "compile templates ..."
     - go run main.go -compile-templates=true
     - npm run build
   post:
-    - echo "Finished qor-example"
+    - echo "Finished qor-demo"
     - echo "pushing to docker hub ..."
-    - docker push dfang/qor-example
+    - docker push dfang/qor-demo

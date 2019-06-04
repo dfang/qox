@@ -2,24 +2,34 @@ version: '3.6'
 
 services:
 
-  postgres:
+  db:
     image: postgres:10.4
     restart: always
+    ports:
+      - '5433:5432'
+    networks:
+      - overlay
     environment:
       POSTGRES_DB: qor-demo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /data
     volumes:
-      - ./data:/var/lib/postgresql/data
-      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      # - pg_data:/var/lib/postgresql/data
+      - ./init.sh:/docker-entrypoint-initdb.d/init.sh
+      # - ./pg_hba.conf:/data/pg_hba.conf
 
   graphql-engine:
-    image: hasura/graphql-engine:v1.0.0-alpha41
+    image: hasura/graphql-engine:v1.0.0-beta.2
     ports:
       - "18080:8080"
+    networks:
+      - overlay
     depends_on:
-      - "postgres"
+      - "db"
     restart: always
     environment:
-      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:@postgres:5432/qor-demo
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgres@db:5432/qor-demo
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
       HASURA_GRAPHQL_ADMIN_SECRET: "admin"
     command:
@@ -29,9 +39,11 @@ services:
 
   adminer:
     image: adminer
-    restart: always
+    # restart: always
+    networks:
+      - overlay
     depends_on:
-      - postgres
+      - db
     ports:
       - 8080:8080
 
@@ -39,20 +51,27 @@ services:
     image: dfang/qor-demo:develop
     # build:
     #   context: .
-    command: ["./qor-example"]
-    # command: ["./seeds"]
+    # command: ["./qor-example", "-debug"]
+    command: ["./seeds"]
     # command: [ "go", "run", "config/db/seeds/main.go", "config/db/seeds/seeds.go" ]
-    restart: always
+    # restart: always
     depends_on:
-      - postgres
+      - db
+    networks:
+      - overlay
     # environment:
     #   QOR_AWS_ACCESS_KEY_ID: AKIAI3Z7SFTABSJQSLDQ
     #   QOR_AWS_SECRET_ACCESS_KEY: secret
     #   QOR_AWS_BUCKET: qor-1234
     #   QOR_AWS_REGION: ap-northeast-1
     env_file:
-      - .env
+      - tmp/.env
     volumes:
       - ./config/database.yml:/go-app/config/database.yml
     ports:
       - 7000:7000
+
+volumes:
+  pg_data:
+networks:
+  overlay:
