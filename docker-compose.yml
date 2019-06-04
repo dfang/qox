@@ -45,7 +45,7 @@ services:
     depends_on:
       - db
     ports:
-      - 8080:8080
+      - 17080:8080
 
   qor:
     image: dfang/qor-demo:develop
@@ -69,7 +69,7 @@ services:
     volumes:
       - ./config/database.yml:/go-app/config/database.yml
     ports:
-      - 7000:7000
+      - 17000:7000
 
 volumes:
   pg_data:
