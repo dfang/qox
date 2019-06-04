@@ -16,8 +16,8 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/bin/seeds config/db/se
 
 # -----------------------------------------------------------------------------
 # step 2: exec
-FROM phusion/baseimage:0.11
-# FROM golang:1.12.5
+# FROM phusion/baseimage:0.11
+FROM golang:1.12.5-alpine:3.9
 
 RUN mkdir /go-app
 WORKDIR /go-app
