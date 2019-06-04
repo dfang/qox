@@ -98,6 +98,20 @@ func main() {
 	Application.Use(stores.NewWithDefault())
 	// Application.Use(enterprise.New(&enterprise.Config{}))
 
+	// views := []string{
+	// 	"app/home/views",
+	// 	"app/account/views",
+	// 	"app/order/views",
+	// 	"app/page/views",
+	// 	"app/products/views",
+	// 	"app/views",
+	// }
+
+	// for _, v := range views {
+	// 	// bindatafs.AssetFS.NameSpace("views").RegisterPath(filepath.Join(config.Root, v))
+	// 	bindatafs.AssetFS.RegisterPath(filepath.Join(config.Root, v))
+	// }
+
 	Application.Use(static.New(&static.Config{
 		Prefixs: []string{"/system"},
 		Handler: utils.FileServer(http.Dir(filepath.Join(config.Root, "public"))),
