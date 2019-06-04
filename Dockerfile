@@ -11,7 +11,7 @@ ENV GOPROXY=https://goproxy.io
 RUN go mod download
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags 'bindatafs' -o /go/bin/qor-example
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags 'bindatafs' -o /go/bin/qor-demo
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/bin/seeds config/db/seeds/main.go config/db/seeds/seeds.go
 
 # -----------------------------------------------------------------------------
@@ -21,13 +21,14 @@ FROM golang:1.12.5-alpine3.9
 
 RUN mkdir /go-app
 WORKDIR /go-app
-COPY --from=build-step /go/bin/qor-example /go-app/qor-example
+COPY --from=build-step /go/bin/qor-demo /go-app/qor-demo
 COPY --from=build-step /go/bin/seeds /go-app/seeds
+COPY --from=build-step /go/pkg/mod /go/pkg/mod
 EXPOSE 7000
 COPY app ./app
 RUN rm app/*/*.go
 COPY config/locales ./config/locales
 COPY config/db/seeds/data ./config/db/seeds/data
 
-CMD ["/go-app/qor-example"]
+CMD ["/go-app/qor-demo"]
 
