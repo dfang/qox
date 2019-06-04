@@ -4,11 +4,11 @@ import (
 	"log"
 	"os"
 
+	"github.com/jinzhu/configor"
 	"github.com/qor/auth/providers/facebook"
 	"github.com/qor/auth/providers/github"
 	"github.com/qor/auth/providers/google"
 	"github.com/qor/auth/providers/twitter"
-	"github.com/jinzhu/configor"
 
 	// amazonpay "github.com/qor/amazon-pay-sdk-go"
 	"github.com/qor/gomerchant"
