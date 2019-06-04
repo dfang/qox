@@ -18,10 +18,10 @@ var (
 	Root, _ = os.Getwd()
 	DraftDB = db.DB.Set(publish2.VisibleMode, publish2.ModeOff).Set(publish2.ScheduleMode, publish2.ModeOff)
 )
-
 var Seeds = struct {
 	Categories []struct {
 		Name string
+		Code string
 	}
 	Collections []struct {
 		Name string

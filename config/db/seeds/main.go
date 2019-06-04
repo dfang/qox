@@ -344,7 +344,7 @@ func createCategories() {
 	for _, c := range Seeds.Categories {
 		category := products.Category{}
 		category.Name = c.Name
-		category.Code = strings.ToLower(c.Name)
+		category.Code = strings.ToLower(c.Code)
 		if err := DraftDB.Create(&category).Error; err != nil {
 			log.Fatalf("create category (%v) failure, got err %v", category, err)
 		}
