@@ -4,6 +4,8 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/joho/godotenv/autoload"
+
 	"github.com/jinzhu/configor"
 	"github.com/qor/auth/providers/facebook"
 	"github.com/qor/auth/providers/github"
