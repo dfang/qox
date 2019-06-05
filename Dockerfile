@@ -11,23 +11,20 @@ ENV GOPROXY=https://goproxy.io
 RUN go mod download
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags 'bindatafs' -o /go/bin/qor-demo
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/bin/seeds config/db/seeds/main.go config/db/seeds/seeds.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags 'bindatafs' -a -o /go/bin/qor-demo
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o /go/bin/seeds config/db/seeds/main.go config/db/seeds/seeds.go
 
 # -----------------------------------------------------------------------------
 # step 2: exec
 # FROM phusion/baseimage:0.11
-# FROM golang:1.12.5-alpine3.9 # result image too big
-FROM alpine:3.9.4
+FROM golang:1.12.5-alpine3.9
+# FROM alpine:3.9.4
 
 RUN apk add --no-cache openssl
 ENV DOCKERIZE_VERSION v0.6.1
 RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
   && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
   && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-RUN wget https://dl.google.com/go/go1.12.5.linux-amd64.tar.gz \
-  && tar -C /usr/local -xzf go1.12.5.linux-amd64.tar.gz \
-  && export PATH=$PATH:/usr/local/go/bin
 
 # RUN mkdir /go-app
 # WORKDIR /go-app
