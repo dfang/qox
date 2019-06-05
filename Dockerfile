@@ -32,10 +32,10 @@ COPY --from=build-step /go/bin/qor-demo /go/bin/qor-demo
 COPY --from=build-step /go/bin/seeds /go/bin/seeds
 COPY --from=build-step /go/pkg/mod /go/pkg/mod
 EXPOSE 7000
-# COPY app ./app
-# RUN rm app/*/*.go
-# COPY config/locales ./config/locales
-# COPY config/db/seeds/data ./config/db/seeds/data
+COPY app ./app
+RUN rm app/*/*.go
+COPY config/locales ./config/locales
+COPY config/db/seeds/data ./config/db/seeds/data
 
 CMD dockerize -wait tcp://db:5432 -timeout 30s /go/bin/qor-demo
 
