@@ -22,3 +22,4 @@ config/application.yml
 
 Dockerfile
 captain.yml
+codefresh.yml
