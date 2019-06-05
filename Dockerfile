@@ -25,6 +25,9 @@ ENV DOCKERIZE_VERSION v0.6.1
 RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
   && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
   && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+RUN wget https://dl.google.com/go/go1.12.5.linux-amd64.tar.gz \
+  && tar -C /usr/local -xzf go1.12.5.linux-amd64.tar.gz \
+  && export PATH=$PATH:/usr/local/go/bin
 
 # RUN mkdir /go-app
 # WORKDIR /go-app
