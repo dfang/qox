@@ -47,7 +47,7 @@ services:
 
   adminer:
     image: adminer
-    # restart: always
+    restart: always
     networks:
       - overlay
     depends_on:
@@ -57,10 +57,7 @@ services:
       - 17070:8080
 
   qor:
-    # image: dfang/qor-demo:develop
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
+    image: dfang/qor-demo:develop
     # command: ["./qor-example", "-debug"]
     # command: ["./seeds"]
     # command: [ "go", "run", "config/db/seeds/main.go", "config/db/seeds/seeds.go" ]
@@ -71,11 +68,6 @@ services:
         condition: service_healthy
     networks:
       - overlay
-    # environment:
-    #   QOR_AWS_ACCESS_KEY_ID: AKIAI3Z7SFTABSJQSLDQ
-    #   QOR_AWS_SECRET_ACCESS_KEY: secret
-    #   QOR_AWS_BUCKET: qor-1234
-    #   QOR_AWS_REGION: ap-northeast-1
     env_file:
       - .env
     volumes:

@@ -17,18 +17,25 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /go/bin/seeds config/db/se
 # -----------------------------------------------------------------------------
 # step 2: exec
 # FROM phusion/baseimage:0.11
-FROM golang:1.12.5-alpine3.9
+# FROM golang:1.12.5-alpine3.9 # result image too big
+FROM alpine:3.9.4
 
-RUN mkdir /go-app
-WORKDIR /go-app
-COPY --from=build-step /go/bin/qor-demo /go-app/qor-demo
-COPY --from=build-step /go/bin/seeds /go-app/seeds
+RUN apk add --no-cache openssl
+ENV DOCKERIZE_VERSION v0.6.1
+RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+  && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+  && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+
+# RUN mkdir /go-app
+# WORKDIR /go-app
+COPY --from=build-step /go/bin/qor-demo /go/bin/qor-demo
+COPY --from=build-step /go/bin/seeds /go/bin/seeds
 COPY --from=build-step /go/pkg/mod /go/pkg/mod
 EXPOSE 7000
-COPY app ./app
-RUN rm app/*/*.go
-COPY config/locales ./config/locales
-COPY config/db/seeds/data ./config/db/seeds/data
+# COPY app ./app
+# RUN rm app/*/*.go
+# COPY config/locales ./config/locales
+# COPY config/db/seeds/data ./config/db/seeds/data
 
-CMD ["/go-app/qor-demo"]
+CMD dockerize -wait tcp://db:5432 -timeout 30s /go/bin/qor-demo
 
