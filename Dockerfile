@@ -17,8 +17,8 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o /go/bin/seeds config/db
 # -----------------------------------------------------------------------------
 # step 2: exec
 # FROM phusion/baseimage:0.11
-FROM golang:1.12.5-alpine3.9
-# FROM alpine:3.9.4
+# FROM golang:1.12.5-alpine3.9
+FROM alpine:3.9.4
 
 RUN apk add --no-cache openssl
 ENV DOCKERIZE_VERSION v0.6.1
