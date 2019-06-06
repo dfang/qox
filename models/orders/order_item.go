@@ -20,6 +20,11 @@ type OrderItem struct {
 	Price            float32
 	DiscountRate     uint
 	transition.Transition
+
+	ProductNo   string `json:"product_no"`
+	OrderNo     string `json:"order_no"`
+	ProductName string `json:"product_name"`
+	Install     string `json:"install"`
 }
 
 // IsCart order item's state is cart
