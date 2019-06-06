@@ -34,13 +34,13 @@ import (
 	"github.com/qor/publish2"
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
-
 	// https://github.com/qor/qor-example/issues/129
-	_ "github.com/dfang/qor-demo/config/db/migrations"
+	// _ "github.com/dfang/qor-demo/config/db/migrations"
 )
 
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	log.Logger = log.With().Caller().Logger()
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
 	compileTemplate := flag.Bool("compile-templates", false, "Compile Templates")
