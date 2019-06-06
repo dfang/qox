@@ -16,6 +16,7 @@ require (
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/google/go-github v17.0.0+incompatible // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/gorilla/schema v1.1.0
 	github.com/gorilla/sessions v1.1.3 // indirect
 	github.com/gosimple/slug v1.5.0 // indirect
@@ -28,6 +29,7 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/lib/pq v1.1.0
 	github.com/manveru/gobdd v0.0.0-20131210092515-f1a17fdd710b // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2
@@ -86,7 +88,7 @@ replace github.com/qor/action_bar v0.0.0-20190314070413-136e5e2c5b8c => gitlab.c
 
 replace github.com/qor/activity v0.0.0-20190529070945-bb9925f02ffb => gitlab.com/qor2/activity v0.0.0-20190603113744-a77a8d222ceb
 
-replace github.com/qor/admin v0.0.0-20190525133731-6329506ec305 => gitlab.com/qor2/admin v0.0.0-20190603120644-fda02ae33deb
+replace github.com/qor/admin v0.0.0-20190525133731-6329506ec305 => gitlab.com/qor2/admin v0.0.0-20190606145212-fb76afa05f9f
 
 replace github.com/qor/auth v0.0.0-20190103025640-46aae9fa92fa => gitlab.com/qor2/auth v0.0.0-20190603032202-1797e2b5fa11
 
