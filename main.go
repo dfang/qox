@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/rs/zerolog"
@@ -80,6 +81,12 @@ func main() {
 
 			if locale := utils.GetLocale(qorContext); locale != "" {
 				tx = tx.Set("l10n:locale", locale)
+			} else {
+				// set default locale to zh-CN
+				// tx = tx.Set("l10n:locale", "zh-CN")
+				expire := time.Now().AddDate(0, 1, 0) // one month later
+				cookie := http.Cookie{Name: "locale", Value: "zh-CN", Path: "/", Expires: expire, MaxAge: 90000}
+				http.SetCookie(w, &cookie)
 			}
 
 			ctx := context.WithValue(req.Context(), utils.ContextDBName, publish2.PreviewByDB(tx, qorContext))

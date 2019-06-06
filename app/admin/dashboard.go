@@ -2,7 +2,6 @@ package admin
 
 import (
 	"encoding/json"
-	"net/http"
 	"time"
 
 	"github.com/dfang/qor-demo/config/db"
@@ -52,12 +51,6 @@ func ReportsDataHandler(context *admin.Context) {
 
 	charts.Orders = GetChartData("orders", startDate, endDate)
 	charts.Users = GetChartData("users", startDate, endDate)
-
-	// set default locale to zh-CN
-	// Needs to improve later
-	expire := time.Now().AddDate(0, 1, 0) // one month later
-	cookie := http.Cookie{Name: "locale", Value: "zh-CN", Path: "/", Expires: expire, MaxAge: 90000}
-	http.SetCookie(context.Writer, &cookie)
 
 	b, _ := json.Marshal(charts)
 	context.Writer.Write(b)
