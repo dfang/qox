@@ -6,7 +6,7 @@ services:
     image: postgres:10.4
     restart: always
     ports:
-      - '5433:5432'
+      - '15432:5432'
     networks:
       - overlay
     environment:
