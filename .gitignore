@@ -22,3 +22,5 @@ node_modules
 
 public/downloads
 public/system
+
+.pgsync.yml
