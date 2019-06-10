@@ -180,8 +180,8 @@ func createRecords() {
 	createStores()
 	fmt.Println("--> Created stores.")
 
-	createOrders()
-	fmt.Println("--> Created orders.")
+	// createOrders()
+	// fmt.Println("--> Created orders.")
 
 	createWidgets()
 	fmt.Println("--> Created widgets.")
