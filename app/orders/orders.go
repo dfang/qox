@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
+	"time"
 
 	// "net/http"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/dfang/qor-demo/utils/funcmapmaker"
 	"github.com/jinzhu/gorm"
+	"github.com/jinzhu/now"
 	"github.com/qor/activity"
 	"github.com/qor/admin"
 	"github.com/qor/application"
@@ -108,7 +110,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		Default: true,
 		Group:   "Filter By Date",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where(orders.Order{})
+			return db.Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", time.Now())
 		},
 	})
 	order.Scope(&admin.Scope{
@@ -116,14 +118,42 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		Label: "This Week",
 		Group: "Filter By Date",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where(orders.Order{})
+			now.WeekStartDay = time.Monday
+			return db.Where("created_at >= ?", now.BeginningOfWeek()).Where("created_at <=? ", now.EndOfWeek())
+		},
+	})
+
+	order.Scope(&admin.Scope{
+		Name:  "ThisMonth",
+		Label: "This Month",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			now.WeekStartDay = time.Monday
+			return db.Where("created_at >= ?", now.BeginningOfMonth()).Where("created_at <=? ", now.EndOfMonth())
+		},
+	})
+
+	order.Scope(&admin.Scope{
+		Name:  "ThisQuarter",
+		Label: "This Quarter",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("created_at >= ?", now.BeginningOfQuarter()).Where("created_at <=? ", now.EndOfQuarter())
+		},
+	})
+
+	order.Scope(&admin.Scope{
+		Name:  "ThisYear",
+		Label: "This Year",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("created_at >= ?", now.BeginningOfYear()).Where("created_at <=? ", now.EndOfYear())
 		},
 	})
 
 	order.Scope(&admin.Scope{
 		Name:  "JD",
 		Label: "JD",
-		// Default: true,
 		Group: "Filter By Source",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 			return db.Where(orders.Order{Source: "JD"})
