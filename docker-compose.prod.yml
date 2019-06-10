@@ -45,6 +45,16 @@ services:
       - serve
       - --enable-console
 
+  pghero:
+    image: ankane/pghero
+    environment:
+      DATABASE_URL: postgres://postgres://postgres@db:5432/qor-demo
+    ports:
+      - "19090:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
   adminer:
     image: adminer
     restart: always

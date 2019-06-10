@@ -56,6 +56,16 @@ services:
     ports:
       - 17070:8080
 
+  pghero:
+    image: ankane/pghero
+    environment:
+      DATABASE_URL: postgres://postgres://postgres@db:5432/qor-demo
+    ports:
+      - "19090:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
   qor:
     # image: dfang/qor-demo:develop
     build:
