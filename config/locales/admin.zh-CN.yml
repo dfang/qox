@@ -1,17 +1,32 @@
 zh-CN:
+  installs:
+    attributes:
+      Source: 订单来源
+      Order_no: 订单编号
+      Customer_name: 客户姓名
+      Customer_phone: 客户电话
+      Customer_address: 客户地址
+      Is_delivery_and_setup: "是否配送一体"
+      Reserverd_delivery_time: 预约配送时间
+      Reserverd_setup_time: 预约安装时间
+      Man_to_deliver_id: "配送师傅"
+      Man_to_setup_id: "安装师傅"
+      Man_to_pickup_id: "取件师傅"
+      State: 订单状态
   qor_admin:
     menus:
       "Site Management": 站点管理
       "Pages Management": 页面管理
       "Order Management": 订单管理
       "Publishing": 发布管理
-      Translations: 翻译
+      "Translations": 翻译
 
       "Product Management": 产品管理
       "Products": 产品
 
       "Store Management": 店面管理
       "Orders": 订单
+      "installs": "京东订单"
       "Abandoned Orders": 废弃订单
 
       "User Management": 用户管理

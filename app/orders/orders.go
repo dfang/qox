@@ -120,6 +120,16 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		},
 	})
 
+	order.Scope(&admin.Scope{
+		Name:  "JD",
+		Label: "JD",
+		// Default: true,
+		Group: "Filter By Source",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where(orders.Order{Source: "JD"})
+		},
+	})
+
 	// define actions for Order
 	type trackingNumberArgument struct {
 		TrackingNumber string
@@ -412,6 +422,29 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 
 	// Delivery Methods
 	Admin.AddResource(&orders.DeliveryMethod{}, &admin.Config{Menu: []string{"Site Management"}})
+
+	installs := Admin.AddResource(&orders.Order{Source: "JD"}, &admin.Config{Name: "Installs", Menu: []string{"Order Management"}})
+	installs.Scope(&admin.Scope{
+		Default: true,
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("source IS NOT NULL")
+		},
+	})
+	installs.IndexAttrs("ID", "source", "order_no", "customer_name", "customer_address", "customer_phone", "is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "state")
+
+	// define scopes for Order
+	for _, state := range []string{"pending", "processing", "delivery_scheduled", "setup_scheduled", "pickup_scheduled", "cancelled", "shipped", "paid_cancelled", "returned"} {
+		var state = state
+		installs.Scope(&admin.Scope{
+			Name:  state,
+			Label: strings.Title(strings.Replace(state, "_", " ", -1)),
+			Group: "Order Status",
+			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+				return db.Where(orders.Order{Transition: transition.Transition{State: strings.Title(state)}})
+			},
+		})
+	}
+
 }
 
 func sizeVariationCollection(resource interface{}, context *qor.Context) (results [][]string) {

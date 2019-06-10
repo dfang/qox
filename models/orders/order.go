@@ -68,8 +68,12 @@ type Order struct {
 	// 预约安装时间
 	ReserverdSetupTime string
 
-	// 是否送装一体
-	IsDeliveryAndSetup bool
+	// 预约取件时间
+	ReserverdPickupTime string
+
+	// 是否送装一体（这个jd页面抓下来的是什么就存什么, 但是实际上有的订单是非送装一体，如果客户要求，也需要派人安装的，有些订单是取件单)
+	// 所以这个字段保持和京东抓下来的一致，另外还要个OrderType， 根据规则或者人工去改OrderType
+	IsDeliveryAndSetup string
 
 	// 应收款项
 	Receivables float32

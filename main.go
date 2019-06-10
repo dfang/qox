@@ -36,10 +36,13 @@ import (
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 	// https://github.com/qor/qor-example/issues/129
-	// _ "github.com/dfang/qor-demo/config/db/migrations"
+	"github.com/dfang/qor-demo/config/db/migrations"
 )
 
 func main() {
+
+	migrations.Migrate()
+
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	log.Logger = log.With().Caller().Logger()
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
