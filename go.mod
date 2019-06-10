@@ -29,7 +29,7 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/lib/pq v1.1.0
+	github.com/lib/pq v1.1.1
 	github.com/manveru/gobdd v0.0.0-20131210092515-f1a17fdd710b // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2
