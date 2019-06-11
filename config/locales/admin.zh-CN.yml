@@ -27,6 +27,14 @@ zh-CN:
         "Returned": 已退货
         "Pending": 待处理
         "Processing": 处理中
+    actions:
+      Processing: 预处理
+      Cancel: 取消订单
+      Delete: 删除
+      Export: 导出
+      "Schedule Delivery": 安排配送
+      "Schedule Setup": 安排安装
+
     attributes:
       Source: 订单来源
       Order_no: 订单编号

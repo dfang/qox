@@ -371,7 +371,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	})
 	// 安排配送
 	order.Action(&admin.Action{
-		Name: "安排配送",
+		Name: "Schedule Delivery",
 		Handler: func(argument *admin.ActionArgument) error {
 			var (
 				tx = argument.Context.GetDB().Begin()
@@ -428,7 +428,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	})
 	// 安排安装
 	order.Action(&admin.Action{
-		Name: "安排安装",
+		Name: "Schedule Setup",
 		Handler: func(argument *admin.ActionArgument) error {
 			var (
 				tx  = argument.Context.GetDB().Begin()
@@ -497,11 +497,14 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	})
 
 	// order.IndexAttrs("ID", "User", "PaymentAmount", "ShippedAt", "CancelledAt", "State", "ShippingAddress")
-	order.IndexAttrs("ID", "source", "order_no", "state", "order_type", "customer_name", "customer_address", "customer_phone", "receivables", "is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "shipping_fee", "setup_fee", "pickup_fee")
+	// order.IndexAttrs("ID", "source", "order_no", "state", "order_type", "customer_name", "customer_address", "customer_phone", "receivables", "is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "shipping_fee", "setup_fee", "pickup_fee")
+	order.IndexAttrs("ID", "source", "order_no", "state", "order_type", "customer_name", "customer_address", "customer_phone", "receivables",
+		"is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id",
+		"shipping_fee", "setup_fee", "pickup_fee", "created_at", "updated_at")
 	order.NewAttrs("-DiscountValue", "-AbandonedReason", "-CancelledAt", "-PaymentLog", "-AmazonOrderReferenceID", "-AmazonAddressAccessToken")
 	order.EditAttrs("-DiscountValue", "-AbandonedReason", "-CancelledAt", "-State", "-PaymentLog", "-AmazonOrderReferenceID", "-AmazonAddressAccessToken")
 	order.ShowAttrs("-DiscountValue", "-State", "-AmazonAddressAccessToken")
-	order.SearchAttrs("ID", "User.Name", "User.Email", "AmazonOrderReferenceID", "ShippingAddress.Phone", "ShippingAddress.ContactName", "ShippingAddress.Address1", "ShippingAddress.Address2")
+	order.SearchAttrs("customer_name", "customer_phone", "order_no")
 
 	// https://doc.getqor.com/admin/metas/select-one.html
 	// Generate options by data from the database
