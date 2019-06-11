@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -40,17 +41,18 @@ import (
 )
 
 func main() {
+	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	compileTemplate := cmdLine.Bool("compile-templates", false, "Compile Templates")
+	isDebug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
+	debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
+
+	cmdLine.Parse(os.Args[1:])
 
 	migrations.Migrate()
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	log.Logger = log.With().Caller().Logger()
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-
-	compileTemplate := flag.Bool("compile-templates", false, "Compile Templates")
-	debug := flag.Bool("debug", false, "Set log level to debug")
-
-	flag.Parse()
 
 	if *debug {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
