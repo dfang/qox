@@ -1,7 +1,6 @@
 package orders
 
 import (
-	"errors"
 	"fmt"
 	"html/template"
 	"time"
@@ -87,11 +86,106 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 			},
 		},
 	})
+	// order.Meta(&admin.Meta{Name: "customer_address", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+	// 	order := record.(*orders.Order)
+	// 	return strings.Replace(order.CustomerAddress, "江西九江市修水县", "", -1)
+	// }})
+
+	// order.Meta(&admin.Meta{Name: "customer_phone", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+	// 	order := record.(*orders.Order)
+	// 	phones := strings.Split(order.CustomerPhone, "/")
+	// 	if phones[0] == phones[1] {
+	// 		return phones[0]
+	// 	}
+	// 	return order.CustomerPhone
+	// }})
+	// order.Meta(&admin.Meta{Name: "man_to_deliver_id", Type: "string", FormattedValuer: func(record interface{}, ctx *qor.Context) (result interface{}) {
+	// 	order := record.(*orders.Order)
+	// 	if order.ManToDeliverID != "" {
+	// 		var user users.User
+	// 		ctx.DB.Where("id = ?", order.ManToDeliverID).Find(&user)
+	// 		return user.Name
+	// 	}
+	// 	return ""
+	// }})
+	// order.Meta(&admin.Meta{Name: "man_to_setup_id", Type: "string", FormattedValuer: func(record interface{}, ctx *qor.Context) (result interface{}) {
+	// 	order := record.(*orders.Order)
+	// 	if order.ManToSetupID != "" {
+	// 		var user users.User
+	// 		ctx.DB.Where("id = ?", order.ManToSetupID).Find(&user)
+	// 		return user.Name
+	// 	}
+	// 	return ""
+	// }})
+	// order.Meta(&admin.Meta{Name: "man_to_pickup_id", Type: "string", FormattedValuer: func(record interface{}, ctx *qor.Context) (result interface{}) {
+	// 	order := record.(*orders.Order)
+	// 	if order.ManToPickupID != "" {
+	// 		var user users.User
+	// 		ctx.DB.Where("id = ?", order.ManToPickupID).Find(&user)
+	// 		return user.Name
+	// 	}
+	// 	return ""
+	// }})
 
 	orderItemMeta := order.Meta(&admin.Meta{Name: "OrderItems"})
 	orderItemMeta.Resource.Meta(&admin.Meta{Name: "SizeVariation", Config: &admin.SelectOneConfig{Collection: sizeVariationCollection}})
 
 	// define scopes for Order
+	order.Scope(&admin.Scope{
+		Name:    "Today",
+		Label:   "Today",
+		Default: true,
+		Group:   "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", time.Now())
+		},
+	})
+	order.Scope(&admin.Scope{
+		Name:  "Yesterday",
+		Label: "Yesterday",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			now.WeekStartDay = time.Monday
+
+			return db.Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -1)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -1))
+		},
+	})
+	order.Scope(&admin.Scope{
+		Name:  "ThisWeek",
+		Label: "This Week",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			now.WeekStartDay = time.Monday
+			return db.Where("created_at >= ?", now.BeginningOfWeek()).Where("created_at <=? ", now.EndOfWeek())
+		},
+	})
+	order.Scope(&admin.Scope{
+		Name:  "ThisMonth",
+		Label: "This Month",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			now.WeekStartDay = time.Monday
+			return db.Where("created_at >= ?", now.BeginningOfMonth()).Where("created_at <=? ", now.EndOfMonth())
+		},
+	})
+	order.Scope(&admin.Scope{
+		Name:  "ThisQuarter",
+		Label: "This Quarter",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("created_at >= ?", now.BeginningOfQuarter()).Where("created_at <=? ", now.EndOfQuarter())
+		},
+	})
+	order.Scope(&admin.Scope{
+		Name:  "ThisYear",
+		Label: "This Year",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("created_at >= ?", now.BeginningOfYear()).Where("created_at <=? ", now.EndOfYear())
+		},
+	})
+
+	// filter by order state
 	for _, state := range []string{"pending", "processing", "delivery_scheduled", "setup_scheduled", "pickup_scheduled", "cancelled", "shipped", "paid_cancelled", "returned"} {
 		var state = state
 		order.Scope(&admin.Scope{
@@ -104,53 +198,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		})
 	}
 
-	order.Scope(&admin.Scope{
-		Name:    "Today",
-		Label:   "Today",
-		Default: true,
-		Group:   "Filter By Date",
-		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", time.Now())
-		},
-	})
-	order.Scope(&admin.Scope{
-		Name:  "ThisWeek",
-		Label: "This Week",
-		Group: "Filter By Date",
-		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			now.WeekStartDay = time.Monday
-			return db.Where("created_at >= ?", now.BeginningOfWeek()).Where("created_at <=? ", now.EndOfWeek())
-		},
-	})
-
-	order.Scope(&admin.Scope{
-		Name:  "ThisMonth",
-		Label: "This Month",
-		Group: "Filter By Date",
-		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			now.WeekStartDay = time.Monday
-			return db.Where("created_at >= ?", now.BeginningOfMonth()).Where("created_at <=? ", now.EndOfMonth())
-		},
-	})
-
-	order.Scope(&admin.Scope{
-		Name:  "ThisQuarter",
-		Label: "This Quarter",
-		Group: "Filter By Date",
-		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("created_at >= ?", now.BeginningOfQuarter()).Where("created_at <=? ", now.EndOfQuarter())
-		},
-	})
-
-	order.Scope(&admin.Scope{
-		Name:  "ThisYear",
-		Label: "This Year",
-		Group: "Filter By Date",
-		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("created_at >= ?", now.BeginningOfYear()).Where("created_at <=? ", now.EndOfYear())
-		},
-	})
-
+	// filter by order source
 	order.Scope(&admin.Scope{
 		Name:  "JD",
 		Label: "JD",
@@ -159,6 +207,19 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 			return db.Where(orders.Order{Source: "JD"})
 		},
 	})
+
+	// filter by order type
+	for _, state := range []string{"delivery", "setup", "delivery_and_setup", "repair", "clean", "sales"} {
+		var state = state
+		order.Scope(&admin.Scope{
+			Name:  state,
+			Label: strings.Title(strings.Replace(state, "_", " ", -1)),
+			Group: "Filter By Order Type",
+			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+				return db.Where(orders.Order{Transition: transition.Transition{State: state}})
+			},
+		})
+	}
 
 	// define actions for Order
 	type trackingNumberArgument struct {
@@ -173,15 +234,53 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		ManToSetup string
 	}
 
+	type processingActionArgument struct {
+		ShippingFee float32
+		SetupFee    float32
+		PickupFee   float32
+		OrderType   string
+	}
+	processingActionResource := Admin.NewResource(&processingActionArgument{})
+	processingActionResource.Meta(&admin.Meta{
+		Name: "ShippingFee",
+		Type: "float",
+	})
+	processingActionResource.Meta(&admin.Meta{
+		Name: "SetupFee",
+		Type: "float",
+	})
+	processingActionResource.Meta(&admin.Meta{
+		Name: "PickupFee",
+		Type: "float",
+	})
+	processingActionResource.Meta(&admin.Meta{
+		Name:       "OrderType",
+		Type:       "select_one",
+		Collection: []string{"配送", "安装", "配送一体", "维修", "清洗"},
+	})
 	order.Action(&admin.Action{
 		Name: "Processing",
 		Handler: func(argument *admin.ActionArgument) error {
-			for _, order := range argument.FindSelectedRecords() {
-				db := argument.Context.GetDB()
-				if err := orders.OrderState.Trigger("process", order.(*orders.Order), db); err != nil {
+			db := argument.Context.GetDB()
+			var (
+				tx  = argument.Context.GetDB().Begin()
+				arg = argument.Argument.(*processingActionArgument)
+			)
+			for _, record := range argument.FindSelectedRecords() {
+				order := record.(*orders.Order)
+				order.ShippingFee = arg.ShippingFee
+				order.SetupFee = arg.SetupFee
+				order.PickupFee = arg.PickupFee
+				order.OrderType = arg.OrderType
+				if err := orders.OrderState.Trigger("process", order, db); err != nil {
 					return err
 				}
-				db.Save(order)
+				if err := tx.Save(order).Error; err != nil {
+					tx.Rollback()
+					return err
+				}
+				tx.Commit()
+				return nil
 			}
 			return nil
 		},
@@ -191,43 +290,63 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 			}
 			return false
 		},
-		Modes: []string{"show", "menu_item"},
-	})
-
-	order.Action(&admin.Action{
-		Name: "Ship",
-		Handler: func(argument *admin.ActionArgument) error {
-			var (
-				tx                     = argument.Context.GetDB().Begin()
-				trackingNumberArgument = argument.Argument.(*trackingNumberArgument)
-			)
-
-			if trackingNumberArgument.TrackingNumber != "" {
-				for _, record := range argument.FindSelectedRecords() {
-					order := record.(*orders.Order)
-					order.TrackingNumber = &trackingNumberArgument.TrackingNumber
-					orders.OrderState.Trigger("ship", order, tx, "tracking number "+trackingNumberArgument.TrackingNumber)
-					if err := tx.Save(order).Error; err != nil {
-						tx.Rollback()
-						return err
-					}
-				}
-			} else {
-				return errors.New("invalid shipment number")
-			}
-
-			tx.Commit()
-			return nil
-		},
-		Visible: func(record interface{}, context *admin.Context) bool {
-			if order, ok := record.(*orders.Order); ok {
-				return order.State == "processing"
-			}
-			return false
-		},
-		Resource: Admin.NewResource(&trackingNumberArgument{}),
+		Resource: processingActionResource,
 		Modes:    []string{"show", "menu_item"},
 	})
+	// order.Action(&admin.Action{
+	// 	Name: "Processing",
+	// 	Handler: func(argument *admin.ActionArgument) error {
+	// 		for _, order := range argument.FindSelectedRecords() {
+	// 			db := argument.Context.GetDB()
+	// 			if err := orders.OrderState.Trigger("process", order.(*orders.Order), db); err != nil {
+	// 				return err
+	// 			}
+	// 			db.Save(order)
+	// 		}
+	// 		return nil
+	// 	},
+	// 	Visible: func(record interface{}, context *admin.Context) bool {
+	// 		if order, ok := record.(*orders.Order); ok {
+	// 			return order.State == "pending"
+	// 		}
+	// 		return false
+	// 	},
+	// 	Modes: []string{"show", "menu_item"},
+	// })
+
+	// order.Action(&admin.Action{
+	// 	Name: "Ship",
+	// 	Handler: func(argument *admin.ActionArgument) error {
+	// 		var (
+	// 			tx                     = argument.Context.GetDB().Begin()
+	// 			trackingNumberArgument = argument.Argument.(*trackingNumberArgument)
+	// 		)
+	// 		if trackingNumberArgument.TrackingNumber != "" {
+	// 			for _, record := range argument.FindSelectedRecords() {
+	// 				order := record.(*orders.Order)
+	// 				order.TrackingNumber = &trackingNumberArgument.TrackingNumber
+	// 				orders.OrderState.Trigger("ship", order, tx, "tracking number "+trackingNumberArgument.TrackingNumber)
+	// 				if err := tx.Save(order).Error; err != nil {
+	// 					tx.Rollback()
+	// 					return err
+	// 				}
+	// 			}
+	// 		} else {
+	// 			return errors.New("invalid shipment number")
+	// 		}
+
+	// 		tx.Commit()
+	// 		return nil
+	// 	},
+	// 	Visible: func(record interface{}, context *admin.Context) bool {
+	// 		if order, ok := record.(*orders.Order); ok {
+	// 			return order.State == "processing"
+	// 		}
+	// 		return false
+	// 	},
+	// 	Resource: Admin.NewResource(&trackingNumberArgument{}),
+	// 	Modes:    []string{"show", "menu_item"},
+	// })
 
 	deliveryActionArgumentResource := Admin.NewResource(&deliveryActionArgument{})
 	deliveryActionArgumentResource.Meta(&admin.Meta{
@@ -251,7 +370,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	})
 	// 安排配送
 	order.Action(&admin.Action{
-		Name: "配送",
+		Name: "安排配送",
 		Handler: func(argument *admin.ActionArgument) error {
 			var (
 				tx = argument.Context.GetDB().Begin()
@@ -262,7 +381,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 			for _, record := range argument.FindSelectedRecords() {
 				order := record.(*orders.Order)
 				order.ManToDeliverID = arg.ManToDeliver
-				// orders.OrderState.Trigger("deliver", order, tx, "man to deliver "+orderActionArgument.ManToDeliver)
+				orders.OrderState.Trigger("schedule_delivery", order, tx, "man to deliver: "+arg.ManToDeliver)
 				if err := tx.Save(order).Error; err != nil {
 					tx.Rollback()
 					return err
@@ -308,18 +427,17 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	})
 	// 安排安装
 	order.Action(&admin.Action{
-		Name: "安装",
+		Name: "安排安装",
 		Handler: func(argument *admin.ActionArgument) error {
 			var (
 				tx  = argument.Context.GetDB().Begin()
 				arg = argument.Argument.(*setupActionArgument)
-				// setupArgument = argument.Argument.(*setupActionArgument)
 			)
 			// if setupArgument.ManToSetup != "" {
 			for _, record := range argument.FindSelectedRecords() {
 				order := record.(*orders.Order)
 				order.ManToSetupID = arg.ManToSetup
-				// 		// orders.OrderState.Trigger("ship", order, tx, "tracking number "+setupActionArgument.ManToSetup)
+				orders.OrderState.Trigger("schedule_setup", order, tx, "man to setup: "+arg.ManToSetup)
 				if err := tx.Save(order).Error; err != nil {
 					tx.Rollback()
 					return err
@@ -368,7 +486,8 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		Modes: []string{"show", "menu_item"},
 	})
 
-	order.IndexAttrs("ID", "User", "PaymentAmount", "ShippedAt", "CancelledAt", "State", "ShippingAddress")
+	// order.IndexAttrs("ID", "User", "PaymentAmount", "ShippedAt", "CancelledAt", "State", "ShippingAddress")
+	order.IndexAttrs("ID", "source", "order_no", "state", "order_type", "customer_name", "customer_address", "customer_phone", "receivables", "is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "shipping_fee", "setup_fee", "pickup_fee")
 	order.NewAttrs("-DiscountValue", "-AbandonedReason", "-CancelledAt", "-PaymentLog", "-AmazonOrderReferenceID", "-AmazonAddressAccessToken")
 	order.EditAttrs("-DiscountValue", "-AbandonedReason", "-CancelledAt", "-State", "-PaymentLog", "-AmazonOrderReferenceID", "-AmazonAddressAccessToken")
 	order.ShowAttrs("-DiscountValue", "-State", "-AmazonAddressAccessToken")
@@ -453,27 +572,29 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	// Delivery Methods
 	Admin.AddResource(&orders.DeliveryMethod{}, &admin.Config{Menu: []string{"Site Management"}})
 
-	installs := Admin.AddResource(&orders.Order{Source: "JD"}, &admin.Config{Name: "Installs", Menu: []string{"Order Management"}})
-	installs.Scope(&admin.Scope{
-		Default: true,
-		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("source IS NOT NULL")
-		},
-	})
-	installs.IndexAttrs("ID", "source", "order_no", "customer_name", "customer_address", "customer_phone", "is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "state")
+	// installs := Admin.AddResource(&orders.Order{Source: "JD"}, &admin.Config{Name: "Installs", Menu: []string{"Order Management"}})
+	// installs.Scope(&admin.Scope{
+	// 	Default: true,
+	// 	Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+	// 		return db.Where("source IS NOT NULL")
+	// 	},
+	// })
+	// // installs.IndexAttrs("ID", "source", "order_no", "customer_name", "customer_address", "customer_phone", "is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "state")
 
-	// define scopes for Order
-	for _, state := range []string{"pending", "processing", "delivery_scheduled", "setup_scheduled", "pickup_scheduled", "cancelled", "shipped", "paid_cancelled", "returned"} {
-		var state = state
-		installs.Scope(&admin.Scope{
-			Name:  state,
-			Label: strings.Title(strings.Replace(state, "_", " ", -1)),
-			Group: "Order Status",
-			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-				return db.Where(orders.Order{Transition: transition.Transition{State: strings.Title(state)}})
-			},
-		})
-	}
+	// installs.IndexAttrs("ID", "source", "order_no", "customer_name", "customer_address", "customer_phone", "is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "state")
+
+	// // define scopes for Order
+	// for _, state := range []string{"pending", "processing", "delivery_scheduled", "setup_scheduled", "pickup_scheduled", "cancelled", "shipped", "paid_cancelled", "returned"} {
+	// 	var state = state
+	// 	installs.Scope(&admin.Scope{
+	// 		Name:  state,
+	// 		Label: strings.Title(strings.Replace(state, "_", " ", -1)),
+	// 		Group: "Order Status",
+	// 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+	// 			return db.Where(orders.Order{Transition: transition.Transition{State: strings.Title(state)}})
+	// 		},
+	// 	})
+	// }
 
 }
 
@@ -483,34 +604,3 @@ func sizeVariationCollection(resource interface{}, context *qor.Context) (result
 	// }
 	return
 }
-
-// func deliveryManCollection(resource interface{}, context *qor.Context) (results []users.User) {
-// 	// for _, sizeVariation := range products.SizeVariations() {
-// 	// 	results = append(results, []string{strconv.Itoa(int(sizeVariation.ID)), sizeVariation.Stringify()})
-// 	// }
-// 	// return context.GetDB().Find(&users.User)
-// }
-
-// getAvailableLocales Get Available DevelieryMan
-// func getAvailableLocales(req *http.Request, currentUser interface{}) []string {
-// 	if user, ok := currentUser.(viewableLocalesInterface); ok {
-// 		return user.ViewableLocales()
-// 	}
-
-// 	if user, ok := currentUser.(availableLocalesInterface); ok {
-// 		return user.AvailableLocales()
-// 	}
-// 	return []string{Global}
-// }
-// 	Collection: func(_ interface{}, context *admin.Context) (options [][]string) {
-// 				var methods []orders.DeliveryMethod
-// 				context.GetDB().Find(&methods)
-
-// 				for _, m := range methods {
-// 					idStr := fmt.Sprintf("%d", m.ID)
-// 					var option = []string{idStr, fmt.Sprintf("%s (%0.2f) руб", m.Name, m.Price)}
-// 					options = append(options, option)
-// 				}
-
-// 				return options
-// 			},
