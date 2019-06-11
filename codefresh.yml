@@ -11,5 +11,8 @@ steps:
     title: Pushing to Docker Registry
     type: push
     candidate: '${{BuildingDockerImage}}'
-    tag: '${{CF_BRANCH_TAG_NORMALIZED}}'
+    tags:
+      - ${{CF_SHORT_REVISION}}
+      - ${{CF_BRANCH_TAG_NORMALIZED}}
+      - latest
     registry: dockerhub
