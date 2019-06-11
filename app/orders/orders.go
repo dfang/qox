@@ -17,6 +17,7 @@ import (
 	"github.com/qor/activity"
 	"github.com/qor/admin"
 	"github.com/qor/application"
+	"github.com/qor/exchange"
 	"github.com/qor/qor"
 	"github.com/qor/render"
 	"github.com/qor/transition"
@@ -486,6 +487,15 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		Modes: []string{"show", "menu_item"},
 	})
 
+	order.Action(&admin.Action{
+		Name:        "Export",
+		URLOpenType: "slideout",
+		URL: func(record interface{}, context *admin.Context) string {
+			return "/admin/workers/new?job=Export Orders"
+		},
+		Modes: []string{"collection"},
+	})
+
 	// order.IndexAttrs("ID", "User", "PaymentAmount", "ShippedAt", "CancelledAt", "State", "ShippingAddress")
 	order.IndexAttrs("ID", "source", "order_no", "state", "order_type", "customer_name", "customer_address", "customer_phone", "receivables", "is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "shipping_fee", "setup_fee", "pickup_fee")
 	order.NewAttrs("-DiscountValue", "-AbandonedReason", "-CancelledAt", "-PaymentLog", "-AmazonOrderReferenceID", "-AmazonAddressAccessToken")
@@ -595,6 +605,16 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	// 		},
 	// 	})
 	// }
+
+	// Define Resource
+	o1 := exchange.NewResource(&orders.Order{}, exchange.Config{PrimaryField: "customer_name"})
+	// Define columns are exportable/importable
+	o1.Meta(&exchange.Meta{Name: "customer_name"})
+	o1.Meta(&exchange.Meta{Name: "customer_address"})
+	o1.Meta(&exchange.Meta{Name: "customer_phone"})
+	o1.Meta(&exchange.Meta{Name: "receivables"})
+	o1.Meta(&exchange.Meta{Name: "reserverd_delivery_time"})
+	o1.Meta(&exchange.Meta{Name: "reserverd_setup_time"})
 
 }
 

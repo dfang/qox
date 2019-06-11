@@ -134,6 +134,30 @@ func SetupWorker(Admin *admin.Admin) {
 		},
 	})
 
+	Worker.RegisterJob(&worker.Job{
+		Name:  "Export Orders",
+		Group: "Orders Management",
+		Handler: func(arg interface{}, qorJob worker.QorJobInterface) error {
+			qorJob.AddLog("Exporting orders...")
+
+			context := &qor.Context{DB: db.DB}
+			fileName := fmt.Sprintf("/downloads/orders.%v.csv", time.Now().UnixNano())
+			if err := ProductExchange.Export(
+				csv.New(filepath.Join("public", fileName)),
+				context,
+				func(progress exchange.Progress) error {
+					qorJob.AddLog(fmt.Sprintf("%v/%v Exporting product %v", progress.Current, progress.Total, progress.Value.(*products.Product).Code))
+					return nil
+				},
+			); err != nil {
+				qorJob.AddLog(err.Error())
+			}
+
+			qorJob.SetProgressText(fmt.Sprintf("<a href='%v'>Download exported orders</a>", fileName))
+			return nil
+		},
+	})
+
 	exchange_actions.RegisterExchangeJobs(i18n.I18n, Worker)
 	Admin.AddResource(Worker, &admin.Config{Menu: []string{"Site Management"}, Priority: 3})
 }
