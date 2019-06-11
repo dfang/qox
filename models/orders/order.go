@@ -52,7 +52,7 @@ type Order struct {
 	Source string
 
 	// 订单号 面单号
-	OrderNo string
+	OrderNo string `gorm:"unique;not null"`
 
 	// -- ORDER_TYPE starts with Q 退货的取件单
 	OrderType string
