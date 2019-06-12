@@ -22,7 +22,7 @@ require (
 	github.com/gosimple/slug v1.5.0 // indirect
 	github.com/headzoo/surf v1.0.0 // indirect
 	github.com/headzoo/ut v0.0.0-20181013193318-a13b5a7a02ca // indirect
-	github.com/jinzhu/configor v1.0.0
+	github.com/jinzhu/configor v1.0.1
 	github.com/jinzhu/copier v0.0.0-20180308034124-7e38e58719c3 // indirect
 	github.com/jinzhu/gorm v1.9.8
 	github.com/jinzhu/now v1.0.0
