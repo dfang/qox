@@ -25,7 +25,7 @@ require (
 	github.com/jinzhu/configor v1.0.0
 	github.com/jinzhu/copier v0.0.0-20180308034124-7e38e58719c3 // indirect
 	github.com/jinzhu/gorm v1.9.8
-	github.com/jinzhu/now v1.0.0
+	github.com/jinzhu/now v1.0.1
 	github.com/joho/godotenv v1.3.0
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible
 	github.com/kr/pretty v0.1.0 // indirect
