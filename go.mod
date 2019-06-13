@@ -24,7 +24,7 @@ require (
 	github.com/headzoo/ut v0.0.0-20181013193318-a13b5a7a02ca // indirect
 	github.com/jinzhu/configor v1.0.0
 	github.com/jinzhu/copier v0.0.0-20180308034124-7e38e58719c3 // indirect
-	github.com/jinzhu/gorm v1.9.8
+	github.com/jinzhu/gorm v1.9.9
 	github.com/jinzhu/now v1.0.0
 	github.com/joho/godotenv v1.3.0
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible
