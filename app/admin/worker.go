@@ -148,6 +148,8 @@ func SetupWorker(Admin *admin.Admin) {
 			// https://forum.golangbridge.org/t/how-to-write-csv-file-with-bom-utf8/9434
 			// https://www.zhihu.com/question/21869078
 			// https://blog.csdn.net/wodatoucai/article/details/46970347
+			// https://pathbox.github.io/2017/01/20/csv-operation-in-GO/
+			// https://stackoverflow.com/questions/21371673/reading-files-with-a-bom-in-go
 			fileName := fmt.Sprintf("/downloads/orders/%v.csv", time.Now().UnixNano())
 			bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
 			f, err := os.Create(filepath.Join("public", fileName))
