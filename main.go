@@ -156,24 +156,19 @@ func main() {
 		os.Exit(1)
 	} else {
 		fmt.Printf("Listening on: %v\n", config.Config.Port)
-		// if config.Config.HTTPS {
-		// 	if err := http.ListenAndServeTLS(fmt.Sprintf(":%d", config.Config.Port), "config/local_certs/server.crt", "config/local_certs/server.key", Application.NewServeMux()); err != nil {
-		// 		panic(err)
-		// 	}
-		// } else {
-		// 	if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
-		// 		panic(err)
-		// 	}
-		// }
-		// http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), certManager.HTTPHandler(nil))
-
 		if os.Getenv("GO_ENV") != "production" {
 			if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
 				panic(err)
 			}
 		} else {
-			http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), certManager.HTTPHandler(nil))
-			server.ListenAndServeTLS("", "")
+			if config.Config.HTTPS {
+				go http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), certManager.HTTPHandler(nil))
+				server.ListenAndServeTLS("", "")
+			} else {
+				if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
+					panic(err)
+				}
+			}
 		}
 	}
 }
