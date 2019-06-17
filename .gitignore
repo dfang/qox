@@ -24,3 +24,6 @@ public/downloads
 public/system
 
 .pgsync.yml
+
+nohup.out
+cert-cache
