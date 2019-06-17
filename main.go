@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"net/http"
@@ -9,6 +10,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"golang.org/x/crypto/acme/autocert"
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/rs/zerolog"
@@ -36,6 +39,7 @@ import (
 	"github.com/qor/publish2"
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
+
 	// https://github.com/qor/qor-example/issues/129
 	"github.com/dfang/qor-demo/config/db/migrations"
 )
@@ -71,6 +75,20 @@ func main() {
 			DB:     db.DB,
 		})
 	)
+	certManager := autocert.Manager{
+		Prompt: autocert.AcceptTOS,
+		Cache:  autocert.DirCache("cert-cache"),
+		// Put your domain here:
+		HostPolicy: autocert.HostWhitelist(os.Getenv("DOMAIN")),
+	}
+
+	server := &http.Server{
+		Addr:    ":443",
+		Handler: Router,
+		TLSConfig: &tls.Config{
+			GetCertificate: certManager.GetCertificate,
+		},
+	}
 
 	funcmapmaker.AddFuncMapMaker(auth.Auth.Config.Render)
 
@@ -138,14 +156,24 @@ func main() {
 		os.Exit(1)
 	} else {
 		fmt.Printf("Listening on: %v\n", config.Config.Port)
-		if config.Config.HTTPS {
-			if err := http.ListenAndServeTLS(fmt.Sprintf(":%d", config.Config.Port), "config/local_certs/server.crt", "config/local_certs/server.key", Application.NewServeMux()); err != nil {
-				panic(err)
-			}
-		} else {
+		// if config.Config.HTTPS {
+		// 	if err := http.ListenAndServeTLS(fmt.Sprintf(":%d", config.Config.Port), "config/local_certs/server.crt", "config/local_certs/server.key", Application.NewServeMux()); err != nil {
+		// 		panic(err)
+		// 	}
+		// } else {
+		// 	if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
+		// 		panic(err)
+		// 	}
+		// }
+		// http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), certManager.HTTPHandler(nil))
+
+		if os.Getenv("GO_ENV") != "production" {
 			if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
 				panic(err)
 			}
+		} else {
+			http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), certManager.HTTPHandler(nil))
+			server.ListenAndServeTLS("", "")
 		}
 	}
 }
