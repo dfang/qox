@@ -1,15 +1,18 @@
 package auth
 
 import (
+	"os"
+	"strconv"
 	"time"
 
-	"github.com/qor/auth"
-	"github.com/qor/auth/authority"
-	"github.com/qor/auth_themes/clean"
 	"github.com/dfang/qor-demo/config"
 	"github.com/dfang/qor-demo/config/bindatafs"
 	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/models/users"
+	"github.com/qor/auth"
+	"github.com/qor/auth/authority"
+	"github.com/qor/auth/providers/wechat_work"
+	"github.com/qor/auth_themes/clean"
 	"github.com/qor/render"
 )
 
@@ -43,6 +46,22 @@ func init() {
 	// Auth.RegisterProvider(google.New(&config.Config.Google))
 	// Auth.RegisterProvider(facebook.New(&config.Config.Facebook))
 	// Auth.RegisterProvider(twitter.New(&config.Config.Twitter))
+
+	CorpID := os.Getenv("AUTH_CORP_ID")
+	CorpSecret := os.Getenv("AUTH_CORP_SECRET")
+	if CorpID == "" || CorpSecret == "" {
+		panic("AUTH_CORP_ID 和 AUTH_CORP_SECRET 都不能为空, 请配置")
+	}
+	AgentID, err := strconv.ParseInt(os.Getenv("AUTH_AGENT_ID"), 10, 64)
+	if err != nil {
+		panic(err)
+	}
+
+	Auth.RegisterProvider(wechat_work.New(&wechat_work.Config{
+		CorpID:     CorpID,
+		CorpSecret: CorpSecret,
+		AgentID:    AgentID,
+	}))
 
 	Authority.Register("logged_in_half_hour", authority.Rule{TimeoutSinceLastLogin: time.Minute * 30})
 }

@@ -3,6 +3,7 @@ package migrations
 import (
 	"fmt"
 
+	"github.com/qor/auth/auth_identity"
 	"github.com/dfang/qor-demo/app/admin"
 	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/models/blogs"
@@ -13,7 +14,6 @@ import (
 	"github.com/dfang/qor-demo/models/stores"
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/qor/activity"
-	"github.com/qor/auth/auth_identity"
 	"github.com/qor/banner_editor"
 	"github.com/qor/help"
 	i18n_database "github.com/qor/i18n/backends/database"
@@ -22,7 +22,7 @@ import (
 )
 
 func Migrate() {
-	fmt.Println("running miration .......")
+	fmt.Println("running migration .......")
 
 	AutoMigrate(&asset_manager.AssetManager{})
 
