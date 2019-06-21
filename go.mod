@@ -19,7 +19,7 @@ require (
 	github.com/gorilla/schema v1.1.0
 	github.com/headzoo/surf v1.0.0 // indirect
 	github.com/headzoo/ut v0.0.0-20181013193318-a13b5a7a02ca // indirect
-	github.com/jinzhu/configor v1.0.0
+	github.com/jinzhu/configor v1.1.0
 	github.com/jinzhu/gorm v1.9.9
 	github.com/jinzhu/now v1.0.1
 	github.com/joho/godotenv v1.3.0
