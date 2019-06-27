@@ -45,14 +45,21 @@ import (
 )
 
 func main() {
+	start := time.Now()
+
 	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	compileTemplate := cmdLine.Bool("compile-templates", false, "Compile Templates")
 	isDebug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
 	debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
+	runMigration := cmdLine.Bool("migration", false, "Run migration")
+	// runSeed := cmdLine.Bool("seed", false, "Run seed")
 
 	cmdLine.Parse(os.Args[1:])
 
-	migrations.Migrate()
+	if *runMigration {
+		migrations.Migrate()
+		os.Exit(0)
+	}
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	log.Logger = log.With().Caller().Logger()
@@ -153,8 +160,11 @@ func main() {
 
 	if *compileTemplate {
 		bindatafs.AssetFS.Compile()
-		os.Exit(1)
+		os.Exit(0)
 	} else {
+
+		elapsed := time.Since(start)
+		fmt.Printf("Startup took %s\n", elapsed)
 		fmt.Printf("Listening on: %v\n", config.Config.Port)
 		if os.Getenv("GO_ENV") != "production" {
 			if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
@@ -170,5 +180,6 @@ func main() {
 				}
 			}
 		}
+
 	}
 }
