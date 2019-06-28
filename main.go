@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/acme/autocert"
@@ -34,6 +35,7 @@ import (
 	"github.com/dfang/qor-demo/utils/funcmapmaker"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/application"
 	"github.com/qor/publish2"
@@ -44,15 +46,28 @@ import (
 	"github.com/dfang/qor-demo/config/db/migrations"
 )
 
+var (
+	Router      *chi.Mux
+	Admin       *admin.Admin
+	Application *application.Application
+)
+
 func main() {
+	start := time.Now()
+
 	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	compileTemplate := cmdLine.Bool("compile-templates", false, "Compile Templates")
 	isDebug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
 	debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
+	runMigration := cmdLine.Bool("migration", false, "Run migration")
+	// runSeed := cmdLine.Bool("seed", false, "Run seed")
 
 	cmdLine.Parse(os.Args[1:])
 
-	migrations.Migrate()
+	if *runMigration {
+		migrations.Migrate()
+		os.Exit(0)
+	}
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	log.Logger = log.With().Caller().Logger()
@@ -62,39 +77,57 @@ func main() {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 
-	var (
-		Router = chi.NewRouter()
-		Admin  = admin.New(&admin.AdminConfig{
-			SiteName: "QOR DEMO",
-			Auth:     auth.AdminAuth{},
-			DB:       db.DB.Set(publish2.VisibleMode, publish2.ModeOff).Set(publish2.ScheduleMode, publish2.ModeOff),
-		})
-		Application = application.New(&application.Config{
-			Router: Router,
-			Admin:  Admin,
-			DB:     db.DB,
-		})
-	)
-	certManager := autocert.Manager{
-		Prompt: autocert.AcceptTOS,
-		Cache:  autocert.DirCache("cert-cache"),
-		// Put your domain here:
-		HostPolicy: autocert.HostWhitelist(os.Getenv("DOMAIN")),
-	}
-
-	server := &http.Server{
-		Addr:    ":443",
-		Handler: Router,
-		TLSConfig: &tls.Config{
-			GetCertificate: certManager.GetCertificate,
-		},
-	}
+	Router = chi.NewRouter()
+	Admin = admin.New(&admin.AdminConfig{
+		SiteName: "QOR DEMO",
+		Auth:     auth.AdminAuth{},
+		DB:       db.DB.Set(publish2.VisibleMode, publish2.ModeOff).Set(publish2.ScheduleMode, publish2.ModeOff),
+	})
+	Application = application.New(&application.Config{
+		Router: Router,
+		Admin:  Admin,
+		DB:     Admin.DB,
+	})
 
 	funcmapmaker.AddFuncMapMaker(auth.Auth.Config.Render)
 
 	Router.Use(middleware.RealIP)
 	Router.Use(middleware.Logger)
 	Router.Use(middleware.Recoverer)
+
+	// subdomain support
+	Admin.GetRouter().Use(&admin.Middleware{
+		Name: "switch_db",
+		Handler: func(context *admin.Context, middleware *admin.Middleware) {
+			fmt.Println("Host: ", context.Request.Host)
+			host := context.Request.Host
+			//Figure out if a subdomain exists in the host given.
+			hostParts := strings.Split(host, ".")
+			var subDomain string
+			if len(hostParts) > 2 {
+				subDomain = hostParts[0]
+			}
+			fmt.Println("SubDomain: ", subDomain)
+			if subDomain != "" {
+				// http://codepodu.com/subdomains-with-golang/
+				// https://stackoverflow.com/questions/26517636/getting-the-subdomain
+				// https://www.learngoogle.com/2013/07/14/extract-subdomain-from-request-in-go/
+				subDomain := strings.Split(context.Request.Host, ".")[0]
+				fmt.Println(fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", "postgres", "postgres", "localhost", "5432", subDomain))
+				DB, err := gorm.Open("postgres", fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", "postgres", "postgres", "localhost", "5432", subDomain))
+				if err != nil {
+					log.Fatal().Str("err", err.Error())
+				}
+				err = DB.DB().Ping()
+				if err != nil {
+					log.Fatal().Str("err", err.Error())
+				}
+				context.SetDB(DB)
+			}
+			middleware.Next(context)
+		},
+	})
+
 	Router.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			var (
@@ -119,7 +152,7 @@ func main() {
 
 	Application.Use(api.New(&api.Config{}))
 	Application.Use(adminapp.New(&adminapp.Config{}))
-	Application.Use(home.New(&home.Config{}))
+	// Application.Use(home.New(&home.Config{}))
 	Application.Use(account.NewWithDefault())
 	Application.Use(home.NewWithDefault())
 	Application.Use(products.NewWithDefault())
@@ -153,15 +186,31 @@ func main() {
 
 	if *compileTemplate {
 		bindatafs.AssetFS.Compile()
-		os.Exit(1)
+		os.Exit(0)
 	} else {
+
+		elapsed := time.Since(start)
+		fmt.Printf("Startup took %s\n", elapsed)
 		fmt.Printf("Listening on: %v\n", config.Config.Port)
 		if os.Getenv("GO_ENV") != "production" {
-			if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
+			if err := http.ListenAndServe(fmt.Sprintf("app.localhost:%d", config.Config.Port), Application.NewServeMux()); err != nil {
 				panic(err)
 			}
 		} else {
 			if config.Config.HTTPS {
+				certManager := autocert.Manager{
+					Prompt: autocert.AcceptTOS,
+					Cache:  autocert.DirCache("cert-cache"),
+					// Put your domain here:
+					HostPolicy: autocert.HostWhitelist(os.Getenv("DOMAIN")),
+				}
+				server := &http.Server{
+					Addr:    ":443",
+					Handler: Router,
+					TLSConfig: &tls.Config{
+						GetCertificate: certManager.GetCertificate,
+					},
+				}
 				go http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), certManager.HTTPHandler(nil))
 				server.ListenAndServeTLS("", "")
 			} else {
