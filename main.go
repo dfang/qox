@@ -82,20 +82,6 @@ func main() {
 			DB:     db.DB,
 		})
 	)
-	certManager := autocert.Manager{
-		Prompt: autocert.AcceptTOS,
-		Cache:  autocert.DirCache("cert-cache"),
-		// Put your domain here:
-		HostPolicy: autocert.HostWhitelist(os.Getenv("DOMAIN")),
-	}
-
-	server := &http.Server{
-		Addr:    ":443",
-		Handler: Router,
-		TLSConfig: &tls.Config{
-			GetCertificate: certManager.GetCertificate,
-		},
-	}
 
 	funcmapmaker.AddFuncMapMaker(auth.Auth.Config.Render)
 
@@ -126,7 +112,7 @@ func main() {
 
 	Application.Use(api.New(&api.Config{}))
 	Application.Use(adminapp.New(&adminapp.Config{}))
-	Application.Use(home.New(&home.Config{}))
+	// Application.Use(home.New(&home.Config{}))
 	Application.Use(account.NewWithDefault())
 	Application.Use(home.NewWithDefault())
 	Application.Use(products.NewWithDefault())
@@ -167,11 +153,24 @@ func main() {
 		fmt.Printf("Startup took %s\n", elapsed)
 		fmt.Printf("Listening on: %v\n", config.Config.Port)
 		if os.Getenv("GO_ENV") != "production" {
-			if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
+			if err := http.ListenAndServe(fmt.Sprintf("app.localhost:%d", config.Config.Port), Application.NewServeMux()); err != nil {
 				panic(err)
 			}
 		} else {
 			if config.Config.HTTPS {
+				certManager := autocert.Manager{
+					Prompt: autocert.AcceptTOS,
+					Cache:  autocert.DirCache("cert-cache"),
+					// Put your domain here:
+					HostPolicy: autocert.HostWhitelist(os.Getenv("DOMAIN")),
+				}
+				server := &http.Server{
+					Addr:    ":443",
+					Handler: Router,
+					TLSConfig: &tls.Config{
+						GetCertificate: certManager.GetCertificate,
+					},
+				}
 				go http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), certManager.HTTPHandler(nil))
 				server.ListenAndServeTLS("", "")
 			} else {
@@ -180,6 +179,5 @@ func main() {
 				}
 			}
 		}
-
 	}
 }
