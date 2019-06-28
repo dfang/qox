@@ -108,7 +108,7 @@ func main() {
 				subDomain = hostParts[0]
 			}
 			fmt.Println("SubDomain: ", subDomain)
-			if subDomain != "" {
+			if subDomain != "" && sudDomain != "www" {
 				// http://codepodu.com/subdomains-with-golang/
 				// https://stackoverflow.com/questions/26517636/getting-the-subdomain
 				// https://www.learngoogle.com/2013/07/14/extract-subdomain-from-request-in-go/
