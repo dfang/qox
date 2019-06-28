@@ -91,7 +91,13 @@ func main() {
 
 	funcmapmaker.AddFuncMapMaker(auth.Auth.Config.Render)
 
+	// Health check for k8s pod
+	Router.Use(middleware.Heartbeat("/health"))
+	// TODO: implement Graceful shutdown
+	// https://medium.com/over-engineering/graceful-shutdown-with-go-http-servers-and-kubernetes-rolling-updates-6697e7db17cf
+
 	Router.Use(middleware.RealIP)
+	Router.Use(middleware.RequestID)
 	Router.Use(middleware.Logger)
 	Router.Use(middleware.Recoverer)
 
