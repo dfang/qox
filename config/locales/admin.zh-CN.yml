@@ -17,6 +17,10 @@ zh-CN:
       State: 订单状态
   orders:
     scopes:
+      "Order Status": "按订单状态"
+      "Filter By Date": "按日期"
+      "Filter By Source": "按订单来源"
+      "Filter By Order Type": "按订单类型"
       "Order Status":
         "Pickup Scheduled": 已安排取件
         "Delivery Scheduled": 已安排配送
@@ -27,6 +31,23 @@ zh-CN:
         "Returned": 已退货
         "Pending": 待处理
         "Processing": 处理中
+      "Filter By Date":
+        Today: "今天"
+        Yesterday: "昨天"
+        "This Week": 本周
+        "This Month": 本月
+        "This Quarter": 本季度
+        "This Year": 本年
+      "Filter By Source":
+        "JD": 京东
+      "Filter By Order Type":
+        "Delivery": 配送
+        "Setup": 安装
+        "Delivery And Setup": 配送一体
+        "Clean": 清洗
+        "Repair": 维修
+        "Sales": 销售
+
     actions:
       Processing: 预处理
       Cancel: 取消订单
