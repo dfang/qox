@@ -74,6 +74,8 @@ zh-CN:
       Order_type: "订单类型"
       Receivables: 应收款项
       State: 订单状态
+      Created_at: 创建于
+      Updated_at: 更新于
   qor_admin:
     menus:
       "Site Management": 站点管理

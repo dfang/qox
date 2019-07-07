@@ -87,46 +87,57 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 			},
 		},
 	})
-	// order.Meta(&admin.Meta{Name: "customer_address", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
-	// 	order := record.(*orders.Order)
-	// 	return strings.Replace(order.CustomerAddress, "江西九江市修水县", "", -1)
-	// }})
 
-	// order.Meta(&admin.Meta{Name: "customer_phone", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
-	// 	order := record.(*orders.Order)
-	// 	phones := strings.Split(order.CustomerPhone, "/")
-	// 	if phones[0] == phones[1] {
-	// 		return phones[0]
-	// 	}
-	// 	return order.CustomerPhone
-	// }})
-	// order.Meta(&admin.Meta{Name: "man_to_deliver_id", Type: "string", FormattedValuer: func(record interface{}, ctx *qor.Context) (result interface{}) {
-	// 	order := record.(*orders.Order)
-	// 	if order.ManToDeliverID != "" {
-	// 		var user users.User
-	// 		ctx.DB.Where("id = ?", order.ManToDeliverID).Find(&user)
-	// 		return user.Name
-	// 	}
-	// 	return ""
-	// }})
-	// order.Meta(&admin.Meta{Name: "man_to_setup_id", Type: "string", FormattedValuer: func(record interface{}, ctx *qor.Context) (result interface{}) {
-	// 	order := record.(*orders.Order)
-	// 	if order.ManToSetupID != "" {
-	// 		var user users.User
-	// 		ctx.DB.Where("id = ?", order.ManToSetupID).Find(&user)
-	// 		return user.Name
-	// 	}
-	// 	return ""
-	// }})
-	// order.Meta(&admin.Meta{Name: "man_to_pickup_id", Type: "string", FormattedValuer: func(record interface{}, ctx *qor.Context) (result interface{}) {
-	// 	order := record.(*orders.Order)
-	// 	if order.ManToPickupID != "" {
-	// 		var user users.User
-	// 		ctx.DB.Where("id = ?", order.ManToPickupID).Find(&user)
-	// 		return user.Name
-	// 	}
-	// 	return ""
-	// }})
+	order.Meta(&admin.Meta{Name: "created_at", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		order := record.(*orders.Order)
+		return order.CreatedAt.Local().Format("2006-01-02 15:04:05")
+	}})
+
+	order.Meta(&admin.Meta{Name: "updated_at", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		order := record.(*orders.Order)
+		return order.UpdatedAt.Local().Format("2006-01-02 15:04:05")
+	}})
+
+	order.Meta(&admin.Meta{Name: "customer_address", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		order := record.(*orders.Order)
+		return strings.Replace(order.CustomerAddress, "江西九江市修水县", "", -1)
+	}})
+
+	order.Meta(&admin.Meta{Name: "customer_phone", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		order := record.(*orders.Order)
+		phones := strings.Split(order.CustomerPhone, "/")
+		if phones[0] == phones[1] {
+			return phones[0]
+		}
+		return order.CustomerPhone
+	}})
+	order.Meta(&admin.Meta{Name: "man_to_deliver_id", Type: "string", FormattedValuer: func(record interface{}, ctx *qor.Context) (result interface{}) {
+		order := record.(*orders.Order)
+		if order.ManToDeliverID != "" {
+			var user users.User
+			ctx.DB.Where("id = ?", order.ManToDeliverID).Find(&user)
+			return user.Name
+		}
+		return ""
+	}})
+	order.Meta(&admin.Meta{Name: "man_to_setup_id", Type: "string", FormattedValuer: func(record interface{}, ctx *qor.Context) (result interface{}) {
+		order := record.(*orders.Order)
+		if order.ManToSetupID != "" {
+			var user users.User
+			ctx.DB.Where("id = ?", order.ManToSetupID).Find(&user)
+			return user.Name
+		}
+		return ""
+	}})
+	order.Meta(&admin.Meta{Name: "man_to_pickup_id", Type: "string", FormattedValuer: func(record interface{}, ctx *qor.Context) (result interface{}) {
+		order := record.(*orders.Order)
+		if order.ManToPickupID != "" {
+			var user users.User
+			ctx.DB.Where("id = ?", order.ManToPickupID).Find(&user)
+			return user.Name
+		}
+		return ""
+	}})
 
 	orderItemMeta := order.Meta(&admin.Meta{Name: "OrderItems"})
 	orderItemMeta.Resource.Meta(&admin.Meta{Name: "SizeVariation", Config: &admin.SelectOneConfig{Collection: sizeVariationCollection}})
