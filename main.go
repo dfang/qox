@@ -158,37 +158,48 @@ func main() {
 	if *compileTemplate {
 		bindatafs.AssetFS.Compile()
 		os.Exit(0)
-	} else {
+	}
 
-		elapsed := time.Since(start)
-		fmt.Printf("Startup took %s\n", elapsed)
-		fmt.Printf("Listening on: %v\n", config.Config.Port)
-		if os.Getenv("GO_ENV") != "production" {
-			if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
-				panic(err)
-			}
-		} else {
-			if config.Config.HTTPS {
-				certManager := autocert.Manager{
-					Prompt: autocert.AcceptTOS,
-					Cache:  autocert.DirCache("cert-cache"),
-					// Put your domain here:
-					HostPolicy: autocert.HostWhitelist(os.Getenv("DOMAIN")),
-				}
-				server := &http.Server{
-					Addr:    ":443",
-					Handler: Router,
-					TLSConfig: &tls.Config{
-						GetCertificate: certManager.GetCertificate,
-					},
-				}
-				go http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), certManager.HTTPHandler(nil))
-				server.ListenAndServeTLS("", "")
-			} else {
-				if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
-					panic(err)
-				}
-			}
+	envs := []string{
+		"GO_ENV", "DEBUG", "HTTPS", "DOMAIN", "PORT",
+	}
+
+	for _, e := range envs {
+		if os.Getenv(e) != "" {
+			fmt.Printf("Found env var %s=%s\n", e, os.Getenv(e))
+		}
+	}
+
+	if os.Getenv("HTTPS") == "true" && os.Getenv("DOMAIN") == "" {
+		log.Info().Msg("If set HTTPS=true, this app will get ssl certificates automatically and serve on 443,  so you must also set DOMAIN")
+		log.Info().Msg("By default (HTTPS not set), you need to config caddy as reverse proxy to serve https requests")
+		log.Info().Msg("If you plan to use caddy as frontend (reverse proxy), you don't need to set HTTPS, or just set to false")
+		os.Exit(1)
+	}
+
+	elapsed := time.Since(start)
+	fmt.Printf("Startup took %s\n", elapsed)
+	fmt.Printf("Listening on: %v\n", config.Config.Port)
+
+	if config.Config.HTTPS {
+		certManager := autocert.Manager{
+			Prompt: autocert.AcceptTOS,
+			Cache:  autocert.DirCache("cert-cache"),
+			// Put your domain here:
+			HostPolicy: autocert.HostWhitelist(os.Getenv("DOMAIN")),
+		}
+		server := &http.Server{
+			Addr:    ":443",
+			Handler: Router,
+			TLSConfig: &tls.Config{
+				GetCertificate: certManager.GetCertificate,
+			},
+		}
+		go http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), certManager.HTTPHandler(nil))
+		server.ListenAndServeTLS("", "")
+	} else {
+		if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
+			panic(err)
 		}
 	}
 }
