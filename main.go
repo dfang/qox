@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	"golang.org/x/crypto/acme/autocert"
@@ -35,7 +34,6 @@ import (
 	"github.com/dfang/qor-demo/utils/funcmapmaker"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/application"
 	"github.com/qor/publish2"
@@ -100,39 +98,6 @@ func main() {
 	Router.Use(middleware.RequestID)
 	Router.Use(middleware.Logger)
 	Router.Use(middleware.Recoverer)
-
-	// subdomain support
-	Admin.GetRouter().Use(&admin.Middleware{
-		Name: "switch_db",
-		Handler: func(context *admin.Context, middleware *admin.Middleware) {
-			fmt.Println("Host: ", context.Request.Host)
-			host := context.Request.Host
-			//Figure out if a subdomain exists in the host given.
-			hostParts := strings.Split(host, ".")
-			var subDomain string
-			if len(hostParts) > 2 {
-				subDomain = hostParts[0]
-			}
-			fmt.Println("SubDomain: ", subDomain)
-			if subDomain != "" && subDomain != "www" {
-				// http://codepodu.com/subdomains-with-golang/
-				// https://stackoverflow.com/questions/26517636/getting-the-subdomain
-				// https://www.learngoogle.com/2013/07/14/extract-subdomain-from-request-in-go/
-				subDomain := strings.Split(context.Request.Host, ".")[0]
-				fmt.Println(fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", "postgres", "postgres", "localhost", "5432", subDomain))
-				DB, err := gorm.Open("postgres", fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", "postgres", "postgres", "localhost", "5432", subDomain))
-				if err != nil {
-					log.Fatal().Str("err", err.Error())
-				}
-				err = DB.DB().Ping()
-				if err != nil {
-					log.Fatal().Str("err", err.Error())
-				}
-				context.SetDB(DB)
-			}
-			middleware.Next(context)
-		},
-	})
 
 	Router.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
