@@ -199,7 +199,7 @@ func main() {
 		fmt.Printf("Startup took %s\n", elapsed)
 		fmt.Printf("Listening on: %v\n", config.Config.Port)
 		if os.Getenv("GO_ENV") != "production" {
-			if err := http.ListenAndServe(fmt.Sprintf("app.localhost:%d", config.Config.Port), Application.NewServeMux()); err != nil {
+			if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
 				panic(err)
 			}
 		} else {
