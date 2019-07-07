@@ -19,6 +19,7 @@ config/*.yml
 public/dist
 node_modules
 .env
+*.env
 
 public/downloads
 public/system
