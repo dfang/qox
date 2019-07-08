@@ -106,7 +106,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	order.Meta(&admin.Meta{Name: "customer_phone", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
 		order := record.(*orders.Order)
 		phones := strings.Split(order.CustomerPhone, "/")
-		if phones[0] == phones[1] {
+		if len(phones) > 1 && phones[0] == phones[1] {
 			return phones[0]
 		}
 		return order.CustomerPhone
@@ -158,7 +158,10 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		Group: "Filter By Date",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 			now.WeekStartDay = time.Monday
-
+			// select order_no, customer_name, item_name::varchar(20), quantity, created_at
+			// from orders_view
+			// where created_at between now() - interval '2 day' and  now() - interval '1 day';
+			// return db.Where("created_at between now() - interval '2 day' and  now() - interval '1 day'")
 			return db.Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -1)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -1))
 		},
 	})
