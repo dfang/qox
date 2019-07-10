@@ -84,7 +84,7 @@ replace github.com/qor/action_bar v0.0.0-20190314070413-136e5e2c5b8c => gitlab.c
 
 replace github.com/qor/activity v0.0.0-20190529070945-bb9925f02ffb => gitlab.com/qor2/activity v0.0.0-20190603113744-a77a8d222ceb
 
-replace github.com/qor/admin v0.0.0-20190525133731-6329506ec305 => gitlab.com/qor2/admin v0.0.0-20190710123852-8018a1abc078
+replace github.com/qor/admin v0.0.0-20190525133731-6329506ec305 => gitlab.com/qor2/admin v0.0.0-20190710123852-4131afc59aee
 
 // replace github.com/qor/auth => /Users/mj/gohack/github.com/qor/auth // was github.com/qor/auth v0.0.0-20190103025640-46aae9fa92fa => gitlab.com/qor2/auth v0.0.0-20190603032202-1797e2b5fa11
 replace github.com/qor/auth => github.com/dfang/auth v0.0.0-20190621073723-af06642e0754 // was github.com/qor/auth v0.0.0-20190103025640-46aae9fa92fa => gitlab.com/qor2/auth v0.0.0-20190603032202-1797e2b5fa11

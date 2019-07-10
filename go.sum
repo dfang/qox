@@ -278,6 +278,7 @@ gitlab.com/qor2/action_bar v0.0.0-20190603113738-6cef4983ea67 h1:3irHRKtqLMq2afu
 gitlab.com/qor2/action_bar v0.0.0-20190603113738-6cef4983ea67/go.mod h1:Qwxb/mgv4CPFbfBGE3Tju6nF6JSIcXYRzS9rbYaXab0=
 gitlab.com/qor2/activity v0.0.0-20190603113744-a77a8d222ceb h1:UyyGWAYPszwIF1DhKuLRnlkipCFQwxfCJtu2bni8qDg=
 gitlab.com/qor2/activity v0.0.0-20190603113744-a77a8d222ceb/go.mod h1:q59KuWPQmDqmBFEGlP428Q2utJpRGvttGvjvdEjm2q4=
+gitlab.com/qor2/admin v0.0.0-20190710123852-4131afc59aee/go.mod h1:ny4bcpRWM/KtyRSPewOhUisgkhFpS0BJdbMrQzKDUKo=
 gitlab.com/qor2/admin v0.0.0-20190710123852-8018a1abc078 h1:3EqKhznkyLOWTqgyESBjQNM7ezT2MutdwjS7nIYEXTM=
 gitlab.com/qor2/admin v0.0.0-20190710123852-8018a1abc078/go.mod h1:ny4bcpRWM/KtyRSPewOhUisgkhFpS0BJdbMrQzKDUKo=
 gitlab.com/qor2/banner_editor v0.0.0-20190603113758-d987fd7c3c72 h1:LtL6WacaKFCYQQw9hoXdpqyEIS+xB3m+Nowuo7Y/zII=
