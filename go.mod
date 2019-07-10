@@ -23,6 +23,7 @@ require (
 	github.com/jinzhu/gorm v1.9.9
 	github.com/jinzhu/now v1.0.1
 	github.com/joho/godotenv v1.3.0
+	github.com/joho/sqltocsv v0.0.0-20190321025444-a9e6f980056c
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v1.1.1

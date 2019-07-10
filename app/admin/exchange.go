@@ -17,6 +17,7 @@ var ProductExchange = exchange.NewResource(&products.Product{}, exchange.Config{
 var OrderExchange = exchange.NewResource(&orders.Order{}, exchange.Config{PrimaryField: "order_no"})
 
 func init() {
+	OrderExchange.Meta(&exchange.Meta{Name: "created_at"})
 	OrderExchange.Meta(&exchange.Meta{Name: "source"})
 	OrderExchange.Meta(&exchange.Meta{Name: "order_no"})
 	OrderExchange.Meta(&exchange.Meta{Name: "state"})
@@ -34,7 +35,6 @@ func init() {
 	OrderExchange.Meta(&exchange.Meta{Name: "shipping_fee"})
 	OrderExchange.Meta(&exchange.Meta{Name: "setup_fee"})
 	OrderExchange.Meta(&exchange.Meta{Name: "pickup_fee"})
-	OrderExchange.Meta(&exchange.Meta{Name: "created_at"})
 	OrderExchange.Meta(&exchange.Meta{Name: "updated_at"})
 
 	ProductExchange.Meta(&exchange.Meta{Name: "Code"})

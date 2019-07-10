@@ -8,12 +8,9 @@ import (
 
 	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/config/i18n"
-	"github.com/dfang/qor-demo/models/orders"
+	"github.com/joho/sqltocsv"
 	"github.com/qor/admin"
-	"github.com/qor/exchange"
-	"github.com/qor/exchange/backends/csv"
 	"github.com/qor/i18n/exchange_actions"
-	"github.com/qor/qor"
 	"github.com/qor/worker"
 )
 
@@ -141,8 +138,7 @@ func SetupWorker(Admin *admin.Admin) {
 		Group: "Orders Management",
 		Handler: func(arg interface{}, qorJob worker.QorJobInterface) error {
 			qorJob.AddLog("Exporting orders...")
-
-			context := &qor.Context{DB: db.DB}
+			// context := &qor.Context{DB: db.DB}
 
 			// 导出csv文件 中文乱码问题
 			// https://forum.golangbridge.org/t/how-to-write-csv-file-with-bom-utf8/9434
@@ -151,30 +147,46 @@ func SetupWorker(Admin *admin.Admin) {
 			// https://pathbox.github.io/2017/01/20/csv-operation-in-GO/
 			// https://stackoverflow.com/questions/21371673/reading-files-with-a-bom-in-go
 			fileName := fmt.Sprintf("/downloads/orders/%v.csv", time.Now().UnixNano())
-			bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
+			// bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
 			f, err := os.Create(filepath.Join("public", fileName))
 			defer f.Close()
-			f.Write(bomUtf8)
+			// f.Write(bomUtf8)
 			if err != nil {
 				panic(err)
 			}
+
 			// // dec := encoding.Encoding.UTF8
 			// dec := unicode.UTF8.NewDecoder()
 			// dec := unicode.UTF16(unicode.LittleEndian, unicode.UseBOM).NewDecoder()
 			// // transform.NewWriter()
 			// writer := transform.NewWriter(f, dec.Transformer)
 
-			if err := OrderExchange.Export(
-				// csv.New(filepath.Join("public", fileName)),
-				csv.New(f),
-				context,
-				func(progress exchange.Progress) error {
-					qorJob.AddLog(fmt.Sprintf("%v/%v Exporting order %v", progress.Current, progress.Total, progress.Value.(*orders.Order).OrderNo))
-					return nil
-				},
-			); err != nil {
-				qorJob.AddLog(err.Error())
+			// if err := OrderExchange.Export(
+			// 	// csv.New(filepath.Join("public", fileName)),
+			// 	csv.New(f),
+			// 	context,
+			// 	func(progress exchange.Progress) error {
+			// 		qorJob.AddLog(fmt.Sprintf("%v/%v Exporting order %v", progress.Current, progress.Total, progress.Value.(*orders.Order).OrderNo))
+			// 		return nil
+			// 	},
+			// ); err != nil {
+			// 	qorJob.AddLog(err.Error())
+			// }
+
+			rows, err := db.DB.DB().Query("SELECT * FROM orders_view where DATE(created_at) = DATE(timestamp 'yesterday');")
+			if err != nil {
 			}
+
+			defer rows.Close()
+
+			// context.Writer.Header().Set("Content-type", "text/csv")
+			// context.Writer.Header().Set("Content-Disposition", "attachment; filename=\"report.csv\"")
+			sqltocsv.Write(f, rows)
+
+			// err = sqltocsv.WriteFile(fileName, rows)
+			// if err != nil {
+			// 	panic(err)
+			// }
 
 			qorJob.SetProgressText(fmt.Sprintf("<a href='%v'>Download exported orders</a>", fileName))
 			return nil
