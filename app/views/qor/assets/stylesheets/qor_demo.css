@@ -46,3 +46,23 @@
     max-height: 30px;
     margin-right: 8px;
 }
+
+
+
+/* Hack, add hidden-drawer to .mdl-layout can hide the drawer */
+.mdl-layout.hidden-drawer .mdl-layout__header {
+  margin-left: 0 !important;
+  width: 100% !important;
+  padding-left: 50px;
+}
+
+.mdl-layout.hidden-drawer .mdl-layout__drawer {
+  display: none;
+}
+
+.mdl-layout.hidden-drawer .mdl-layout__content{
+  padding-left: 0;
+}
+.mdl-layout.hidden-drawer .qor-page__header{
+  width: 100%;
+}
