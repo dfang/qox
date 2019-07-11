@@ -74,6 +74,7 @@ Date.prototype.AddDate = function (add){
 // qor dashboard
 $(document).ready(function() {
   var yesterday = (new Date()).AddDate(-1);
+  var today = new Date();
   var defStartDate = yesterday.AddDate(-6);
   $("#startDate").val(defStartDate.Format("yyyy-MM-dd"));
   $("#endDate").val(yesterday.Format("yyyy-MM-dd"));
@@ -83,6 +84,13 @@ $(document).ready(function() {
     });
   });
   $(".j-update-record").click();
+
+  $(".today-reports").click(function() {
+    $("#startDate").val(today.Format("yyyy-MM-dd"));
+    $("#endDate").val(today.Format("yyyy-MM-dd"));
+    $(".j-update-record").click();
+    $(this).blur();
+  });
 
   $(".yesterday-reports").click(function() {
     $("#startDate").val(yesterday.Format("yyyy-MM-dd"));
