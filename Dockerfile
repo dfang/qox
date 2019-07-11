@@ -7,7 +7,6 @@ RUN mkdir /go-app
 WORKDIR /go-app
 COPY go.mod .
 COPY go.sum .
-ENV GOPROXY=https://goproxy.io
 RUN go mod download
 COPY . .
 
