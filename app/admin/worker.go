@@ -146,7 +146,8 @@ func SetupWorker(Admin *admin.Admin) {
 			// https://blog.csdn.net/wodatoucai/article/details/46970347
 			// https://pathbox.github.io/2017/01/20/csv-operation-in-GO/
 			// https://stackoverflow.com/questions/21371673/reading-files-with-a-bom-in-go
-			fileName := fmt.Sprintf("/downloads/orders/%v.csv", time.Now().UnixNano())
+			// fileName := fmt.Sprintf("/downloads/orders/%v.csv", time.Now().UnixNano())
+			fileName := fmt.Sprintf("/downloads/orders/%v.csv", time.Now().AddDate(0, 0, -1).Format("20060102"))
 			// bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
 			f, err := os.Create(filepath.Join("public", fileName))
 			defer f.Close()
