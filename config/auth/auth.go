@@ -46,12 +46,19 @@ func init() {
 	// Auth.RegisterProvider(google.New(&config.Config.Google))
 	// Auth.RegisterProvider(facebook.New(&config.Config.Facebook))
 	// Auth.RegisterProvider(twitter.New(&config.Config.Twitter))
-
 	CorpID := os.Getenv("AUTH_CORP_ID")
 	CorpSecret := os.Getenv("AUTH_CORP_SECRET")
 	if CorpID == "" || CorpSecret == "" {
 		panic("AUTH_CORP_ID 和 AUTH_CORP_SECRET 都不能为空, 请配置")
 	}
+
+  AUTH_DOMAIN = os.Getenv("AUTH_DOMAIN")
+  if AUTH_DOMAIN == "" {
+    panic("请设置用于企业微信登录后台的 AUTH_DOMAIN")
+  }
+
+  redirectURI = AUTH_DOMAIN + "/wechat_work/callback"
+
 	AgentID, err := strconv.ParseInt(os.Getenv("AUTH_AGENT_ID"), 10, 64)
 	if err != nil {
 		panic(err)
@@ -61,6 +68,7 @@ func init() {
 		CorpID:     CorpID,
 		CorpSecret: CorpSecret,
 		AgentID:    AgentID,
+    RedirectURI: redirectURI,
 	}))
 
 	Authority.Register("logged_in_half_hour", authority.Rule{TimeoutSinceLastLogin: time.Minute * 30})

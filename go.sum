@@ -43,8 +43,8 @@ github.com/denisenkom/go-mssqldb v0.0.0-20190423183735-731ef375ac02 h1:PS3xfVPa8
 github.com/denisenkom/go-mssqldb v0.0.0-20190423183735-731ef375ac02/go.mod h1:zAg7JM8CkOJ43xKXIj7eRO9kmWm/TW578qo+oDO6tuM=
 github.com/denisenkom/go-mssqldb v0.0.0-20190515213511-eb9f6a1743f3 h1:tkum0XDgfR0jcVVXuTsYv/erY2NnEDqwRojbxR1rBYA=
 github.com/denisenkom/go-mssqldb v0.0.0-20190515213511-eb9f6a1743f3/go.mod h1:zAg7JM8CkOJ43xKXIj7eRO9kmWm/TW578qo+oDO6tuM=
-github.com/dfang/auth v0.0.0-20190621073723-af06642e0754 h1:54MKz0O28JC8W8ChT7eFCiTrq0Q0aCArwm3VzGLD1QM=
-github.com/dfang/auth v0.0.0-20190621073723-af06642e0754/go.mod h1:PIP1qaCATwjdNWRIqBQH3Y70p/2vQi6Pu6kSsh7xUsY=
+github.com/dfang/auth v0.0.0-20190711063714-408e41c1a2cc h1:HhCCd3xd+2kOEWN2xV38ByB7jvFF6i3Bx7p0IMgnugw=
+github.com/dfang/auth v0.0.0-20190711063714-408e41c1a2cc/go.mod h1:PIP1qaCATwjdNWRIqBQH3Y70p/2vQi6Pu6kSsh7xUsY=
 github.com/dfang/render v0.0.0-20190601083323-c410f4728d31 h1:SIEBj9cbVjbmeTO66/Rslv2QBhZUz9c4+WRKPz8LYpo=
 github.com/dfang/render v0.0.0-20190601083323-c410f4728d31/go.mod h1:2VkVykuCLTjnXysg+bUKl7hCDfIUhpEKtzhJ0tr82co=
 github.com/dfang/wechat-work-go v0.0.0-20190616111753-cbf0ed27ba02 h1:tJMbkH46T2JgAaoYC/iEPwOxm5/SRK5UHTS3j8QFBL4=
