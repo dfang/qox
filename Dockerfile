@@ -37,5 +37,5 @@ RUN rm app/*/*.go
 COPY config/locales ./config/locales
 COPY config/db/seeds/data ./config/db/seeds/data
 
-CMD dockerize -wait tcp://db:5432 -timeout 30s /go/bin/qor-demo
+CMD /go/bin/qor-demo
 
