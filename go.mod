@@ -85,7 +85,7 @@ replace github.com/qor/action_bar v0.0.0-20190314070413-136e5e2c5b8c => gitlab.c
 
 replace github.com/qor/activity v0.0.0-20190529070945-bb9925f02ffb => gitlab.com/qor2/activity v0.0.0-20190603113744-a77a8d222ceb
 
-replace github.com/qor/admin v0.0.0-20190525133731-6329506ec305 => gitlab.com/qor2/admin v0.0.0-20190710123852-4131afc59aee
+replace github.com/qor/admin v0.0.0-20190525133731-6329506ec305 => gitlab.com/qor2/admin v0.0.0-20190710125636-4131afc59aee
 
 replace github.com/qor/auth v0.0.0-20190603071357-709ba0ce943b => github.com/dfang/auth v0.0.0-20190711063714-408e41c1a2cc
 
