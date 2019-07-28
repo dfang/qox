@@ -11,14 +11,6 @@ import (
 	"github.com/qor/transition"
 )
 
-type PaymentMethod = string
-
-const (
-	COD        PaymentMethod = "COD"
-	AmazonPay  PaymentMethod = "AmazonPay"
-	CreditCard PaymentMethod = "CreditCard"
-)
-
 type Order struct {
 	gorm.Model
 	audited.AuditedModel

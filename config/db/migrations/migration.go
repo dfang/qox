@@ -31,7 +31,8 @@ func Migrate() {
 	AutoMigrate(&users.User{}, &users.Address{})
 	AutoMigrate(&auth_identity.AuthIdentity{})
 
-	AutoMigrate(&orders.Order{}, &orders.OrderItem{})
+	AutoMigrate(&orders.Order{}, &orders.OrderItem{}, &orders.OrderFollowUp{})
+
 	AutoMigrate(&orders.DeliveryMethod{})
 
 	AutoMigrate(&stores.Store{})
