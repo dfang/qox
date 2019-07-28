@@ -408,6 +408,18 @@ func configureScopes(order *admin.Resource) {
 }
 
 func configureActions(Admin *admin.Admin, order *admin.Resource) {
+	// 查看
+	order.Action(&admin.Action{
+		Name: "View",
+		URL: func(record interface{}, context *admin.Context) string {
+			if order, ok := record.(*orders.Order); ok {
+				return fmt.Sprintf("/admin/orders/%v", order.ID)
+			}
+			return "#"
+		},
+		Modes: []string{"menu_item", "edit", "show"},
+	})
+
 	// define actions for Order
 	type trackingNumberArgument struct {
 		TrackingNumber string
@@ -611,18 +623,6 @@ func configureActions(Admin *admin.Admin, order *admin.Resource) {
 			return options
 		},
 		// Collection: []string{"Male", "Female", "Unknown"},
-	})
-
-	// 查看
-	order.Action(&admin.Action{
-		Name: "View",
-		URL: func(record interface{}, context *admin.Context) string {
-			if order, ok := record.(*orders.Order); ok {
-				return fmt.Sprintf("/admin/orders/%v", order.ID)
-			}
-			return "#"
-		},
-		Modes: []string{"menu_item", "edit", "show"},
 	})
 
 	// 安排安装
