@@ -1,4 +1,5 @@
 .vscode/
+.idea/
 tmp/
 data/
 *.sh
@@ -28,3 +29,10 @@ public/system
 
 nohup.out
 cert-cache
+
+# Ignore azure draft temporarily
+.draft-tasks.toml
+draft.toml
+charts
+.draft-tasks.toml
+.draftignore

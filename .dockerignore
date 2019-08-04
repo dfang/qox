@@ -1,25 +1,34 @@
 .git
 *.sh
 .vscode
+.idea
 .DS_Store
 .gitignore
 
 qor-demo
 gin-bin
 
-.env
+*.env
 .realize.yaml
+.pgsync.yml
 
 tmp
 public/downloads
 public/system
 node_modules
 data
+docker
 
 config/database.yml
 config/database.prod.yml
 config/application.yml
 
-Dockerfile
+docker-compose.yaml
+docker-compose.prod.yaml
+.fossa.yml
+
 captain.yml
 codefresh.yml
+draft.toml
+.draft-taks.toml
+charts/
