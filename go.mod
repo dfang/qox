@@ -72,7 +72,7 @@ require (
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 // indirect
 	github.com/theplant/testingutils v0.0.0-20190603093022-26d8b4d95c61 // indirect
-	github.com/unrolled/render v1.0.0
+	github.com/unrolled/render v1.0.1
 	github.com/yosssi/gohtml v0.0.0-20190128141317-9b7db94d32d9 // indirect
 	golang.org/x/crypto v0.0.0-20190618222545-ea8f1a30c443
 	golang.org/x/image v0.0.0-20190618124811-92942e4437e2 // indirect
