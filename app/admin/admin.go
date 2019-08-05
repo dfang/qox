@@ -63,8 +63,8 @@ func (app App) ConfigureApplication(application *application.Application) {
 
 	SetupNotification(Admin)
 	SetupWorker(Admin)
-	SetupSEO(Admin)
-	SetupWidget(Admin)
+	// SetupSEO(Admin)
+	// SetupWidget(Admin)
 	SetupDashboard(Admin)
 	application.Router.Mount(app.Config.Prefix, Admin.NewServeMux(app.Config.Prefix))
 

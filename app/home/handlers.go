@@ -28,3 +28,8 @@ func (ctrl Controller) SwitchLocale(w http.ResponseWriter, req *http.Request) {
 	utils.SetCookie(http.Cookie{Name: "locale", Value: req.URL.Query().Get("locale")}, &qor.Context{Request: req, Writer: w})
 	http.Redirect(w, req, req.Referer(), http.StatusSeeOther)
 }
+
+// RedirectToAdmin 重定向到/admin, 暂时屏蔽前端界面
+func (ctrl Controller) RedirectToAdmin(w http.ResponseWriter, req *http.Request) {
+	http.Redirect(w, req, "/admin", 301)
+}
