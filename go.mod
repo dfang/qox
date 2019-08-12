@@ -68,7 +68,7 @@ require (
 	github.com/qor/widget v0.0.0-20190314070448-e280f6f16615
 	github.com/qor/wildcard_router v0.0.0-20171031035524-56710e5bb5a4 // indirect
 	github.com/qor/worker v0.0.0-20190409083615-5c9381791cdc
-	github.com/rs/zerolog v1.14.3
+	github.com/rs/zerolog v1.15.0
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 // indirect
 	github.com/theplant/testingutils v0.0.0-20190603093022-26d8b4d95c61 // indirect
