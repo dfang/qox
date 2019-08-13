@@ -11,7 +11,7 @@ pool:
 
 variables:
   # dockerID: $(dockerID)  # Replace with your Docker ID for Docker Hub or the admin user name for the Azure Container Registry
-  imageName: $(dockerID)/$(Build.SourceBranch):$(Build.SourceVersion)  # Replace with the name of the image you want to publish
+  imageName: $(dockerID)/$(Build.Repository.Name):$(Build.SourceBranch)-$(Build.SourceVersion)  # Replace with the name of the image you want to publish
 
 steps:
 
