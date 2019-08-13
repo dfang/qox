@@ -22,7 +22,7 @@ steps:
 - script: echo "make sure you've defined docker credentials in env"
 - script: docker login -u $(dockerID) -p $(dockerPWD)
   displayName: 'docker login'
-- script: docker build -f Dockerfile -t $(dockerID)/$(imageName) .
+- script: docker build -f Dockerfile -t $(imageName) .
   displayName: 'docker build'
 - script: docker push $(dockerID)/$(imageName)
   displayName: 'docker push'
