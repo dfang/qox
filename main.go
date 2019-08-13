@@ -53,7 +53,7 @@ func main() {
 	compileTemplate := cmdLine.Bool("compile-templates", false, "Compile Templates")
 	isDebug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
 	debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
-	runMigration := cmdLine.Bool("migration", false, "Run migration")
+	runMigration := cmdLine.Bool("migrate", false, "Run migration")
 	// runSeed := cmdLine.Bool("seed", false, "Run seed")
 
 	cmdLine.Parse(os.Args[1:])
