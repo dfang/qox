@@ -26,4 +26,3 @@ steps:
   displayName: 'docker build'
 - script: docker push $(dockerID)/$(imageName)
   displayName: 'docker push'
-
