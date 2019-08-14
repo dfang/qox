@@ -3,7 +3,7 @@ package home
 import (
 	"github.com/qor/application"
 	// "github.com/dfang/qor-demo/config/bindatafas"
-	// "github.com/dfang/qor-demo/utils/funcmapmaker"
+	"github.com/dfang/qor-demo/utils/funcmapmaker"
 	"github.com/qor/render"
 )
 
@@ -31,7 +31,7 @@ func (App) ConfigureApplication(application *application.Application) {
 	// controller := &Controller{ View: render.New( &render.Config{ AssetFileSystem: bindatafs.AssetFS.NameSpace("home"), }),
 
 	application.Router.Get("/", controller.RedirectToAdmin)
-	// funcmapmaker.AddFuncMapMaker(controller.View)
+	funcmapmaker.AddFuncMapMaker(controller.View)
 	// application.Router.Get("/", controller.Index)
-	// application.Router.Get("/switch_locale", controller.SwitchLocale)
+	application.Router.Get("/switch_locale", controller.SwitchLocale)
 }
