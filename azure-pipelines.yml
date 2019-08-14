@@ -11,7 +11,7 @@ pool:
 
 variables:
   # dockerID: $(dockerID)  # Replace with your Docker ID for Docker Hub or the admin user name for the Azure Container Registry
-  imageName: $(dockerID)/$(Build.Repository.Name):$(Build.SourceBranchName)-$(Build.SourceVersion)  # Replace with the name of the image you want to publish
+  imageName: $(dockerID)/$(Build.Repository.Name):$(Build.SourceBranchName)-$(git rev-parse --short HEAD)  # Replace with the name of the image you want to publish
 
 steps:
 
@@ -19,7 +19,8 @@ steps:
 # Build a Docker image to run, deploy, or push to a container registry.
 # Add steps that use Docker Compose, tag images, push to a registry, run an image, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-- script: echo "make sure you've defined docker credentials in env"
+
+# - script: echo "make sure you've defined docker credentials in env"
 - script: docker login -u $(dockerID) -p $(dockerPWD)
   displayName: 'docker login'
 - script: docker build -f Dockerfile -t $(imageName) .
