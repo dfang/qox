@@ -3,6 +3,11 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
+# docs
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/go?view=azure-devops
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&viewFallbackFrom=vsts&tabs=yaml
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/release/variables?view=azure-devops&tabs=batch
+
 trigger:
 - develop
 
@@ -25,9 +30,9 @@ steps:
   displayName: 'docker login'
 - script: docker build -f Dockerfile -t $(imageName) .
   displayName: 'docker build'
-- script: docker tag $(imageName) $(dockerID)/$(Build.Repository.Name):latest
-  displayName: 'docker tag latest'
 - script: docker push $(imageName)
   displayName: 'docker push'
-- script: docker push $(dockerID)/$(Build.Repository.Name):latest
-  displayName: 'docker push latest'
+# - script: docker tag $(imageName) $(dockerID)/$(Build.Repository.Name):latest
+#   displayName: 'docker tag latest'
+# - script: docker push $(dockerID)/$(Build.Repository.Name):latest
+#   displayName: 'docker push latest'
