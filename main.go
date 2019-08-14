@@ -19,6 +19,7 @@ import (
 
 	"github.com/dfang/qor-demo/config/bindatafs"
 
+	"github.com/dfang/qor-demo/app/account"
 	adminapp "github.com/dfang/qor-demo/app/admin"
 	"github.com/dfang/qor-demo/app/api"
 	"github.com/dfang/qor-demo/app/home"
@@ -120,7 +121,7 @@ func main() {
 	Application.Use(api.New(&api.Config{}))
 	Application.Use(adminapp.New(&adminapp.Config{}))
 	// Application.Use(home.New(&home.Config{}))
-	// Application.Use(account.NewWithDefault())
+	Application.Use(account.NewWithDefault())
 	Application.Use(home.NewWithDefault())
 	// Application.Use(products.NewWithDefault())
 	Application.Use(orders.NewWithDefault())
