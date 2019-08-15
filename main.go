@@ -41,6 +41,8 @@ import (
 	"github.com/dfang/qor-demo/config/db/migrations"
 )
 
+const version = "0.0.1" // must follow semver spec, https://github.com/motemen/gobump
+
 var (
 	Router      *chi.Mux
 	Admin       *admin.Admin
