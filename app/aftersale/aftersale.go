@@ -37,6 +37,11 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	Admin.AddMenu(&admin.Menu{Name: "Aftersale Management", Priority: 6})
 
 	// Add Aftersale
-	// aftersale :=
-	Admin.AddResource(&aftersales.AfterSale{}, &admin.Config{Menu: []string{"Aftersale Management"}})
+	aftersale := Admin.AddResource(&aftersales.AfterSale{}, &admin.Config{Menu: []string{"Aftersale Management"}})
+
+	aftersale.Meta(&admin.Meta{
+		Name:       "ServiceType",
+		Type:       "select_one",
+		Collection: []string{"安装", "维修", "清洗"},
+	})
 }
