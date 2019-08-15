@@ -49,7 +49,7 @@ steps:
               >[DevOps Build](https://dev.azure.com/curry-tech/qor-demo/_build)"
           }
       }
-EOF
+    EOF
     }
 
     curl -v \
