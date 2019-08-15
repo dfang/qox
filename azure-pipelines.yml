@@ -54,6 +54,6 @@ EOF
 
     curl -v \
       -H "Content-Type:application/json" \
-      -H "Accept: application/json" \
+      -H "Accept:application/json" \
       -X POST --data "$(generate_post_data)" $(wechat_work_bot_webhook_url)
   displayName: 'Send Notification to wechat work'
