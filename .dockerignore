@@ -32,3 +32,4 @@ codefresh.yml
 draft.toml
 .draft-taks.toml
 charts/
+azure-pipelines.yml
