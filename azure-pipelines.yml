@@ -31,15 +31,11 @@ steps:
 - script: |
     echo commit hash is $(git rev-parse HEAD)
     echo commit hash short version is $(gitCommitShortHash)
-    echo Build.Repository.Name is $(Build.Build.Repository.Name)
+    echo Build.Repository.Name is $(Build.Repository.Name)
     echo Build.SourceBranch is $(Build.SourceBranch)
     echo Build.SourceBranchName is $(Build.SourceBranchName)
     echo Build.SourceVersion is $(Build.SourceVersion)
     echo Build.SourceVersionMessage	is $(Build.SourceVersionMessage)
-    echo Build.TriggeredBy.BuildId	is $(Build.TriggeredBy.BuildId)
-    echo Build.TriggeredBy.DefinitionName	is $(Build.TriggeredBy.DefinitionName)
-    echo Build.TriggeredBy.BuildNumber	is $(Build.TriggeredBy.BuildNumber)
-    echo Build.TriggeredBy.ProjectID	is $(Build.TriggeredBy.ProjectID)
   displayName: 'echo'
 - script: docker login -u $(dockerID) -p $(dockerPWD)
   displayName: 'docker login'
