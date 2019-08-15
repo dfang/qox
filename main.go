@@ -21,6 +21,7 @@ import (
 
 	"github.com/dfang/qor-demo/app/account"
 	adminapp "github.com/dfang/qor-demo/app/admin"
+	"github.com/dfang/qor-demo/app/aftersale"
 	"github.com/dfang/qor-demo/app/api"
 	"github.com/dfang/qor-demo/app/home"
 	"github.com/dfang/qor-demo/app/orders"
@@ -119,6 +120,8 @@ func main() {
 			next.ServeHTTP(w, req.WithContext(ctx))
 		})
 	})
+
+	Application.Use(aftersale.NewWithDefault())
 
 	Application.Use(api.New(&api.Config{}))
 	Application.Use(adminapp.New(&adminapp.Config{}))

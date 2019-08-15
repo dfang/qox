@@ -46,3 +46,17 @@
     max-height: 30px;
     margin-right: 8px;
 }
+
+
+
+
+
+
+/* OVERRIDES */
+[qor-icon-name*="Aftersale"] > a::before {
+    content: "\e7fd";
+}
+
+
+
+

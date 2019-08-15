@@ -15,6 +15,19 @@ zh-CN:
       Receivables: 应收款项
       Order_type: "订单类型"
       State: 订单状态
+
+  after_sales:
+    name:
+      plural: 售后
+    attributes:
+      Customer Name: 客户姓名
+      Customer Phone: 客户电话
+      Customer Address: 客户地址
+      Service Type: 售后类型
+      Reserverd Service Time: 售后类型
+      Service Content: 服务内容
+      Remark: 备注
+
   orders:
     scopes:
       "Order Status": "按订单状态"
@@ -109,7 +122,6 @@ zh-CN:
       Feedback: 有无问题要反馈
       Exception Handling: "异常处理结果"
 
-
   qor_admin:
     menus:
       "Site Management": 站点管理
@@ -134,6 +146,8 @@ zh-CN:
       "Delivery Mens": 配送师傅
       "Setup Mens": 安装师傅
       "Operators": 操作员
+
+      "Aftersale Management": 售后管理
 
     actions:
       advanced_filter: " 高级过滤"

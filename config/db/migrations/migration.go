@@ -5,6 +5,7 @@ import (
 
 	"github.com/dfang/qor-demo/app/admin"
 	"github.com/dfang/qor-demo/config/db"
+	"github.com/dfang/qor-demo/models/aftersales"
 	"github.com/dfang/qor-demo/models/blogs"
 	"github.com/dfang/qor-demo/models/orders"
 	"github.com/dfang/qor-demo/models/products"
@@ -22,8 +23,11 @@ import (
 	"github.com/qor/transition"
 )
 
+// Migrate
 func Migrate() {
 	fmt.Println("running migration .......")
+
+	AutoMigrate(&aftersales.AfterSale{})
 
 	AutoMigrate(&products.Product{}, &products.ProductVariation{}, &products.ProductImage{}, &products.ColorVariation{}, &products.ColorVariationImage{}, &products.SizeVariation{})
 	AutoMigrate(&products.Color{}, &products.Size{}, &products.Material{}, &products.Category{}, &products.Collection{})
