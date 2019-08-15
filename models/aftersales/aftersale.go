@@ -16,6 +16,7 @@ type AfterSale struct {
 	// -- ORDER_TYPE starts with Q 退货的取件单
 	ServiceType    string
 	ServiceContent string
+
 	// 预约安装时间
 	ReserverdServiceTime string
 	Remark               string
