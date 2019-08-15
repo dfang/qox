@@ -11,14 +11,6 @@ import (
 	"github.com/qor/transition"
 )
 
-type PaymentMethod = string
-
-const (
-	COD        PaymentMethod = "COD"
-	AmazonPay  PaymentMethod = "AmazonPay"
-	CreditCard PaymentMethod = "CreditCard"
-)
-
 type Order struct {
 	gorm.Model
 	audited.AuditedModel
@@ -52,7 +44,7 @@ type Order struct {
 	Source string
 
 	// 订单号 面单号
-	OrderNo string
+	OrderNo string `gorm:"unique;not null"`
 
 	// -- ORDER_TYPE starts with Q 退货的取件单
 	OrderType string
@@ -68,8 +60,12 @@ type Order struct {
 	// 预约安装时间
 	ReserverdSetupTime string
 
-	// 是否送装一体
-	IsDeliveryAndSetup bool
+	// 预约取件时间
+	ReserverdPickupTime string
+
+	// 是否送装一体（这个jd页面抓下来的是什么就存什么, 但是实际上有的订单是非送装一体，如果客户要求，也需要派人安装的，有些订单是取件单)
+	// 所以这个字段保持和京东抓下来的一致，另外还要个OrderType， 根据规则或者人工去改OrderType
+	IsDeliveryAndSetup string
 
 	// 应收款项
 	Receivables float32

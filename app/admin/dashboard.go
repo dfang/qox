@@ -54,6 +54,7 @@ func ReportsDataHandler(context *admin.Context) {
 
 	b, _ := json.Marshal(charts)
 	context.Writer.Write(b)
+
 	return
 }
 

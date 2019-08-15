@@ -10,6 +10,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qor/admin"
 	"github.com/qor/application"
+	"github.com/qor/exchange"
 	"github.com/qor/media"
 	"github.com/qor/media/media_library"
 	"github.com/qor/qor"
@@ -58,8 +59,13 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	// fmt.Println(permission.HasPermission(roles.Read, "operator"))
 
 	// only admin can see products management menu and crud on products
-	Admin.AddMenu(&admin.Menu{Name: "Product Management", Priority: 1, Permission: permission})
-	product := Admin.AddResource(&products.Product{}, &admin.Config{Menu: []string{"Product Management"}, Permission: permission})
+	Admin.AddMenu(&admin.Menu{Name: "Product Management", Priority: 2, Permission: permission})
+	product := Admin.AddResource(&products.Product{}, &admin.Config{
+		Name:       "Product",
+		Menu:       []string{"Product Management"},
+		Permission: permission,
+	})
+	// product.UseTheme("products")
 
 	color := Admin.AddResource(&products.Color{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -5})
 	Admin.AddResource(&products.Size{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -4})
@@ -155,10 +161,19 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	})
 
 	product.Action(&admin.Action{
-		Name:        "Import Product",
+		Name:        "Import",
 		URLOpenType: "slideout",
 		URL: func(record interface{}, context *admin.Context) string {
 			return "/admin/workers/new?job=Import Products"
+		},
+		Modes: []string{"collection"},
+	})
+
+	product.Action(&admin.Action{
+		Name:        "Export",
+		URLOpenType: "slideout",
+		URL: func(record interface{}, context *admin.Context) string {
+			return "/admin/workers/new?job=Export Products"
 		},
 		Modes: []string{"collection"},
 	})
@@ -289,5 +304,12 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		},
 		Modes: []string{"menu_item", "edit"},
 	})
+
+	// Define Resource
+	p1 := exchange.NewResource(&products.Product{}, exchange.Config{PrimaryField: "Code"})
+	// Define columns are exportable/importable
+	p1.Meta(&exchange.Meta{Name: "Code"})
+	p1.Meta(&exchange.Meta{Name: "Name"})
+	p1.Meta(&exchange.Meta{Name: "Price"})
 
 }

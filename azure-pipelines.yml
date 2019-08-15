@@ -1,0 +1,59 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+# docs
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/go?view=azure-devops
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&viewFallbackFrom=vsts&tabs=yaml
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/release/variables?view=azure-devops&tabs=batch
+
+trigger:
+- develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  gitCommitShortHash: $(git rev-parse --short HEAD)
+  # dockerID: $(dockerID)  # Replace with your Docker ID for Docker Hub or the admin user name for the Azure Container Registry
+  imageName: $(dockerID)/$(Build.Repository.Name):$(Build.SourceBranchName)-$(gitCommitShortHash)  # Replace with the name of the image you want to publish
+
+steps:
+
+# Docker image
+# Build a Docker image to run, deploy, or push to a container registry.
+# Add steps that use Docker Compose, tag images, push to a registry, run an image, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+# - script: echo "make sure you've defined docker credentials in env"
+- script: docker login -u $(dockerID) -p $(dockerPWD)
+  displayName: 'docker login'
+- script: docker build -f Dockerfile -t $(imageName) .
+  displayName: 'docker build'
+- script: docker push $(imageName)
+  displayName: 'docker push'
+# - script: docker tag $(imageName) $(dockerID)/$(Build.Repository.Name):latest
+#   displayName: 'docker tag latest'
+# - script: docker push $(dockerID)/$(Build.Repository.Name):latest
+#   displayName: 'docker push latest'
+- script: |
+    generate_post_data(){
+      cat <<EOF
+      {
+          "msgtype": "markdown",
+          "markdown": {
+              "content": "**有新的Build**\n
+              >Git Commit Hash: $(gitCommitShortHash) \n
+              >Docker Image: $(imageName) \n
+              >[DevOps Build](https://dev.azure.com/curry-tech/qor-demo/_build)"
+          }
+      }
+    EOF
+    }
+
+    curl -v \
+      -H "Content-Type:application/json" \
+      -H "Accept:application/json" \
+      -X POST --data "$(generate_post_data)" $(wechat_work_bot_webhook_url)
+  displayName: 'Send Notification to wechat work'

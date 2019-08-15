@@ -3,7 +3,6 @@ package migrations
 import (
 	"fmt"
 
-	"github.com/dfang/auth/auth_identity"
 	"github.com/dfang/qor-demo/app/admin"
 	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/models/blogs"
@@ -14,48 +13,44 @@ import (
 	"github.com/dfang/qor-demo/models/stores"
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/qor/activity"
+	"github.com/qor/auth/auth_identity"
 	"github.com/qor/banner_editor"
 	"github.com/qor/help"
 	i18n_database "github.com/qor/i18n/backends/database"
 	"github.com/qor/media/asset_manager"
+	"github.com/qor/notification"
 	"github.com/qor/transition"
 )
 
-func init() {
-	fmt.Println("running miration .......")
-
-	AutoMigrate(&asset_manager.AssetManager{})
+func Migrate() {
+	fmt.Println("running migration .......")
 
 	AutoMigrate(&products.Product{}, &products.ProductVariation{}, &products.ProductImage{}, &products.ColorVariation{}, &products.ColorVariationImage{}, &products.SizeVariation{})
 	AutoMigrate(&products.Color{}, &products.Size{}, &products.Material{}, &products.Category{}, &products.Collection{})
 
 	AutoMigrate(&users.User{}, &users.Address{})
+	AutoMigrate(&auth_identity.AuthIdentity{})
 
-	AutoMigrate(&orders.Order{}, &orders.OrderItem{})
+	AutoMigrate(&orders.Order{}, &orders.OrderItem{}, &orders.OrderFollowUp{})
 
 	AutoMigrate(&orders.DeliveryMethod{})
 
 	AutoMigrate(&stores.Store{})
 
-	AutoMigrate(&settings.Setting{}, &settings.MediaLibrary{})
-
+	AutoMigrate(&notification.QorNotification{})
+	AutoMigrate(&i18n_database.Translation{})
 	AutoMigrate(&transition.StateChangeLog{})
-
 	AutoMigrate(&activity.QorActivity{})
 
+	AutoMigrate(&settings.Setting{}, &settings.MediaLibrary{})
+	AutoMigrate(&asset_manager.AssetManager{})
 	AutoMigrate(&admin.QorWidgetSetting{})
-
-	AutoMigrate(&blogs.Page{}, &blogs.Article{})
-
+	AutoMigrate(&banner_editor.QorBannerEditorSetting{})
 	AutoMigrate(&seo.MySEOSetting{})
 
+	AutoMigrate(&blogs.Page{}, &blogs.Article{})
 	AutoMigrate(&help.QorHelpEntry{})
 
-	AutoMigrate(&auth_identity.AuthIdentity{})
-
-	AutoMigrate(&banner_editor.QorBannerEditorSetting{})
-
-	AutoMigrate(&i18n_database.Translation{})
 }
 
 // AutoMigrate run auto migration

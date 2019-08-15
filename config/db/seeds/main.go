@@ -17,21 +17,22 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dfang/auth/auth_identity"
-	"github.com/dfang/auth/providers/password"
 	"github.com/dfang/qor-demo/app/admin"
 	"github.com/dfang/qor-demo/config/auth"
 	"github.com/dfang/qor-demo/config/db"
+	"github.com/qor/auth/auth_identity"
+	"github.com/qor/auth/providers/password"
 
 	// _ "github.com/dfang/qor-demo/config/db/migrations"
 	"github.com/dfang/qor-demo/models/blogs"
 	"github.com/dfang/qor-demo/models/orders"
 	"github.com/dfang/qor-demo/models/products"
-	adminseo "github.com/dfang/qor-demo/models/seo"
+	"github.com/dfang/qor-demo/models/seo"
 	"github.com/dfang/qor-demo/models/settings"
 	"github.com/dfang/qor-demo/models/stores"
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/jinzhu/now"
+	"github.com/qor/activity"
 	qoradmin "github.com/qor/admin"
 	"github.com/qor/banner_editor"
 	"github.com/qor/help"
@@ -44,9 +45,9 @@ import (
 	"github.com/qor/notification/channels/database"
 	"github.com/qor/publish2"
 	"github.com/qor/qor"
-	"github.com/qor/seo"
 	"github.com/qor/slug"
 	"github.com/qor/sorting"
+	"github.com/qor/transition"
 )
 
 /* How to run this script
@@ -63,34 +64,56 @@ var (
 	AdminUser    *users.User
 	Notification = notification.New(&notification.Config{})
 	Tables       = []interface{}{
+		// users
 		&auth_identity.AuthIdentity{},
-		&users.User{}, &users.Address{},
+		&users.User{},
+		&users.Address{},
 
-		&products.Category{}, &products.Color{}, &products.Size{}, &products.Material{}, &products.Collection{},
-		&products.Product{}, &products.ProductImage{}, &products.ColorVariation{}, &products.SizeVariation{},
+		// orders
+		&orders.Order{},
+		&orders.OrderItem{},
+		&orders.DeliveryMethod{},
 
+		// notification, activity, i18n, state machine
+		&activity.QorActivity{},
+		&i18n_database.Translation{},
+		&transition.StateChangeLog{},
+		&notification.QorNotification{},
+
+		// stores
 		&stores.Store{},
-		&orders.Order{}, &orders.OrderItem{},
+
+		// settings
 		&settings.Setting{},
-		&adminseo.MySEOSetting{},
-		&blogs.Article{},
 		&settings.MediaLibrary{},
-		&banner_editor.QorBannerEditorSetting{},
+		&admin.QorWidgetSetting{},
+		// &adminseo.MySEOSetting{},
+		&seo.MySEOSetting{},
 
 		&asset_manager.AssetManager{},
-		&i18n_database.Translation{},
-		&notification.QorNotification{},
-		&admin.QorWidgetSetting{},
+		&banner_editor.QorBannerEditorSetting{},
+		&blogs.Page{}, &blogs.Article{},
 		&help.QorHelpEntry{},
+
+		// products
+		&products.Category{},
+		&products.Color{},
+		&products.Size{},
+		&products.Material{},
+		&products.Collection{},
+		&products.Product{},
+		&products.ProductImage{},
+		&products.ColorVariation{},
+		&products.SizeVariation{},
+		&products.ColorVariationImage{},
 	}
 )
 
 func main() {
 	Notification.RegisterChannel(database.New(&database.Config{}))
+
 	fmt.Println("Truncate tables .....")
 	TruncateTables(Tables...)
-
-	importUsers()
 
 	createRecords()
 }
@@ -147,11 +170,14 @@ func createRecords() {
 	createSetting()
 	fmt.Println("--> Created setting.")
 
-	createSeo()
-	fmt.Println("--> Created seo.")
+	// createSeo()
+	// fmt.Println("--> Created seo.")
 
 	createAdminUsers()
 	fmt.Println("--> Created admin users.")
+
+	importUsers()
+	fmt.Println("--> Imported users from yaml.")
 
 	createUsers()
 	fmt.Println("--> Created users.")
@@ -178,8 +204,8 @@ func createRecords() {
 	createStores()
 	fmt.Println("--> Created stores.")
 
-	createOrders()
-	fmt.Println("--> Created orders.")
+	// createOrders()
+	// fmt.Println("--> Created orders.")
 
 	createWidgets()
 	fmt.Println("--> Created widgets.")
@@ -213,45 +239,45 @@ func createSetting() {
 	}
 }
 
-func createSeo() {
-	globalSeoSetting := adminseo.MySEOSetting{}
-	globalSetting := make(map[string]string)
-	globalSetting["SiteName"] = "Qor Demo"
-	globalSeoSetting.Setting = seo.Setting{GlobalSetting: globalSetting}
-	globalSeoSetting.Name = "QorSeoGlobalSettings"
-	globalSeoSetting.LanguageCode = "en-US"
-	globalSeoSetting.QorSEOSetting.SetIsGlobalSEO(true)
+// func createSeo() {
+// 	globalSeoSetting := adminseo.MySEOSetting{}
+// 	globalSetting := make(map[string]string)
+// 	globalSetting["SiteName"] = "Qor Demo"
+// 	seo.Setting{GlobalSetting: globalSetting}
+// 	globalSeoSetting.Name = "QorSeoGlobalSettings"
+// 	globalSeoSetting.LanguageCode = "en-US"
+// 	globalSeoSetting.QorSEOSetting.SetIsGlobalSEO(true)
 
-	if err := db.DB.Create(&globalSeoSetting).Error; err != nil {
-		log.Fatalf("create seo (%v) failure, got err %v", globalSeoSetting, err)
-	}
+// 	if err := db.DB.Create(&globalSeoSetting).Error; err != nil {
+// 		log.Fatalf("create seo (%v) failure, got err %v", globalSeoSetting, err)
+// 	}
 
-	defaultSeo := adminseo.MySEOSetting{}
-	defaultSeo.Setting = seo.Setting{Title: "{{SiteName}}", Description: "{{SiteName}} - Default Description", Keywords: "{{SiteName}} - Default Keywords", Type: "Default Page"}
-	defaultSeo.Name = "Default Page"
-	defaultSeo.LanguageCode = "en-US"
-	if err := db.DB.Create(&defaultSeo).Error; err != nil {
-		log.Fatalf("create seo (%v) failure, got err %v", defaultSeo, err)
-	}
+// 	defaultSeo := adminseo.MySEOSetting{}
+// 	defaultSeo.Setting = seo.Setting{Title: "{{SiteName}}", Description: "{{SiteName}} - Default Description", Keywords: "{{SiteName}} - Default Keywords", Type: "Default Page"}
+// 	defaultSeo.Name = "Default Page"
+// 	defaultSeo.LanguageCode = "en-US"
+// 	if err := db.DB.Create(&defaultSeo).Error; err != nil {
+// 		log.Fatalf("create seo (%v) failure, got err %v", defaultSeo, err)
+// 	}
 
-	productSeo := adminseo.MySEOSetting{}
-	productSeo.Setting = seo.Setting{Title: "{{SiteName}}", Description: "{{SiteName}} - {{Name}} - {{Code}}", Keywords: "{{SiteName}},{{Name}},{{Code}}", Type: "Product Page"}
-	productSeo.Name = "Product Page"
-	productSeo.LanguageCode = "en-US"
-	if err := db.DB.Create(&productSeo).Error; err != nil {
-		log.Fatalf("create seo (%v) failure, got err %v", productSeo, err)
-	}
+// 	productSeo := adminseo.MySEOSetting{}
+// 	productSeo.Setting = seo.Setting{Title: "{{SiteName}}", Description: "{{SiteName}} - {{Name}} - {{Code}}", Keywords: "{{SiteName}},{{Name}},{{Code}}", Type: "Product Page"}
+// 	productSeo.Name = "Product Page"
+// 	productSeo.LanguageCode = "en-US"
+// 	if err := db.DB.Create(&productSeo).Error; err != nil {
+// 		log.Fatalf("create seo (%v) failure, got err %v", productSeo, err)
+// 	}
 
-	// seoSetting := models.SEOSetting{}
-	// seoSetting.SiteName = Seeds.Seo.SiteName
-	// seoSetting.DefaultPage = seo.Setting{Title: Seeds.Seo.DefaultPage.Title, Description: Seeds.Seo.DefaultPage.Description, Keywords: Seeds.Seo.DefaultPage.Keywords}
-	// seoSetting.HomePage = seo.Setting{Title: Seeds.Seo.HomePage.Title, Description: Seeds.Seo.HomePage.Description, Keywords: Seeds.Seo.HomePage.Keywords}
-	// seoSetting.ProductPage = seo.Setting{Title: Seeds.Seo.ProductPage.Title, Description: Seeds.Seo.ProductPage.Description, Keywords: Seeds.Seo.ProductPage.Keywords}
+// 	// seoSetting := models.SEOSetting{}
+// 	// seoSetting.SiteName = Seeds.Seo.SiteName
+// 	// seoSetting.DefaultPage = seo.Setting{Title: Seeds.Seo.DefaultPage.Title, Description: Seeds.Seo.DefaultPage.Description, Keywords: Seeds.Seo.DefaultPage.Keywords}
+// 	// seoSetting.HomePage = seo.Setting{Title: Seeds.Seo.HomePage.Title, Description: Seeds.Seo.HomePage.Description, Keywords: Seeds.Seo.HomePage.Keywords}
+// 	// seoSetting.ProductPage = seo.Setting{Title: Seeds.Seo.ProductPage.Title, Description: Seeds.Seo.ProductPage.Description, Keywords: Seeds.Seo.ProductPage.Keywords}
 
-	// if err := DraftDB.Create(&seoSetting).Error; err != nil {
-	// 	log.Fatalf("create seo (%v) failure, got err %v", seoSetting, err)
-	// }
-}
+// 	// if err := DraftDB.Create(&seoSetting).Error; err != nil {
+// 	// 	log.Fatalf("create seo (%v) failure, got err %v", seoSetting, err)
+// 	// }
+// }
 
 func createAdminUsers() {
 	AdminUser = &users.User{}
@@ -342,7 +368,7 @@ func createCategories() {
 	for _, c := range Seeds.Categories {
 		category := products.Category{}
 		category.Name = c.Name
-		category.Code = strings.ToLower(c.Name)
+		category.Code = strings.ToLower(c.Code)
 		if err := DraftDB.Create(&category).Error; err != nil {
 			log.Fatalf("create category (%v) failure, got err %v", category, err)
 		}
@@ -430,7 +456,6 @@ func createProducts() {
 				if file, err := openFileByURL(i.URL); err != nil {
 					fmt.Printf("open file (%q) failure, got err %v", i.URL, err)
 				} else {
-					fmt.Printf("file downloaded to")
 					defer file.Close()
 					image.File.Scan(file)
 				}
@@ -556,6 +581,9 @@ func createOrders() {
 
 	var sizeVariationsCount = len(sizeVariations)
 	var colorVariationsCount = len(colorVariations)
+
+	fmt.Println("sizeVariationsCount", sizeVariationsCount)
+	fmt.Println("colorVariationsCount", colorVariationsCount)
 
 	for _, user := range Users {
 		count := 5

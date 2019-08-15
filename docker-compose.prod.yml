@@ -1,0 +1,91 @@
+version: '2.4'
+
+services:
+
+  db:
+    image: postgres:10.4
+    restart: always
+    ports:
+      - '15432:5432'
+    networks:
+      - overlay
+    environment:
+      POSTGRES_DB: qor-demo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      # test: ["CMD-SHELL", "nc -z localhost 5432"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      # - pg_data:/var/lib/postgresql/data
+      # - ./docker/pg_hba.conf:/data/pg_hba.conf
+      - ./data:/data
+      - ./docker/init:/docker-entrypoint-initdb.d/init.sh
+
+  graphql-engine:
+    image: hasura/graphql-engine:v1.0.0-beta.2
+    ports:
+      - "18080:8080"
+    networks:
+      - overlay
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgres@db:5432/qor-demo
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_ADMIN_SECRET: "admin"
+    command:
+      - graphql-engine
+      - serve
+      - --enable-console
+
+  pghero:
+    image: ankane/pghero
+    environment:
+      DATABASE_URL: postgres://postgres://postgres@db:5432/qor-demo
+    ports:
+      - "19090:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - overlay
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 17070:8080
+
+  qor:
+    image: dfang/qor-demo:develop
+    # command: ["./qor-example", "-debug"]
+    # command: ["./seeds"]
+    # command: [ "go", "run", "config/db/seeds/main.go", "config/db/seeds/seeds.go" ]
+    restart: on-failure
+    # command: sh -c './wait-for db:5432 -- npm start'
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - overlay
+    env_file:
+      - .env
+    volumes:
+      - ./config/database.yml:/go-app/config/database.yml
+    ports:
+      - 17000:7000
+
+volumes:
+  pg_data:
+networks:
+  overlay:

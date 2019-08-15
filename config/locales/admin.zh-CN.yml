@@ -1,17 +1,132 @@
 zh-CN:
+  installs:
+    attributes:
+      Source: 订单来源
+      Order_no: 订单编号
+      Customer_name: 客户姓名
+      Customer_phone: 客户电话
+      Customer_address: 客户地址
+      Is_delivery_and_setup: "是否配送一体"
+      Reserverd_delivery_time: 预约配送时间
+      Reserverd_setup_time: 预约安装时间
+      Man_to_deliver_id: "配送师傅"
+      Man_to_setup_id: "安装师傅"
+      Man_to_pickup_id: "取件师傅"
+      Receivables: 应收款项
+      Order_type: "订单类型"
+      State: 订单状态
+  orders:
+    scopes:
+      "Order Status": "按订单状态"
+      "Filter By Date": "按日期"
+      "Filter By Source": "按订单来源"
+      "Filter By Order Type": "按订单类型"
+      "Order Status":
+        "Pickup Scheduled": 已安排取件
+        "Delivery Scheduled": 已安排配送
+        "Setup Scheduled": 已安排安装
+        "Cancelled": 已取消
+        "Shipped": 已发货
+        "Paided Cancelled": 付款后取消
+        "Returned": 已退货
+        "Pending": 待处理
+        "Processing": 处理中
+      "Filter By Date":
+        Today: "今天"
+        Yesterday: "昨天"
+        "This Week": 本周
+        "This Month": 本月
+        "This Quarter": 本季度
+        "This Year": 本年
+      "Filter By Source":
+        "JD": 京东
+      "Filter By Order Type":
+        "Delivery": 配送
+        "Setup": 安装
+        "Delivery And Setup": 配送一体
+        "Clean": 清洗
+        "Repair": 维修
+        "Sales": 销售
+
+    actions:
+      Processing: 预处理
+      Cancel: 取消订单
+      Delete: 删除
+      Export: 导出
+      "Schedule Delivery": 安排配送
+      "Schedule Setup": 安排安装
+
+    attributes:
+      Source: 订单来源
+      Order_no: 订单编号
+      Order No: 订单号
+      Customer_name: 客户姓名
+      Customer Name: 客户姓名
+      Customer_phone: 客户电话
+      Customer Phone: 客户电话
+      Customer_address: 客户地址
+      Customer Address: 客户地址
+      Is_delivery_and_setup: "是否配送一体"
+      Reserverd_delivery_time: 预约配送时间
+      Reserverd Delivery Time: 预约配送时间
+      Reserverd_setup_time: 预约安装时间
+      Reserverd Setup Time: 预约安装时间
+      Reserverd Pickup Time: 预约取件时间
+      Man_to_deliver_id: "配送师傅"
+      Man To Deliver: "配送师傅"
+      Man_to_setup_id: "安装师傅"
+      Man To Setup: "安装师傅"
+      Man_to_pickup_id: "取件师傅"
+      Man To Pickup: "取件师傅"
+      Shipping_fee: 配送费用
+      Shipping Fee: 配送费用
+      Setup_fee: 安装费用
+      Setup Fee: 安装费用
+      Pickup_fee: 取件费用
+      Pickup Fee: 取件费用
+      Order_type: "订单类型"
+      Order Type: "订单类型"
+      Receivables: 应收款项
+      State: 订单状态
+      Created_at: 创建于
+      Created At: 创建于
+      Updated_at: 更新于
+      Updated At: 更新于
+
+  order_follow_ups:
+    name:
+      plural: "订单回访"
+
+    attributes:
+      Order No: "订单编号"
+      Satisfaction Of Timeliness: "对时效是否满意"
+      Satisfaction Of Services:  "对服务态度是否满意"
+      Inspect The Goods: "是否有开箱验货"
+      Request Feedback: "是否邀评"
+      Leave Contact Infomation: "是否有留下联系方式"
+      Introduce Warranty Extension: "是否有介绍延保"
+      Position Properly: "是否有把商品放到指定位置"
+      Feedback: 有无问题要反馈
+      Exception Handling: "异常处理结果"
+
+
   qor_admin:
     menus:
       "Site Management": 站点管理
       "Pages Management": 页面管理
-      "Order Management": 订单管理
       "Publishing": 发布管理
-      Translations: 翻译
+      "Translations": 翻译
 
       "Product Management": 产品管理
       "Products": 产品
 
-      "Store Management": 店面管理
+      "Order Management": 订单管理
       "Orders": 订单
+      "Order Follow Ups": 订单回访
+
+      "Store Management": 店面管理
+
+      "installs": "京东订单"
       "Abandoned Orders": 废弃订单
 
       "User Management": 用户管理
@@ -59,10 +174,11 @@ zh-CN:
         button:
             cancel_edit: " 取消编辑 "
             save: " 保存 "
-  orders:
-    scopes:
-      "Order Status":
-        "Pickup Scheduled": 已安排取件
+
+    slideout:
+      close_warning:
+        "You have unsaved changes on this slideout. If you close this slideout, you will lose all unsaved changes. Are you sure you want to close the slideout?": 关闭有可能会丢失未保存的修改, 请确认?
+
 
   products:
     name:

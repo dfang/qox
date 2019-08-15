@@ -47,26 +47,43 @@ func init() {
 	OrderState.State("processing").Enter(func(value interface{}, tx *gorm.DB) (err error) {
 		order := value.(*Order)
 
-		switch order.PaymentMethod {
-		case AmazonPay:
-			// var result amazonpay.AuthorizeResponse
-			// result, err = config.AmazonPay.Authorize(order.AmazonOrderReferenceID, order.UniqueExternalID(),
-			// 	amazonpay.Price{
-			// 		Amount:       utils.FormatPrice(order.PaymentTotal),
-			// 		CurrencyCode: config.Config.AmazonPay.CurrencyCode,
-			// 	},
-			// 	amazonpay.AuthorizeInput{},
-			// )
+		// switch order.PaymentMethod {
+		// case AmazonPay:
+		// 	// var result amazonpay.AuthorizeResponse
+		// 	// result, err = config.AmazonPay.Authorize(order.AmazonOrderReferenceID, order.UniqueExternalID(),
+		// 	// 	amazonpay.Price{
+		// 	// 		Amount:       utils.FormatPrice(order.PaymentTotal),
+		// 	// 		CurrencyCode: config.Config.AmazonPay.CurrencyCode,
+		// 	// 	},
+		// 	// 	amazonpay.AuthorizeInput{},
+		// 	// )
 
-			// if err == nil {
-			// 	order.AmazonAuthorizationID = result.AuthorizeResult.AuthorizationDetails.AmazonAuthorizationID
-			// }
+		// 	// if err == nil {
+		// 	// 	order.AmazonAuthorizationID = result.AuthorizeResult.AuthorizationDetails.AmazonAuthorizationID
+		// 	// }
 
-			// log, _ := json.Marshal(result)
-			// order.PaymentLog += "\n\nAuthorizeResponse\n" + string(log)
-		case COD:
+		// 	// log, _ := json.Marshal(result)
+		// 	// order.PaymentLog += "\n\nAuthorizeResponse\n" + string(log)
+		// case COD:
+		// default:
+		// 	err = errors.New("unsupported pay method")
+		// }
+
+		switch order.OrderType {
+		case "Delivery":
+			if order.ShippingFee <= 0 {
+				err = errors.New("请设置配送费用")
+			}
+		case "Setup":
+			if order.SetupFee <= 0 {
+				err = errors.New("请设置安装费用")
+			}
+		case "DeliveryAndSetup":
+			if order.SetupFee <= 0 {
+				err = errors.New("请设置配送和安装费用")
+			}
 		default:
-			err = errors.New("unsupported pay method")
+			return
 		}
 
 		if err != nil {
@@ -143,6 +160,8 @@ func init() {
 	// 已安排配送
 	OrderState.State("delivery_scheduled").Enter(func(value interface{}, tx *gorm.DB) (err error) {
 		fmt.Println("已安排配送")
+		order := value.(*Order)
+		order.UpdatedAt = time.Now()
 		return
 	})
 
@@ -208,6 +227,26 @@ func init() {
 
 		for _, item := range order.OrderItems {
 			ItemState.Trigger("process", &item, tx)
+		}
+		return nil
+	})
+
+	OrderState.Event("schedule_delivery").To("delivery_scheduled").From("pending", "processing").After(func(value interface{}, tx *gorm.DB) (err error) {
+		order := value.(*Order)
+		tx.Model(order).Association("OrderItems").Find(&order.OrderItems)
+
+		for _, item := range order.OrderItems {
+			ItemState.Trigger("schedule_delivery", &item, tx)
+		}
+		return nil
+	})
+
+	OrderState.Event("schedule_setup").To("setup_scheduled").From("pending", "processing").After(func(value interface{}, tx *gorm.DB) (err error) {
+		order := value.(*Order)
+		tx.Model(order).Association("OrderItems").Find(&order.OrderItems)
+
+		for _, item := range order.OrderItems {
+			ItemState.Trigger("schedule_setup", &item, tx)
 		}
 		return nil
 	})
@@ -279,4 +318,6 @@ func init() {
 	ItemState.Event("process").To("processing").From("paid")
 	ItemState.Event("ship").To("shipped").From("processing")
 	ItemState.Event("return").To("returned").From("shipped")
+	ItemState.Event("schedule_delivery").To("delivery_scheduled")
+	ItemState.Event("schedule_setup").To("setup_scheduled")
 }

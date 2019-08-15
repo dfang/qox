@@ -1,37 +1,43 @@
-version: '3.6'
+version: '2.4'
 
 services:
 
   db:
     image: postgres:10.4
     restart: always
+    ports:
+      - '5433:5432'
+    networks:
+      - overlay
     environment:
-      # POSTGRES_PASSWORD: example
-      POSTGRES_DB: qor_example
-      POSTGRES_USER: adminer
-      POSTGRES_PASSWORD: adminer
+      POSTGRES_DB: qor-demo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      # test: ["CMD-SHELL", "nc -z localhost 5432"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes:
-      - ./data:/var/lib/postgresql/data/
-    ports:
-      - 5432:5432
-
-  adminer:
-    image: adminer
-    restart: always
-    depends_on:
-      - db
-    ports:
-      - 8080:8080
+      # - pg_data:/var/lib/postgresql/data
+      - ./data:/data
+      # - ./init.sh:/docker-entrypoint-initdb.d/init.sh
+      - ./docker/pg_hba.conf:/data/pg_hba.conf
 
   graphql-engine:
-    image: hasura/graphql-engine:v1.0.0-alpha41
+    image: hasura/graphql-engine:v1.0.0-beta.2
     ports:
       - "18080:8080"
+    networks:
+      - overlay
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: always
     environment:
-      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:@postgres:5432/xsjd
+      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgres@db:5432/qor-demo
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
       HASURA_GRAPHQL_ADMIN_SECRET: "admin"
     command:
@@ -39,16 +45,42 @@ services:
       - serve
       - --enable-console
 
+  adminer:
+    image: adminer
+    # restart: always
+    networks:
+      - overlay
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 17070:8080
+
+  pghero:
+    image: ankane/pghero
+    environment:
+      DATABASE_URL: postgres://postgres://postgres@db:5432/qor-demo
+    ports:
+      - "19090:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
   qor:
-    image: dfang/qor-example:latest
-    # build:
-    #   context: .
-    command: ["./qor-example"]
+    # image: dfang/qor-demo:develop
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    # command: ["./qor-example", "-debug"]
     # command: ["./seeds"]
     # command: [ "go", "run", "config/db/seeds/main.go", "config/db/seeds/seeds.go" ]
-    restart: always
+    restart: on-failure
+    # command: sh -c './wait-for db:5432 -- npm start'
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    networks:
+      - overlay
     # environment:
     #   QOR_AWS_ACCESS_KEY_ID: AKIAI3Z7SFTABSJQSLDQ
     #   QOR_AWS_SECRET_ACCESS_KEY: secret
@@ -59,4 +91,9 @@ services:
     volumes:
       - ./config/database.yml:/go-app/config/database.yml
     ports:
-      - 7000:7000
+      - 17000:7000
+
+volumes:
+  pg_data:
+networks:
+  overlay:

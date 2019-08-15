@@ -1,4 +1,5 @@
 .vscode/
+.idea/
 tmp/
 data/
 *.sh
@@ -19,5 +20,19 @@ config/*.yml
 public/dist
 node_modules
 .env
+*.env
 
 public/downloads
+public/system
+
+.pgsync.yml
+
+nohup.out
+cert-cache
+
+# Ignore azure draft temporarily
+.draft-tasks.toml
+draft.toml
+charts
+.draft-tasks.toml
+.draftignore
