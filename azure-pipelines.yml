@@ -36,6 +36,8 @@ steps:
     echo Build.SourceBranchName is $(Build.SourceBranchName)
     echo Build.SourceVersion is $(Build.SourceVersion)
     echo Build.SourceVersionMessage	is $(Build.SourceVersionMessage)
+    echo Build.BuildId	is $(Build.BuildId)
+    echo Build.BuildNumber is $(Build.BuildNumber)
   displayName: 'echo'
 - script: docker login -u $(dockerID) -p $(dockerPWD)
   displayName: 'docker login'
