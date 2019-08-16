@@ -16,6 +16,15 @@ zh-CN:
       Order_type: "订单类型"
       State: 订单状态
 
+  users:
+    attributes:
+      Role: 角色
+      Name: 姓名
+      Gender: 性别
+      IdentityCardNum: 身份证
+
+      Mobile Phone: 手机号
+
   after_sales:
     name:
       plural: 售后
@@ -148,6 +157,8 @@ zh-CN:
       "Operators": 操作员
 
       "Aftersale Management": 售后管理
+      "After Sales": 售后
+
 
     actions:
       advanced_filter: " 高级过滤"

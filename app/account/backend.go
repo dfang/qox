@@ -17,9 +17,109 @@ import (
 func (App) ConfigureAdmin(Admin *admin.Admin) {
 	Admin.AddMenu(&admin.Menu{Name: "User Management", Priority: 3})
 	user := Admin.AddResource(&users.User{}, &admin.Config{Menu: []string{"User Management"}})
-	user.Meta(&admin.Meta{Name: "Gender", Config: &admin.SelectOneConfig{Collection: []string{"Male", "Female", "Unknown"}}})
+
+	user.SearchAttrs("name", "mobile_phone")
+
+	user.Meta(&admin.Meta{
+		Name:   "Gender",
+		Type:   "string",
+		Config: &admin.SelectOneConfig{Collection: []string{"男", "女"}},
+		FormattedValuer: func(record interface{}, context *qor.Context) (value interface{}) {
+			user := record.(*users.User)
+			switch strings.ToLower(user.Gender) {
+			case "male":
+				return "男"
+			case "female":
+				return "女"
+			default:
+				return "男"
+			}
+		},
+		Valuer: func(record interface{}, context *qor.Context) (value interface{}) {
+			user := record.(*users.User)
+			switch strings.ToLower(user.Gender) {
+			case "male":
+				return "男"
+			case "female":
+				return "女"
+			default:
+				return "男"
+			}
+		},
+		Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			// fmt.Println(metaValue.Value)
+			mv := qorutils.ToString(metaValue.Value)
+			var m string
+			switch mv {
+			case "男":
+				m = "male"
+			case "女":
+				m = "female"
+			default:
+				m = "male"
+			}
+			record.(*users.User).Gender = m
+		},
+	})
+
 	user.Meta(&admin.Meta{Name: "Birthday", Type: "date"})
-	user.Meta(&admin.Meta{Name: "Role", Config: &admin.SelectOneConfig{Collection: []string{"admin", "operator", "setup_man", "delivery_man"}}})
+
+	// user.Meta(&admin.Meta{Name: "Role", Config: &admin.SelectOneConfig{Collection: []string{"admin", "operator", "setup_man", "delivery_man"}}})
+	user.Meta(&admin.Meta{
+		Name:   "Role",
+		Type:   "string",
+		Config: &admin.SelectOneConfig{Collection: []string{"管理员", "调度员", "安装师傅", "配送师傅"}},
+		Valuer: func(record interface{}, context *qor.Context) (value interface{}) {
+			user := record.(*users.User)
+			switch user.Role {
+			case "operator":
+				return "调度员"
+			case "delivery_man":
+				return "配送师傅"
+			case "setup_man":
+				return "安装师傅"
+			case "Admin":
+				return "管理员"
+			default:
+				return "调度员"
+			}
+		},
+		Setter: func(record interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+			// fmt.Println(metaValue.Value)
+			mv := qorutils.ToString(metaValue.Value)
+			var m string
+			switch mv {
+			case "调度员":
+				m = "operator"
+			case "配送师傅":
+				m = "delivery_man"
+			case "安装师傅":
+				m = "setup_man"
+			case "管理员":
+				m = "admin"
+			default:
+				m = "operator"
+			}
+			record.(*users.User).Role = m
+		},
+		FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+			user := record.(*users.User)
+			// return user.Role
+			switch user.Role {
+			case "operator":
+				return "调度员"
+			case "delivery_man":
+				return "配送师傅"
+			case "setup_man":
+				return "安装师傅"
+			case "Admin":
+				return "管理员"
+			default:
+				return "调度员"
+			}
+		},
+	})
+
 	user.Meta(&admin.Meta{Name: "Password",
 		Type:   "password",
 		Valuer: func(interface{}, *qor.Context) interface{} { return "" },
@@ -47,53 +147,55 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	for _, role := range []string{"admin", "operator", "setup_man", "delivery_man"} {
 		var role = role
 		user.Scope(&admin.Scope{
-			Name:  role,
-			Label: strings.Title(strings.Replace(role, "_", " ", -1)),
-			Group: "Filter By Role",
+			Name: role,
+			// Label: strings.Title(strings.Replace(role, "_", " ", -1)),
+			Label: users.V2T(users.ROLES_VALUES, users.ROLES_TEXTS, role),
+			Group: "角色",
 			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 				return db.Where(users.User{Role: role})
 			},
 		})
 	}
 
-	user.Filter(&admin.Filter{
-		Name: "Role",
-		Config: &admin.SelectOneConfig{
-			Collection: []string{"admin", "operator", "setup_man", "delivery_man"},
-		},
-	})
+	for _, item := range []string{"male", "female"} {
+		var gender = item
+		user.Scope(&admin.Scope{
+			Name: gender,
+			// Label: strings.Title(strings.Replace(role, "_", " ", -1)),
+			Label: users.V2T(users.GENDERS_VALUES, users.GENDERS_TEXTS, gender),
+			Group: "性别",
+			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+				return db.Where(users.User{Gender: gender})
+			},
+		})
+	}
 
-	user.IndexAttrs("ID", "Email", "Name", "Gender", "Role", "Balance")
+	// user.Filter(&admin.Filter{
+	// 	Name: "Role",
+	// 	Config: &admin.SelectOneConfig{
+	// 		Collection: []string{"admin", "operator", "setup_man", "delivery_man"},
+	// 	},
+	// })
+
+	user.IndexAttrs("ID", "Name", "MobilePhone", "Gender", "Role")
+	user.NewAttrs("ID", "Name", "Gender", "Role", "MobilePhone", "IdentityCardNum")
 	user.ShowAttrs(
 		&admin.Section{
 			Title: "Basic Information",
 			Rows: [][]string{
-				{"Name"},
-				{"Email", "Password"},
-				{"Avatar"},
-				{"Gender", "Role", "Birthday"},
-				{"Confirmed"},
+				{"Name", "Gender"},
+				{"MobilePhone"},
+				{"Role"},
 			},
 		},
-		&admin.Section{
-			Title: "Credit Information",
-			Rows: [][]string{
-				{"Balance"},
-			},
-		},
-		&admin.Section{
-			Title: "Accepts",
-			Rows: [][]string{
-				{"AcceptPrivate", "AcceptLicense", "AcceptNews"},
-			},
-		},
-		&admin.Section{
-			Title: "Default Addresses",
-			Rows: [][]string{
-				{"DefaultBillingAddress"},
-				{"DefaultShippingAddress"},
-			},
-		},
+		// &admin.Section{
+		// 	Title: "Default Addresses",
+		// 	Rows: [][]string{
+		// 		{"DefaultBillingAddress"},
+		// 		{"MobilePhone"},
+		// 		{"Role"},
+		// 	},
+		// },
 		"Addresses",
 	)
 	user.EditAttrs(user.ShowAttrs())

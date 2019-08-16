@@ -8,6 +8,11 @@ import (
 	"github.com/qor/media/oss"
 )
 
+var ROLES_VALUES = []string{"admin", "operator", "setup_man", "delivery_man"}
+var ROLES_TEXTS = []string{"管理员", "调度员", "安装师傅", "配送师傅"}
+var GENDERS_VALUES = []string{"male", "female"}
+var GENDERS_TEXTS = []string{"男", "女"}
+
 type User struct {
 	gorm.Model
 	Email    string `form:"email"`
@@ -72,4 +77,28 @@ func (AvatarImageStorage) GetSizes() map[string]*media.Size {
 		"middle": {Width: 120, Height: 120},
 		"big":    {Width: 320, Height: 320},
 	}
+}
+
+// T2V Text To Value
+func T2V(tArr []string, vArr []string, t string) string {
+	var index int
+	for i, item := range tArr {
+		if t == item {
+			index = i
+			break
+		}
+	}
+	return vArr[index]
+}
+
+// V2T Value To Text
+func V2T(vArr []string, tArr []string, t string) string {
+	var index int
+	for i, item := range vArr {
+		if t == item {
+			index = i
+			break
+		}
+	}
+	return tArr[index]
 }
