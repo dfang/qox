@@ -49,6 +49,12 @@ steps:
 #   displayName: 'docker tag latest'
 # - script: docker push $(dockerID)/$(Build.Repository.Name):latest
 #   displayName: 'docker push latest'
+
+- script: docker tag $(imageName) $(dockerID)/$(Build.Repository.Name):$(Build.SourceBranchName)-$(Build.BuildNumber)
+  displayName: 'docker tag'
+- script: docker push $(dockerID)/$(Build.Repository.Name):$(Build.SourceBranchName)-$(Build.BuildNumber)
+  displayName: 'docker push'
+
 - script: |
     generate_post_data(){
       cat <<EOF
