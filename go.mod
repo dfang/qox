@@ -19,6 +19,7 @@ require (
 	github.com/gorilla/schema v1.1.0
 	github.com/headzoo/surf v1.0.0 // indirect
 	github.com/headzoo/ut v0.0.0-20181013193318-a13b5a7a02ca // indirect
+	github.com/heptiolabs/healthcheck v0.0.0-20180807145615-6ff867650f40
 	github.com/jinzhu/configor v1.0.0
 	github.com/jinzhu/gorm v1.9.9
 	github.com/jinzhu/now v1.0.1
@@ -30,6 +31,7 @@ require (
 	github.com/manveru/gobdd v0.0.0-20131210092515-f1a17fdd710b // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2
+	github.com/prometheus/client_golang v1.1.0 // indirect
 	github.com/qor/action_bar v0.0.0-20190314070413-136e5e2c5b8c
 	github.com/qor/activity v0.0.0-20190529070945-bb9925f02ffb
 	github.com/qor/admin v0.0.0-20190525133731-6329506ec305
@@ -77,7 +79,6 @@ require (
 	golang.org/x/crypto v0.0.0-20190618222545-ea8f1a30c443
 	golang.org/x/image v0.0.0-20190618124811-92942e4437e2 // indirect
 	golang.org/x/net v0.0.0-20190620200207-3b0461eec859 // indirect
-	golang.org/x/sys v0.0.0-20190621062556-bf70e4678053 // indirect
 	google.golang.org/appengine v1.6.1 // indirect
 )
 
