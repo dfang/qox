@@ -112,8 +112,8 @@ var (
 func main() {
 	Notification.RegisterChannel(database.New(&database.Config{}))
 
-	fmt.Println("Truncate tables .....")
-	TruncateTables(Tables...)
+	// fmt.Println("Truncate tables .....")
+	// TruncateTables(Tables...)
 
 	// createRecords()
 	createAdminUsers()
