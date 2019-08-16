@@ -115,7 +115,9 @@ func main() {
 	fmt.Println("Truncate tables .....")
 	TruncateTables(Tables...)
 
-	createRecords()
+	// createRecords()
+	createAdminUsers()
+	fmt.Println("--> Created admin users.")
 }
 
 func importUsers() {
