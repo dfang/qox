@@ -355,9 +355,6 @@ func configureScopes(order *admin.Resource) {
 
 	order.Filter(&admin.Filter{
 		Name: "created_at",
-		// Config: &admin.SelectOneConfig{
-		// 	Collection: []string{"Male", "Female", "Unknown"},
-		// },
 		Config: &admin.DatetimeConfig{
 			ShowTime: false,
 		},
