@@ -297,10 +297,10 @@ func configureMetas(order *admin.Resource) {
 func configureScopes(order *admin.Resource) {
 	// define scopes for Order
 	order.Scope(&admin.Scope{
-		Name:    "Today",
-		Label:   "Today",
-		Default: true,
-		Group:   "Filter By Date",
+		Name:  "Today",
+		Label: "Today",
+		// Default: true,
+		Group: "Filter By Date",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 			return db.Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", time.Now())
 		},
@@ -350,6 +350,16 @@ func configureScopes(order *admin.Resource) {
 		Group: "Filter By Date",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 			return db.Where("created_at >= ?", now.BeginningOfYear()).Where("created_at <=? ", now.EndOfYear())
+		},
+	})
+
+	order.Filter(&admin.Filter{
+		Name: "created_at",
+		// Config: &admin.SelectOneConfig{
+		// 	Collection: []string{"Male", "Female", "Unknown"},
+		// },
+		Config: &admin.DatetimeConfig{
+			ShowTime: false,
 		},
 	})
 
