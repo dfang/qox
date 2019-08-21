@@ -107,6 +107,14 @@ func main() {
 	// TODO: implement Graceful shutdown
 	// https://medium.com/over-engineering/graceful-shutdown-with-go-http-servers-and-kubernetes-rolling-updates-6697e7db17cf
 
+	// https://github.com/qor/qor-example/commit/06835622f5feeeb90aee4f02574abbae29e40e10
+	Router.Use(func(handler http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			req.Header.Del("Authorization")
+			handler.ServeHTTP(w, req)
+		})
+	})
+
 	Router.Use(middleware.RealIP)
 	Router.Use(middleware.RequestID)
 	Router.Use(middleware.Logger)

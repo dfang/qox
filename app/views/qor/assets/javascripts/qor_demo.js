@@ -1,3 +1,10 @@
+moment.locale('en', {
+  dow: 1, // Monday is the first day of the week.
+})
+moment.locale('zh-cn', {
+  dow: 1, // Monday is the first day of the week.
+})
+
 var OrderChart, UsersChart;
 function RenderChart(ordersData, usersData) {
   Chart.defaults.global.responsive = true;
@@ -15,18 +22,18 @@ function RenderChart(ordersData, usersData) {
   var orders_data = ChartData(orderDateLables, orderCounts);
   OrderChart = new Chart(orders_context).Line(orders_data, "");
 
-  var usersDateLables = [];
-  var usersCounts = [];
-  for (var i = 0; i < usersData.length; i++) {
-    usersDateLables.push(usersData[i].Date.substring(5, 10));
-    usersCounts.push(usersData[i].Total)
-  }
-  if (UsersChart) {
-    UsersChart.destroy();
-  }
-  var users_context = document.getElementById("users_report").getContext("2d");
-  var users_data = ChartData(usersDateLables, usersCounts);
-  UsersChart = new Chart(users_context).Bar(users_data, "");
+  // var usersDateLables = [];
+  // var usersCounts = [];
+  // for (var i = 0; i < usersData.length; i++) {
+  //   usersDateLables.push(usersData[i].Date.substring(5, 10));
+  //   usersCounts.push(usersData[i].Total)
+  // }
+  // if (UsersChart) {
+  //   UsersChart.destroy();
+  // }
+  // var users_context = document.getElementById("users_report").getContext("2d");
+  // var users_data = ChartData(usersDateLables, usersCounts);
+  // UsersChart = new Chart(users_context).Bar(users_data, "");
 }
 
 function ChartData(lables, counts) {
@@ -88,11 +95,8 @@ $(document).ready(function () {
     $(document).off("click.qor.openUrl", "[data-url]")
   }
 
-  var yesterday = (new Date()).AddDate(-1);
-  var today = new Date();
-  var defStartDate = yesterday.AddDate(-6);
-  $("#startDate").val(defStartDate.Format("yyyy-MM-dd"));
-  $("#endDate").val(yesterday.Format("yyyy-MM-dd"));
+  $("#startDate").val(moment().subtract(10, 'days').format('YYYY-MM-DD'));
+  $("#endDate").val(moment().format('YYYY-MM-DD'));
   $(".j-update-record").click(function () {
     $.getJSON("/admin/reports.json", { startDate: $("#startDate").val(), endDate: $("#endDate").val() }, function (jsonData) {
       RenderChart(jsonData.Orders, jsonData.Users);
@@ -100,32 +104,56 @@ $(document).ready(function () {
   });
   $(".j-update-record").click();
 
-  $(".today-reports").click(function () {
-    $("#startDate").val(today.Format("yyyy-MM-dd"));
-    $("#endDate").val(today.Format("yyyy-MM-dd"));
-    $(".j-update-record").click();
-    $(this).blur();
-  });
-
-  $(".yesterday-reports").click(function () {
-    $("#startDate").val(yesterday.Format("yyyy-MM-dd"));
-    $("#endDate").val(yesterday.Format("yyyy-MM-dd"));
-    $(".j-update-record").click();
-    $(this).blur();
-  });
-
   $(".this-week-reports").click(function () {
-    var beginningOfThisWeek = yesterday.AddDate(-yesterday.getDay() + 1)
-    $("#startDate").val(beginningOfThisWeek.Format("yyyy-MM-dd"));
-    $("#endDate").val(beginningOfThisWeek.AddDate(6).Format("yyyy-MM-dd"));
+    var start = moment().startOf('week').format('YYYY-MM-DD')
+    var end = moment().format('YYYY-MM-DD')
+    $("#startDate").val(start);
+    $("#endDate").val(end);
     $(".j-update-record").click();
     $(this).blur();
   });
 
   $(".last-week-reports").click(function () {
-    var endOfLastWeek = yesterday.AddDate(-yesterday.getDay())
-    $("#startDate").val(endOfLastWeek.AddDate(-6).Format("yyyy-MM-dd"));
-    $("#endDate").val(endOfLastWeek.Format("yyyy-MM-dd"));
+    var end = moment().startOf('week').subtract(1, 'days').format('YYYY-MM-DD')
+    var start = moment().startOf('week').subtract(1, 'days').startOf('week').format('YYYY-MM-DD')
+    $("#startDate").val(start);
+    $("#endDate").val(end);
+    $(".j-update-record").click();
+    $(this).blur();
+  });
+
+  $(".this-month-reports").click(function () {
+    var start = moment().startOf('month').format('YYYY-MM-DD')
+    var end = moment().format('YYYY-MM-DD')
+    $("#startDate").val(start);
+    $("#endDate").val(end);
+    $(".j-update-record").click();
+    $(this).blur();
+  });
+
+  $(".last-month-reports").click(function () {
+    var start = moment().subtract(1, 'months').startOf('month').format('YYYY-MM-DD');
+    var end = moment().subtract(1, 'months').endOf('month').format('YYYY-MM-DD');
+    $("#startDate").val(start);
+    $("#endDate").val(end);
+    $(".j-update-record").click();
+    $(this).blur();
+  });
+
+  $(".this-year-reports").click(function () {
+    var start = moment().startOf('year').format('YYYY-MM-DD');
+    var end = moment().format('YYYY-MM-DD');
+    $("#startDate").val(start);
+    $("#endDate").val(end);
+    $(".j-update-record").click();
+    $(this).blur();
+  });
+
+  $(".this-year2-reports").click(function () {
+    var start = moment().startOf('year').format('YYYY-MM');
+    var end = moment().format('YYYY-MM');
+    $("#startDate").val(start);
+    $("#endDate").val(end);
     $(".j-update-record").click();
     $(this).blur();
   });
