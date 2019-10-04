@@ -22,7 +22,6 @@ zh-CN:
       Name: 姓名
       Gender: 性别
       IdentityCardNum: 身份证
-
       Mobile Phone: 手机号
 
   after_sales:
@@ -36,6 +35,12 @@ zh-CN:
       Reserverd Service Time: 预约服务时间
       Service Content: 服务内容
       Remark: 备注
+  manufacturers:
+    name:
+      plural: 厂家
+    attributes:
+      Manufacturer Name: "厂家名称"
+      URL: 网址
 
   orders:
     scopes:
