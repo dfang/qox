@@ -20,6 +20,8 @@ import (
 	"github.com/qor/sorting"
 	"github.com/qor/validations"
 	"github.com/rs/zerolog/log"
+
+	"github.com/dfang/qor-demo/models/aftersales"
 )
 
 // DB Global DB connection
@@ -79,6 +81,8 @@ func init() {
 		audited.RegisterCallbacks(DB)
 		media.RegisterCallbacks(DB)
 		publish2.RegisterCallbacks(DB)
+
+		aftersales.RegisterCallbacks(DB)
 	} else {
 		panic(err)
 	}

@@ -157,6 +157,22 @@ $(document).ready(function () {
     $(".j-update-record").click();
     $(this).blur();
   });
+
+  // $('#startDate').on('onOk', function () {
+  //   console.log("fuck")
+  // })
+
+  $('.qor-datepicker').find('.qor-datepicker__save').on('click', function (e) {
+    console.log('fuck');
+  });
+
+  // document.getElementById('startDate').addEventListener('onOk', function () {
+  //   console.log("fuck")
+  // });
+
+  // document.getElementById('endDate').addEventListener('onOk', function () {
+  //   this.value = x.time.toString();
+  // });
 });
 
 

@@ -47,11 +47,12 @@ func Migrate() {
 	AutoMigrate(&transition.StateChangeLog{})
 	AutoMigrate(&activity.QorActivity{})
 
-	AutoMigrate(&settings.Setting{}, &settings.MediaLibrary{})
+	AutoMigrate(&settings.Setting{}, &settings.MediaLibrary{}, &settings.Brand{}, &settings.ServiceType{})
 	AutoMigrate(&asset_manager.AssetManager{})
 	AutoMigrate(&admin.QorWidgetSetting{})
 	AutoMigrate(&banner_editor.QorBannerEditorSetting{})
 	AutoMigrate(&seo.MySEOSetting{})
+
 
 	AutoMigrate(&blogs.Page{}, &blogs.Article{})
 	AutoMigrate(&help.QorHelpEntry{})

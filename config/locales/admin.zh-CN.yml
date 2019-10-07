@@ -35,12 +35,36 @@ zh-CN:
       Reserverd Service Time: 预约服务时间
       Service Content: 服务内容
       Remark: 备注
+    scopes:
+      "Filter By State": 根据状态筛选
+      "Filter By Source": 根据品牌筛选
+      "Filter By Type": 根据服务类型筛选
+      "Filter By State": 
+        created: 已接收 
+        inquired: 已预约
+        scheduled: 已指派
+        overduled: 已超时
+        processing: 待处理
+        processed: 已处理
+        audited: 已审核
+
+
   manufacturers:
     name:
-      plural: 厂家
+      plural: 厂家后台地址管理
     attributes:
       Manufacturer Name: "厂家名称"
       URL: 网址
+  service_types:
+    name:
+      plural: 服务类型管理
+    attributes:
+      Name: 名称
+  brands:
+    name:
+      plural: 品牌管理
+    attributes:
+      Name: 名称
 
   orders:
     scopes:
@@ -162,8 +186,10 @@ zh-CN:
       "Operators": 操作员
 
       "Aftersale Management": 售后管理
-      "After Sales": 售后
-
+      "After Sales": 售后单
+      "Manufacturers": 厂家后台
+      "Brands": 品牌
+      "ServiceTypes": 服务类型
 
     actions:
       advanced_filter: " 高级过滤"

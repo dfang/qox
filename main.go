@@ -25,6 +25,7 @@ import (
 	"github.com/dfang/qor-demo/app/api"
 	"github.com/dfang/qor-demo/app/home"
 	"github.com/dfang/qor-demo/app/orders"
+	"github.com/dfang/qor-demo/app/products"
 	"github.com/dfang/qor-demo/app/static"
 	"github.com/dfang/qor-demo/config"
 	"github.com/dfang/qor-demo/config/auth"
@@ -149,7 +150,7 @@ func main() {
 	// Application.Use(home.New(&home.Config{}))
 	Application.Use(account.NewWithDefault())
 	Application.Use(home.NewWithDefault())
-	// Application.Use(products.NewWithDefault())
+	Application.Use(products.NewWithDefault())
 	Application.Use(orders.NewWithDefault())
 	// Application.Use(pages.NewWithDefault())
 	// Application.Use(stores.NewWithDefault())

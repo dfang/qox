@@ -95,6 +95,10 @@ func ReportsDataHandler(context *admin.Context) {
 func SetupDashboard(Admin *admin.Admin) {
 	// Add Dashboard
 	Admin.AddMenu(&admin.Menu{Name: "Dashboard", Link: "/admin", Priority: 1})
+  
+  Admin.AddMenu(&admin.Menu{Name: "Today", Link: "/today", Priority: 1})
+
+	// Admin.AddMenu(&admin.Menu{Name: "Today", Link: "/admin/today", Ancestors: []string{"Reports"}})
 
 	Admin.GetRouter().Get("/reports", ReportsDataHandler)
 	initFuncMap(Admin)
