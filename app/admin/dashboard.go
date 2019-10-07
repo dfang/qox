@@ -57,6 +57,13 @@ func GetChartDataByMonth(table, start, end string) (res []Chart) {
 	// group by 1
 	// order by 1;
 
+	// select
+	// state,
+	// count(1)
+	// from after_sales
+	// where DATE(created_at) = DATE(timestamp 'yesterday')
+	// group by state;
+
 	db.DB.Table(table).
 		Where("created_at > ? AND created_at < ?", startdate, enddate).
 		Select("to_char(date_trunc('month', created_at), 'YYYY-MM') as date, count(1) as total").
@@ -96,8 +103,7 @@ func SetupDashboard(Admin *admin.Admin) {
 	// Add Dashboard
 	Admin.AddMenu(&admin.Menu{Name: "Dashboard", Link: "/admin", Priority: 1})
   
-  Admin.AddMenu(&admin.Menu{Name: "Today", Link: "/today", Priority: 1})
-
+  	// Admin.AddMenu(&admin.Menu{Name: "Today", Link: "/today", Priority: 1})
 	// Admin.AddMenu(&admin.Menu{Name: "Today", Link: "/admin/today", Ancestors: []string{"Reports"}})
 
 	Admin.GetRouter().Get("/reports", ReportsDataHandler)

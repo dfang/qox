@@ -2,39 +2,105 @@
   {{render "shared/flashes"}}
   {{render "shared/errors"}}
 
+  <!--
+    <div class="qor-section introduction">
+      <h5>This is the DEMO app for Qor</h5>
+      Github: <a href="http://github.com/qor/qor" target="_blank">github.com/qor/qor</a><br/>
+      WebSite: <a href="http://getqor.com" target="_blank">getqor.com</a><br/>
+      Source code of this demo: <a href="http://github.com/qor/qor-example" target="_blank">github.com/qor/qor-example</a><br/>
+    </div>
+  -->
+
   <div class="qor-section reports">
+    <h5>统计</h5>
+    
+    <!-- 
     <div class="qor-section__header">
       <h4 class="qor-section-title">{{t "Reports"}}</h4>
+    </div> 
+    -->
+
+    <div class="mdl-grid">
+      <div class="mdl-cell mdl-cell--6-col">
+        <h4 class="qor-section-title">今日待办</h4>
+        <ul>
+          <li>
+            待预约
+            <span style="float: right">
+              <a rel="nofollow" href="/admin/after_sales?scopes=created"><span style="background:#eae3d3">1</span></a>
+              单
+            </span>
+          </li>
+          
+          <li>
+            待指派师傅
+            <span style="float: right">
+              <a rel="nofollow" href="/admin/after_sales?scopes=inquired"><span style="background:#eae3d3">2</span></a>
+              单
+            </span>
+          </li>
+
+          <li>
+            指派已超时，需重新调度
+            <span style="float: right">
+              <a rel="nofollow" href="/admin/after_sales?scopes=overduled"><span style="background:#eae3d3">3</span></a>
+              单
+            </span>
+          </li>
+          
+          <li>
+            待审核
+            <span style="float: right">
+              <a rel="nofollow" href="/admin/after_sales?scopes=processed"><span style="background:#eae3d3">4</span></a>
+              单
+            </span>
+          </li>
+
+          <li>
+            审核失败
+            <span style="float: right">
+              <a rel="nofollow" href="/admin/after_sales?scopes=audit_failed"><span style="background:#eae3d3">5</span></a>
+              单
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="mdl-cell mdl-cell--6-col">
+        <h4 class="qor-section-title">待监督</h4>
+
+        <ul>
+          <li>
+            待上门服务
+            <span style="float: right">
+              <a rel="nofollow" href="/admin/after_sales?scopes=processing"><span style="background:#eae3d3">1</span></a>
+              单
+            </span>
+          </li>
+          
+          <li>
+            待提交服务完成证明
+            <span style="float: right">
+              <a rel="nofollow" href="/admin/after_sales?scopes=processed"><span style="background:#eae3d3">2</span></a>
+              单
+            </span>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 
-  <div class="qor-section qor-section__table qor-theme-slideout">
-    <div class="qor-section__header">
-      <h4 class="qor-section-title">{{t "今日待处理"}}</h4>
-    </div>
-    <div class="qor-section__body qor-table-container">
-      <ul class="product_options-color">
-        <li>
-          待预约
-          <a rel="nofollow" href="#" ><span style="background:#eae3d3">10</span></a>
-        </li>
-        
-        <li>
-          待指派师傅
-          <a rel="nofollow" href="#" ><span style="background:#eae3d3">1</span></a>
-        </li>
-        
-        <li>
-          待审核
-          <a rel="nofollow" href="#" ><span style="background:#eae3d3">2</span></a>
-        </li>
-        
-      </ul>
-    </div>
+
+  <div class="qor-section introduction">
+    <h5>快速导航</h5>
+    <a href="https://www.youzan.com/v4/dashboard" target="_blank">商城后台</a><br/>
+    <a href="http://jdfw.jd.com/" target="_blank">京东安维</a><br/>
+    <a href="http://fwcss.aux-home.com/#/home" target="_blank">奥克斯</a><br/>
   </div>
 
   <!-- if have table please add qor-section__table className -->
-  <div class="qor-section qor-section__table qor-theme-slideout">
+  <!-- 
+   <div class="qor-section qor-section__table qor-theme-slideout">
     <div class="qor-section__header">
       <h4 class="qor-section-title">{{t "Latest Orders"}}</h4>
     </div>
@@ -42,6 +108,8 @@
       {{render_latest_order .}}
     </div>
   </div>
+  -->
+
 </div>
 
 <link type="text/css" rel="stylesheet" href="/admin/assets/stylesheets/publish2.css?theme=publish2">

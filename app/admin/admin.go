@@ -67,7 +67,6 @@ func (app App) ConfigureApplication(application *application.Application) {
 	SetupSEO(Admin)
 	SetupWidget(Admin)
 	SetupDashboard(Admin)
-	SetupReport(Admin)
 	application.Router.Mount(app.Config.Prefix, Admin.NewServeMux(app.Config.Prefix))
 
 	// TODO: Investigate why Admin.MountTo not works
