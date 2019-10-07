@@ -35,6 +35,9 @@ zh-CN:
       Reserverd Service Time: 预约服务时间
       Service Content: 服务内容
       Remark: 备注
+      User: 已指派给
+      Source: 品牌
+      State: 状态
     scopes:
       "Filter By State": 根据状态筛选
       "Filter By Source": 根据品牌筛选

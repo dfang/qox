@@ -261,19 +261,46 @@ func configureScopes(model *admin.Resource) {
 }
 
 func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
-	// 安排
+	// 预约客户
+	type reserveActionArgument struct {
+		Remark string
+	}
+	reserveActionArgumentResource := Admin.NewResource(&reserveActionArgument{})
+	aftersale.Action(&admin.Action{
+		Name: "预约",
+		Handler: func(argument *admin.ActionArgument) error {
+			var (
+				arg = argument.Argument.(*reserveActionArgument)
+			)
+			for _, record := range argument.FindSelectedRecords() {
+				argument.Context.GetDB().Model(record).UpdateColumn("remark", arg.Remark)
+				argument.Context.GetDB().Model(record).UpdateColumn("state", "inquired")
+			}
+			return nil
+		},
+		Visible: func(record interface{}, context *admin.Context) bool {
+			if item, ok := record.(*aftersales.AfterSale); ok {
+				return item.State == "created"
+			}
+			return false
+			// return true
+		},
+		Resource: reserveActionArgumentResource,
+		Modes:    []string{"edit", "show", "menu_item"},
+	})
+
+	// 指派师傅
 	type setupActionArgument struct {
 		UserID uint
 	}
-
 	setupActionArgumentResource := Admin.NewResource(&setupActionArgument{})
 	setupActionArgumentResource.Meta(&admin.Meta{
 		Name: "UserID",
 		Type: "select_one",
-		Valuer: func(record interface{}, context *qor.Context) interface{} {
-			// return record.(*users.User).ID
-			return ""
-		},
+		// Valuer: func(record interface{}, context *qor.Context) interface{} {
+		// 	// return record.(*users.User).ID
+		// 	return ""
+		// },
 		Collection: func(value interface{}, context *qor.Context) (options [][]string) {
 			var setupMen []users.User
 			// context.GetDB().Where("role = ?", "setup_man").Find(&setupMen)
@@ -287,35 +314,126 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 		},
 		// Collection: []string{"Male", "Female", "Unknown"},
 	})
-
-	// 安排安装
 	aftersale.Action(&admin.Action{
-		Name: "安排",
+		Name: "指派",
 		Handler: func(argument *admin.ActionArgument) error {
 			var (
-				tx  = argument.Context.GetDB().Begin()
+				// tx  = argument.Context.GetDB().Begin()
 				arg = argument.Argument.(*setupActionArgument)
 			)
 			for _, record := range argument.FindSelectedRecords() {
-				item := record.(*aftersales.AfterSale)
-				item.UserID = &arg.UserID
+				// item := record.(*aftersales.AfterSale)
+				// item.UserID = &arg.UserID
+				argument.Context.GetDB().Model(record).UpdateColumn("user_id", arg.UserID)
+				argument.Context.GetDB().Model(record).UpdateColumn("state", "scheduled")
 				// orders.OrderState.Trigger("schedule_setup", order, tx, "man to setup: "+arg.ManToSetup)
-				if err := tx.Save(item).Error; err != nil {
-					tx.Rollback()
-					return err
-				}
+				// if err := tx.Save(item).Error; err != nil {
+				// 	tx.Rollback()
+				// 	return err
+				// }
 			}
-			tx.Commit()
+			// tx.Commit()
 			return nil
 		},
 		Visible: func(record interface{}, context *admin.Context) bool {
-			// if order, ok := record.(*orders.Order); ok {
-			// 	return model.State == "processing"
-			// }
-			// return false
+			if item, ok := record.(*aftersales.AfterSale); ok {
+				return item.State == "inquired"
+			}
 			return true
 		},
 		Resource: setupActionArgumentResource,
+		Modes:    []string{"edit", "show", "menu_item"},
+	})
+
+	// 提示用户
+	type notifyCustomerArgument struct {
+		Content string
+	}
+	notifyCustomerArgumentResource := Admin.NewResource(&notifyCustomerArgument{})
+	aftersale.Action(&admin.Action{
+		Name: "提示用户",
+		Handler: func(argument *admin.ActionArgument) error {
+			var (
+				// arg = argument.Argument.(*setupActionArgument)
+			)
+			// for _, record := range argument.FindSelectedRecords() {
+			// 	// 给用户发短信
+			// }
+			return nil
+		},
+		Visible: func(record interface{}, context *admin.Context) bool {
+			// if item, ok := record.(*aftersales.AfterSale); ok {
+			// 	return item.State == "inquired"
+			// }
+			return true
+		},
+		Resource: notifyCustomerArgumentResource,
+		Modes:    []string{"edit", "show", "menu_item"},
+	})
+
+	// 提示师傅
+	type notifyWorkerArgument struct {
+		Content string
+	}
+	notifyWorkerArgumentResource := Admin.NewResource(&setupActionArgument{})
+	aftersale.Action(&admin.Action{
+		Name: "提示师傅",
+		Handler: func(argument *admin.ActionArgument) error {
+			var (
+				// arg = argument.Argument.(*setupActionArgument)
+			)
+			// for _, record := range argument.FindSelectedRecords() {
+			// 	// 给用户发短信
+			// }
+			return nil
+		},
+		Visible: func(record interface{}, context *admin.Context) bool {
+			// if item, ok := record.(*aftersales.AfterSale); ok {
+			// 	return item.State == "inquired"
+			// }
+			return true
+		},
+		Resource: notifyWorkerArgumentResource,
+		Modes:    []string{"edit", "show", "menu_item"},
+	})
+
+
+	// 审核
+	type auditActionArgument struct {
+		Fee float32
+	}
+	auditActionArgumentResource := Admin.NewResource(&auditActionArgument{})
+	aftersale.Action(&admin.Action{
+		Name: "审核",
+		Handler: func(argument *admin.ActionArgument) error {
+			var (
+				// tx  = argument.Context.GetDB().Begin()
+				arg = argument.Argument.(*auditActionArgument)
+				// db = argument.Context.GetDB()
+			)
+			for _, record := range argument.FindSelectedRecords() {
+				// item := record.(*aftersales.AfterSale)
+				// item.Fee = arg.Fee
+				argument.Context.GetDB().Model(record).UpdateColumn("fee", arg.Fee)
+				argument.Context.GetDB().Model(record).UpdateColumn("state", "audited")
+				// orders.OrderState.Trigger("schedule_setup", order, tx, "man to setup: "+arg.ManToSetup)
+				// if err := tx.Save(item).Error; err != nil {
+				// 	tx.Rollback()
+				// 	return err
+				// }
+				// tx.Commit()
+				// return nil
+			}
+			// tx.Commit()
+			return nil
+		},
+		Visible: func(record interface{}, context *admin.Context) bool {
+			// if item, ok := record.(*aftersales.AfterSale); ok {
+			// 	return item.State == "processed"
+			// }
+			return true
+		},
+		Resource: auditActionArgumentResource,
 		Modes:    []string{"edit", "show", "menu_item"},
 	})
 
