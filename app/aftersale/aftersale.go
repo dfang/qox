@@ -3,8 +3,10 @@ package aftersale
 // "net/http"
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
+	"time"
 
+	"github.com/jinzhu/gorm"
+	"github.com/jinzhu/now"
 	"github.com/dfang/qor-demo/models/aftersales"
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/dfang/qor-demo/models/settings"
@@ -190,6 +192,72 @@ func configureScopes(model *admin.Resource) {
 			},
 		})
 	}
+
+
+	model.Filter(&admin.Filter{
+		Name: "created_at",
+		Config: &admin.DatetimeConfig{
+			ShowTime: false,
+		},
+	})
+
+	// define scopes for Order
+	model.Scope(&admin.Scope{
+		Name:  "Today",
+		Label: "Today",
+		Default: true,
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", time.Now())
+		},
+	})
+	model.Scope(&admin.Scope{
+		Name:  "Yesterday",
+		Label: "Yesterday",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			now.WeekStartDay = time.Monday
+			// select order_no, customer_name, item_name::varchar(20), quantity, created_at
+			// from orders_view
+			// where created_at between now() - interval '2 day' and  now() - interval '1 day';
+			// return db.Where("created_at between now() - interval '2 day' and  now() - interval '1 day'")
+			return db.Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -1)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -1))
+		},
+	})
+	model.Scope(&admin.Scope{
+		Name:  "ThisWeek",
+		Label: "This Week",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			now.WeekStartDay = time.Monday
+			return db.Where("created_at >= ?", now.BeginningOfWeek()).Where("created_at <=? ", now.EndOfWeek())
+		},
+	})
+	model.Scope(&admin.Scope{
+		Name:  "ThisMonth",
+		Label: "This Month",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			now.WeekStartDay = time.Monday
+			return db.Where("created_at >= ?", now.BeginningOfMonth()).Where("created_at <=? ", now.EndOfMonth())
+		},
+	})
+	model.Scope(&admin.Scope{
+		Name:  "ThisQuarter",
+		Label: "This Quarter",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("created_at >= ?", now.BeginningOfQuarter()).Where("created_at <=? ", now.EndOfQuarter())
+		},
+	})
+	model.Scope(&admin.Scope{
+		Name:  "ThisYear",
+		Label: "This Year",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("created_at >= ?", now.BeginningOfYear()).Where("created_at <=? ", now.EndOfYear())
+		},
+	})
 }
 
 func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
@@ -242,7 +310,7 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 		},
 		Visible: func(record interface{}, context *admin.Context) bool {
 			// if order, ok := record.(*orders.Order); ok {
-			// 	return order.State == "processing"
+			// 	return model.State == "processing"
 			// }
 			// return false
 			return true

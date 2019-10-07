@@ -39,6 +39,7 @@ zh-CN:
       "Filter By State": 根据状态筛选
       "Filter By Source": 根据品牌筛选
       "Filter By Type": 根据服务类型筛选
+      "Filter By Date": 根据创建时间快速筛选
       "Filter By State":
         created: 已接收
         inquired: 已预约
@@ -47,6 +48,14 @@ zh-CN:
         processing: 待处理
         processed: 已处理
         audited: 已审核
+        audit_failed: 审核失败
+      "Filter By Date":
+        "Today": "今天"
+        "Yesterday": "昨天"
+        "This Week": 本周
+        "This Month": 本月
+        "This Quarter": 本季度
+        "This Year": 本年
 
 
   manufacturers:
@@ -83,8 +92,8 @@ zh-CN:
         "Pending": 待处理
         "Processing": 处理中
       "Filter By Date":
-        Today: "今天"
-        Yesterday: "昨天"
+        "Today": "今天"
+        "Yesterday": "昨天"
         "This Week": 本周
         "This Month": 本月
         "This Quarter": 本季度
