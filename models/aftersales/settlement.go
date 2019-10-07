@@ -11,7 +11,7 @@ type Settlement struct {
 	ManufacturerName 	string
 
 	UserID *uint
-	User   users.User
+	// User   users.User
 
 	// deposit 存入（完成服务）
 	// withdraw 提现 ()
