@@ -61,11 +61,13 @@ func (app App) ConfigureApplication(application *application.Application) {
 	// Add Help
 	Admin.AddResource(&help.QorHelpEntry{}, &admin.Config{Name: "Help", Menu: []string{"Site Management"}, Singleton: true, Priority: 1})
 
+
 	SetupNotification(Admin)
 	SetupWorker(Admin)
 	SetupSEO(Admin)
 	SetupWidget(Admin)
 	SetupDashboard(Admin)
+	SetupReport(Admin)
 	application.Router.Mount(app.Config.Prefix, Admin.NewServeMux(app.Config.Prefix))
 
 	// TODO: Investigate why Admin.MountTo not works

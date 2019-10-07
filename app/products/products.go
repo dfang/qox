@@ -65,7 +65,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		Menu:       []string{"Product Management"},
 		Permission: permission,
 	})
-	// product.UseTheme("products")
+	product.UseTheme("products")
 
 	color := Admin.AddResource(&products.Color{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -5})
 	Admin.AddResource(&products.Size{}, &admin.Config{Menu: []string{"Product Management"}, Priority: -4})

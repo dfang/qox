@@ -6,34 +6,30 @@
     <div class="qor-section__header">
       <h4 class="qor-section-title">{{t "Reports"}}</h4>
     </div>
+  </div>
 
-    <div class="mdl-grid reports-daterange">
-      <div class="mdl-cell">
-        <input class="mdl-textfield__input" id="startDate" type="text" data-toggle="qor.datepicker">
-      </div>
-      <div class="mdl-cell datepicker-separator">
-        -
-      </div>
-      <div class="mdl-cell">
-        <input class="mdl-textfield__input" id="endDate" type="text" data-toggle="qor.datepicker">
-      </div>
-
-      <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect j-update-record">
-        {{t "更新报表"}} </button>
-      <button class="mdl-button this-week-reports"> {{t "本周"}} </button>
-      <button class="mdl-button last-week-reports"> {{t "上周"}} </button>
-      <button class="mdl-button this-month-reports"> {{t "本月"}} </button>
-      <button class="mdl-button last-month-reports"> {{t "上月"}} </button>
-      <button class="mdl-button this-year-reports"> {{t "今年"}} </button>
-      <button class="mdl-button this-year2-reports"> {{t "今年/按月"}} </button>
+  <div class="qor-section qor-section__table qor-theme-slideout">
+    <div class="qor-section__header">
+      <h4 class="qor-section-title">{{t "今日待处理"}}</h4>
     </div>
+    <div class="qor-section__body qor-table-container">
+      <ul class="product_options-color">
+        <li>
+          待预约
+          <a rel="nofollow" href="#" ><span style="background:#eae3d3">10</span></a>
+        </li>
 
-    <script src="/vendors/Chart.min.js"></script>
-    <div class="mdl-grid">
-      <div class="mdl-cell mdl-cell--12-col">
-        <h4 class="qor-section-title">{{t "Orders Count"}}</h4>
-        <canvas id="orders_report"></canvas>
-      </div>
+        <li>
+          待指派师傅
+          <a rel="nofollow" href="#" ><span style="background:#eae3d3">1</span></a>
+        </li>
+
+        <li>
+          待审核
+          <a rel="nofollow" href="#" ><span style="background:#eae3d3">2</span></a>
+        </li>
+
+      </ul>
     </div>
   </div>
 
