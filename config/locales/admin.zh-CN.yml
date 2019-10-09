@@ -38,6 +38,7 @@ zh-CN:
       User: 已指派给
       Source: 品牌
       State: 状态
+      Fee: 费用
     scopes:
       "Filter By State": 根据状态筛选
       "Filter By Source": 根据品牌筛选

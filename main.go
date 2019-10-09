@@ -64,6 +64,8 @@ func main() {
 
 	cmdLine.Parse(os.Args[1:])
 
+	migrations.Migrate()
+
 	if *runMigration {
 		migrations.Migrate()
 		os.Exit(0)
