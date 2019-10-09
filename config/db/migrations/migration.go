@@ -34,6 +34,9 @@ func Migrate() {
 	AutoMigrate(&products.Color{}, &products.Size{}, &products.Material{}, &products.Category{}, &products.Collection{})
 
 	AutoMigrate(&users.User{}, &users.Address{})
+
+	AutoMigrate(&users.WechatProfile{})
+
 	AutoMigrate(&auth_identity.AuthIdentity{})
 
 	AutoMigrate(&orders.Order{}, &orders.OrderItem{}, &orders.OrderFollowUp{})
@@ -53,10 +56,8 @@ func Migrate() {
 	AutoMigrate(&banner_editor.QorBannerEditorSetting{})
 	AutoMigrate(&seo.MySEOSetting{})
 
-
 	AutoMigrate(&blogs.Page{}, &blogs.Article{})
 	AutoMigrate(&help.QorHelpEntry{})
-
 }
 
 // AutoMigrate run auto migration

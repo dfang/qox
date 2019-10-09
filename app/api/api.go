@@ -3,8 +3,9 @@ package api
 import (
 	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/models/orders"
-	"github.com/dfang/qor-demo/models/products"
+	// "github.com/dfang/qor-demo/models/products"
 	"github.com/dfang/qor-demo/models/users"
+	"github.com/dfang/qor-demo/models/aftersales"
 	"github.com/qor/admin"
 	"github.com/qor/application"
 	"github.com/qor/qor"
@@ -38,27 +39,31 @@ type Config struct {
 func (app App) ConfigureApplication(application *application.Application) {
 	API := admin.New(&qor.Config{DB: db.DB})
 
-	Product := API.AddResource(&products.Product{})
+	// Product := API.AddResource(&products.Product{})
 
-	ColorVariationMeta := Product.Meta(&admin.Meta{Name: "ColorVariations"})
-	ColorVariation := ColorVariationMeta.Resource
-	ColorVariation.IndexAttrs("ID", "Color", "Images", "SizeVariations")
-	ColorVariation.ShowAttrs("Color", "Images", "SizeVariations")
+	// ColorVariationMeta := Product.Meta(&admin.Meta{Name: "ColorVariations"})
+	// ColorVariation := ColorVariationMeta.Resource
+	// ColorVariation.IndexAttrs("ID", "Color", "Images", "SizeVariations")
+	// ColorVariation.ShowAttrs("Color", "Images", "SizeVariations")
 
-	// SizeVariationMeta := ColorVariation.Meta(&admin.Meta{Name: "SizeVariations"})
-	SizeVariationMeta := Product.Meta(&admin.Meta{Name: "SizeVariations"})
-	SizeVariation := SizeVariationMeta.Resource
-	SizeVariation.IndexAttrs("ID", "Size", "AvailableQuantity")
-	SizeVariation.ShowAttrs("ID", "Size", "AvailableQuantity")
+	// // SizeVariationMeta := ColorVariation.Meta(&admin.Meta{Name: "SizeVariations"})
+	// SizeVariationMeta := Product.Meta(&admin.Meta{Name: "SizeVariations"})
+	// SizeVariation := SizeVariationMeta.Resource
+	// SizeVariation.IndexAttrs("ID", "Size", "AvailableQuantity")
+	// SizeVariation.ShowAttrs("ID", "Size", "AvailableQuantity")
 
 	API.AddResource(&orders.Order{})
 
-	API.AddResource(&users.User{})
-	// User := API.AddResource(&users.User{})
-	// userOrders, _ := User.AddSubResource("Orders")
-	// userOrders.AddSubResource("OrderItems", &admin.Config{Name: "Items"})
+	// API.AddResource(&users.User{})
+	user := API.AddResource(&users.User{})
+	user.AddSubResource("Orders")
+	// afterSales, _ := User.AddSubResource("AfterSales")
+	user.AddSubResource("AfterSales")
+	// // userOrders.AddSubResource("OrderItems", &admin.Config{Name: "Items"})
 
-	API.AddResource(&products.Category{})
+	// API.AddResource(&products.Category{})
+
+	API.AddResource(&aftersales.AfterSale{})
 
 	application.Router.Mount(app.Config.Prefix, API.NewServeMux(app.Config.Prefix))
 }

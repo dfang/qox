@@ -34,7 +34,7 @@ type AfterSale struct {
 	// 备注
 	Remark string
 
-	UserID *uint
+	UserID uint
 	User   users.User
 
 	audited.AuditedModel

@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dfang/qor-demo/config/db"
+	"github.com/dfang/qor-demo/models/aftersales"
+	"github.com/dfang/qor-demo/models/settings"
+	"github.com/dfang/qor-demo/models/users"
 	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/now"
-	"github.com/dfang/qor-demo/models/aftersales"
-	"github.com/dfang/qor-demo/models/users"
-	"github.com/dfang/qor-demo/models/settings"
 	"github.com/qor/admin"
 	"github.com/qor/application"
 	"github.com/qor/qor"
-	"github.com/dfang/qor-demo/config/db"
 )
 
 // New new home app
@@ -57,9 +57,11 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	Admin.AddResource(&settings.Brand{}, &admin.Config{Name: "Brand", Menu: []string{"Aftersale Management"}, Priority: 3})
 	Admin.AddResource(&settings.ServiceType{}, &admin.Config{Name: "ServiceType", Menu: []string{"Aftersale Management"}, Priority: 2})
 
+	Admin.AddResource(&users.WechatProfile{}, &admin.Config{Name: "WechatProfile", Menu: []string{"Aftersale Management"}, Priority: 5})
+
 	aftersale.Meta(&admin.Meta{
-		Name:       "ServiceType",
-		Type:       "select_one",
+		Name: "ServiceType",
+		Type: "select_one",
 		// Collection: []string{"安装", "维修", "清洗"},
 		Collection: func(value interface{}, context *qor.Context) (options [][]string) {
 			for _, m := range service_types {
@@ -72,8 +74,8 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	})
 
 	aftersale.Meta(&admin.Meta{
-		Name:       "Source",
-		Type:       "select_one",
+		Name: "Source",
+		Type: "select_one",
 		Collection: func(value interface{}, context *qor.Context) (options [][]string) {
 			for _, m := range brands {
 				idStr := fmt.Sprintf("%s", m.Name)
@@ -116,16 +118,13 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		Modes:       []string{"menu_item", "edit", "show"},
 	})
 
-
 	configureMetas(aftersale)
 	configureActions(Admin, aftersale)
 	configureScopes(aftersale)
 
-
 	// aftersale.UseTheme("grid")
 	// aftersale.UseTheme("publish2")
 	aftersale.UseTheme("fancy")
-
 
 	// aftersale.FindManyHandler = func(results interface{}, context *qor.Context) error {
 	// 	db             = context.GetDB()
@@ -138,8 +137,33 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 
 func configureMetas(model *admin.Resource) {
 	model.EditAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
-	model.NewAttrs("-UserID",  "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
+	model.NewAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
 	model.IndexAttrs("-UserID", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-Fee", "-Remark")
+
+	model.Meta(&admin.Meta{Name: "State", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		m := record.(*aftersales.AfterSale)
+
+		fmt.Println("sssss")
+		fmt.Println(m.State)
+
+		switch m.State {
+		case "created":
+			return "已接收"
+		case "inquired":
+			return "已预约"
+		case "scheduled":
+			return "已指派"
+		case "overdule":
+			return "已指派"
+		case "audited":
+			return "已指派"
+		case "processed":
+			return "已服务"
+		default:
+			// return "N/A"
+			return m.State
+		}
+	}})
 }
 
 func configureScopes(model *admin.Resource) {
@@ -193,7 +217,6 @@ func configureScopes(model *admin.Resource) {
 		})
 	}
 
-
 	model.Filter(&admin.Filter{
 		Name: "created_at",
 		Config: &admin.DatetimeConfig{
@@ -203,10 +226,10 @@ func configureScopes(model *admin.Resource) {
 
 	// define scopes for Order
 	model.Scope(&admin.Scope{
-		Name:  "Today",
-		Label: "Today",
+		Name:    "Today",
+		Label:   "Today",
 		Default: true,
-		Group: "Filter By Date",
+		Group:   "Filter By Date",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 			return db.Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", time.Now())
 		},
@@ -354,7 +377,7 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 		Name: "提示用户",
 		Handler: func(argument *admin.ActionArgument) error {
 			var (
-				// arg = argument.Argument.(*setupActionArgument)
+			// arg = argument.Argument.(*setupActionArgument)
 			)
 			// for _, record := range argument.FindSelectedRecords() {
 			// 	// 给用户发短信
@@ -380,7 +403,7 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 		Name: "提示师傅",
 		Handler: func(argument *admin.ActionArgument) error {
 			var (
-				// arg = argument.Argument.(*setupActionArgument)
+			// arg = argument.Argument.(*setupActionArgument)
 			)
 			// for _, record := range argument.FindSelectedRecords() {
 			// 	// 给用户发短信
@@ -396,7 +419,6 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 		Resource: notifyWorkerArgumentResource,
 		Modes:    []string{"edit", "show", "menu_item"},
 	})
-
 
 	// 审核
 	type auditActionArgument struct {
