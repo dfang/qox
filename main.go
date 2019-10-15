@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -145,8 +146,14 @@ func main() {
 		})
 	})
 
-	Application.Use(aftersale.NewWithDefault())
+	Router.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			DumpHTTPRequest(req)
+			next.ServeHTTP(w, req)
+		})
+	})
 
+	Application.Use(aftersale.NewWithDefault())
 	Application.Use(api.New(&api.Config{}))
 	Application.Use(adminapp.New(&adminapp.Config{}))
 	// Application.Use(home.New(&home.Config{}))
@@ -229,4 +236,14 @@ func main() {
 			panic(err)
 		}
 	}
+}
+
+// DumpHTTPRequest for debugging
+func DumpHTTPRequest(r *http.Request) {
+	output, err := httputil.DumpRequest(r, true)
+	if err != nil {
+		fmt.Println("Error when dumping request:", err)
+		return
+	}
+	fmt.Println(string(output))
 }

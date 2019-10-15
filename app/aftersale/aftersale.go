@@ -226,10 +226,10 @@ func configureScopes(model *admin.Resource) {
 
 	// define scopes for Order
 	model.Scope(&admin.Scope{
-		Name:    "Today",
-		Label:   "Today",
-		Default: true,
-		Group:   "Filter By Date",
+		Name:  "Today",
+		Label: "Today",
+		// Default: true, // 如果开启了这个，那么所有的Actions With User Input 就会废掉, 因为argument.FindSelectedRecords 返回为空
+		Group: "Filter By Date",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 			return db.Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", time.Now())
 		},

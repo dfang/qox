@@ -1,11 +1,12 @@
 package aftersales
 
 import (
+	"strings"
+	"time"
+
 	"github.com/jinzhu/gorm"
 	"github.com/qor/audited"
 	"github.com/qor/transition"
-	"time"
-	"strings"
 
 	"github.com/dfang/qor-demo/models/users"
 )
@@ -27,7 +28,7 @@ type AfterSale struct {
 	ReserverdServiceTime string
 
 	// 品牌
-	Source  string
+	Source string
 
 	Fee float32
 
@@ -43,8 +44,8 @@ type AfterSale struct {
 }
 
 func (item *AfterSale) BeforeCreate(scope *gorm.Scope) error {
-  scope.SetColumn("State", "created")
-  return nil
+	scope.SetColumn("State", "created")
+	return nil
 }
 
 // AfterSale
@@ -57,8 +58,8 @@ func (item *AfterSale) BeforeCreate(scope *gorm.Scope) error {
 
 const (
 	CREATED_FROM = "created_at_from:query"
-	CREATED_TO = "created_at_to:query"
-) 
+	CREATED_TO   = "created_at_to:query"
+)
 
 func RegisterCallbacks(db *gorm.DB) {
 	if db.Callback().Query().Get(CREATED_FROM) == nil {
@@ -71,10 +72,10 @@ func RegisterCallbacks(db *gorm.DB) {
 }
 
 func queryCallback(scope *gorm.Scope) {
-	var			conditions         []string
-	var			conditionValues    []interface{}
+	var conditions []string
+	var conditionValues []interface{}
 	// var			scheduledStartTime, scheduledEndTime, scheduledCurrentTime *time.Time
-	var			scheduledStartTime, scheduledEndTime *time.Time
+	var scheduledStartTime, scheduledEndTime *time.Time
 
 	if v, ok := scope.Get(CREATED_FROM); ok {
 		if t, ok := v.(*time.Time); ok {
@@ -106,7 +107,5 @@ func queryCallback(scope *gorm.Scope) {
 }
 
 // func init() {
-// 	RegisterCallbacks	
+// 	RegisterCallbacks
 // }
-
-
