@@ -37,6 +37,7 @@ type Config struct {
 
 var brands []settings.Brand
 var service_types []settings.ServiceType
+var workmen []users.User
 
 // ConfigureApplication configure application
 func (app App) ConfigureApplication(application *application.Application) {
@@ -50,6 +51,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 
 	db.DB.Select("name, id").Find(&brands)
 	db.DB.Select("name, id").Find(&service_types)
+	db.DB.Select("name, id").Where("role = ?", "workman").Find(&workmen)
 
 	// Add Aftersale
 	aftersale := Admin.AddResource(&aftersales.AfterSale{}, &admin.Config{Menu: []string{"Aftersale Management"}, Priority: 1})
@@ -195,6 +197,9 @@ func configureScopes(model *admin.Resource) {
 			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 				// 两种写法都可以
 				// return db.Where(aftersales.AfterSale{State: item})
+				if item == "overduled" {
+					return db.Where("state = 'scheduled'").Where("updated_at <= NOW() - INTERVAL '20 minutes'")
+				}
 				return db.Where("state = ?", item)
 			},
 		})
@@ -210,6 +215,19 @@ func configureScopes(model *admin.Resource) {
 			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 				// 两种写法都可以
 				return db.Where("service_type = ?", item.Name)
+			},
+		})
+	}
+
+	for _, item := range workmen {
+		var item = item
+		model.Scope(&admin.Scope{
+			Name:  item.Name,
+			Label: item.Name,
+			Group: "Filter By Workman",
+			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+				// 两种写法都可以
+				return db.Where("user_id = ?", item.ID)
 			},
 		})
 	}
