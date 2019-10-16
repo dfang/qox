@@ -15,7 +15,7 @@ import (
 
 // ConfigureAdmin configure admin interface
 func (App) ConfigureAdmin(Admin *admin.Admin) {
-	Admin.AddMenu(&admin.Menu{Name: "User Management", Priority: 3})
+	Admin.AddMenu(&admin.Menu{Name: "User Management", Priority: 2})
 	user := Admin.AddResource(&users.User{}, &admin.Config{Menu: []string{"User Management"}})
 
 	user.SearchAttrs("name", "mobile_phone")
@@ -68,7 +68,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	user.Meta(&admin.Meta{
 		Name:   "Role",
 		Type:   "string",
-		Config: &admin.SelectOneConfig{Collection: []string{"管理员", "调度员", "安装师傅", "配送师傅"}},
+		Config: &admin.SelectOneConfig{Collection: []string{"管理员", "调度员", "师傅"}},
 		Valuer: func(record interface{}, context *qor.Context) (value interface{}) {
 			user := record.(*users.User)
 			switch user.Role {
@@ -78,6 +78,8 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 				return "配送师傅"
 			case "setup_man":
 				return "安装师傅"
+			case "workman":
+				return "师傅"
 			case "Admin":
 				return "管理员"
 			default:
@@ -91,6 +93,8 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 			switch mv {
 			case "调度员":
 				m = "operator"
+			case "师傅":
+				m = "workman"
 			case "配送师傅":
 				m = "delivery_man"
 			case "安装师傅":
@@ -108,6 +112,8 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 			switch user.Role {
 			case "operator":
 				return "调度员"
+			case "workman":
+				return "师傅"
 			case "delivery_man":
 				return "配送师傅"
 			case "setup_man":
@@ -144,7 +150,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	user.Meta(&admin.Meta{Name: "DefaultBillingAddress", Config: &admin.SelectOneConfig{Collection: userAddressesCollection}})
 	user.Meta(&admin.Meta{Name: "DefaultShippingAddress", Config: &admin.SelectOneConfig{Collection: userAddressesCollection}})
 
-	for _, role := range []string{"admin", "operator", "setup_man", "delivery_man"} {
+	for _, role := range []string{"admin", "operator", "workman"} {
 		var role = role
 		user.Scope(&admin.Scope{
 			Name: role,
@@ -202,26 +208,61 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 
 	// user.UseTheme("grid")
 
-	// Add deliveryMen submenu
-	deliveryMan := Admin.AddResource(&users.User{}, &admin.Config{Name: "Delivery Men", Menu: []string{"User Management"}})
-	deliveryMan.Scope(&admin.Scope{
-		Default: true,
-		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("role = ?", "delivery_man")
-		},
-	})
-
 	// Add  submenu
-	setupMan := Admin.AddResource(&users.User{}, &admin.Config{Name: "Setup Men", Menu: []string{"User Management"}})
+	setupMan := Admin.AddResource(&users.User{}, &admin.Config{Name: "Workman", Menu: []string{"User Management"}})
+	setupMan.IndexAttrs("ID", "Name", "MobilePhone", "Gender", "Role")
+	setupMan.NewAttrs("ID", "Name", "Gender", "Role", "MobilePhone", "IdentityCardNum")
+	setupMan.ShowAttrs(
+		&admin.Section{
+			Title: "Basic Information",
+			Rows: [][]string{
+				{"Name", "Gender"},
+				{"MobilePhone"},
+				{"Role"},
+			},
+		},
+		// &admin.Section{
+		// 	Title: "Default Addresses",
+		// 	Rows: [][]string{
+		// 		{"DefaultBillingAddress"},
+		// 		{"MobilePhone"},
+		// 		{"Role"},
+		// 	},
+		// },
+		"Addresses",
+	)
+	setupMan.EditAttrs(setupMan.ShowAttrs())
 	setupMan.Scope(&admin.Scope{
 		Default: true,
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("role = ?", "setup_man")
+			return db.Where("role = ?", "workman")
 		},
 	})
 
 	// Add  submenu
 	operator := Admin.AddResource(&users.User{}, &admin.Config{Name: "Operator", Menu: []string{"User Management"}})
+	operator.IndexAttrs("ID", "Name", "MobilePhone", "Gender", "Role")
+	operator.NewAttrs("ID", "Name", "Gender", "Role", "MobilePhone", "IdentityCardNum")
+	operator.ShowAttrs(
+		&admin.Section{
+			Title: "Basic Information",
+			Rows: [][]string{
+				{"Name", "Gender"},
+				{"MobilePhone"},
+				{"Role"},
+			},
+		},
+		// &admin.Section{
+		// 	Title: "Default Addresses",
+		// 	Rows: [][]string{
+		// 		{"DefaultBillingAddress"},
+		// 		{"MobilePhone"},
+		// 		{"Role"},
+		// 	},
+		// },
+		"Addresses",
+	)
+	operator.EditAttrs(operator.ShowAttrs())
 	operator.Scope(&admin.Scope{
 		Default: true,
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {

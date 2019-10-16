@@ -46,7 +46,7 @@ func (app App) ConfigureApplication(application *application.Application) {
 
 // ConfigureAdmin configure admin interface
 func (App) ConfigureAdmin(Admin *admin.Admin) {
-	Admin.AddMenu(&admin.Menu{Name: "Aftersale Management", Priority: 6})
+	Admin.AddMenu(&admin.Menu{Name: "Aftersale Management", Priority: 2})
 
 	db.DB.Select("name, id").Find(&brands)
 	db.DB.Select("name, id").Find(&service_types)
@@ -142,9 +142,6 @@ func configureMetas(model *admin.Resource) {
 
 	model.Meta(&admin.Meta{Name: "State", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
 		m := record.(*aftersales.AfterSale)
-
-		fmt.Println("sssss")
-		fmt.Println(m.State)
 
 		switch m.State {
 		case "created":
@@ -341,21 +338,21 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 		Name: "指派",
 		Handler: func(argument *admin.ActionArgument) error {
 			var (
-				// tx  = argument.Context.GetDB().Begin()
+				tx  = argument.Context.GetDB().Begin()
 				arg = argument.Argument.(*setupActionArgument)
 			)
 			for _, record := range argument.FindSelectedRecords() {
-				// item := record.(*aftersales.AfterSale)
-				// item.UserID = &arg.UserID
-				argument.Context.GetDB().Model(record).UpdateColumn("user_id", arg.UserID)
-				argument.Context.GetDB().Model(record).UpdateColumn("state", "scheduled")
-				// orders.OrderState.Trigger("schedule_setup", order, tx, "man to setup: "+arg.ManToSetup)
-				// if err := tx.Save(item).Error; err != nil {
-				// 	tx.Rollback()
-				// 	return err
-				// }
+				// argument.Context.GetDB().Model(record).UpdateColumn("user_id", arg.UserID)
+				// argument.Context.GetDB().Model(record).UpdateColumn("state", "scheduled")
+				item := record.(*aftersales.AfterSale)
+				item.UserID = arg.UserID
+				aftersales.OrderState.Trigger("schedule", item, tx, "scheduled to user_id: "+fmt.Sprintf("%d", arg.UserID))
+				if err := tx.Save(item).Error; err != nil {
+					tx.Rollback()
+					return err
+				}
 			}
-			// tx.Commit()
+			tx.Commit()
 			return nil
 		},
 		Visible: func(record interface{}, context *admin.Context) bool {
@@ -368,57 +365,57 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 		Modes:    []string{"edit", "show", "menu_item"},
 	})
 
-	// 提示用户
-	type notifyCustomerArgument struct {
-		Content string
-	}
-	notifyCustomerArgumentResource := Admin.NewResource(&notifyCustomerArgument{})
-	aftersale.Action(&admin.Action{
-		Name: "提示用户",
-		Handler: func(argument *admin.ActionArgument) error {
-			var (
-			// arg = argument.Argument.(*setupActionArgument)
-			)
-			// for _, record := range argument.FindSelectedRecords() {
-			// 	// 给用户发短信
-			// }
-			return nil
-		},
-		Visible: func(record interface{}, context *admin.Context) bool {
-			// if item, ok := record.(*aftersales.AfterSale); ok {
-			// 	return item.State == "inquired"
-			// }
-			return true
-		},
-		Resource: notifyCustomerArgumentResource,
-		Modes:    []string{"edit", "show", "menu_item"},
-	})
+	// // 提示用户
+	// type notifyCustomerArgument struct {
+	// 	Content string
+	// }
+	// notifyCustomerArgumentResource := Admin.NewResource(&notifyCustomerArgument{})
+	// aftersale.Action(&admin.Action{
+	// 	Name: "提示用户",
+	// 	Handler: func(argument *admin.ActionArgument) error {
+	// 		var (
+	// 		// arg = argument.Argument.(*setupActionArgument)
+	// 		)
+	// 		// for _, record := range argument.FindSelectedRecords() {
+	// 		// 	// 给用户发短信
+	// 		// }
+	// 		return nil
+	// 	},
+	// 	Visible: func(record interface{}, context *admin.Context) bool {
+	// 		// if item, ok := record.(*aftersales.AfterSale); ok {
+	// 		// 	return item.State == "inquired"
+	// 		// }
+	// 		return true
+	// 	},
+	// 	Resource: notifyCustomerArgumentResource,
+	// 	Modes:    []string{"edit", "show", "menu_item"},
+	// })
 
-	// 提示师傅
-	type notifyWorkerArgument struct {
-		Content string
-	}
-	notifyWorkerArgumentResource := Admin.NewResource(&setupActionArgument{})
-	aftersale.Action(&admin.Action{
-		Name: "提示师傅",
-		Handler: func(argument *admin.ActionArgument) error {
-			var (
-			// arg = argument.Argument.(*setupActionArgument)
-			)
-			// for _, record := range argument.FindSelectedRecords() {
-			// 	// 给用户发短信
-			// }
-			return nil
-		},
-		Visible: func(record interface{}, context *admin.Context) bool {
-			// if item, ok := record.(*aftersales.AfterSale); ok {
-			// 	return item.State == "inquired"
-			// }
-			return true
-		},
-		Resource: notifyWorkerArgumentResource,
-		Modes:    []string{"edit", "show", "menu_item"},
-	})
+	// // 提示师傅
+	// type notifyWorkerArgument struct {
+	// 	Content string
+	// }
+	// notifyWorkerArgumentResource := Admin.NewResource(&setupActionArgument{})
+	// aftersale.Action(&admin.Action{
+	// 	Name: "提示师傅",
+	// 	Handler: func(argument *admin.ActionArgument) error {
+	// 		var (
+	// 		// arg = argument.Argument.(*setupActionArgument)
+	// 		)
+	// 		// for _, record := range argument.FindSelectedRecords() {
+	// 		// 	// 给用户发短信
+	// 		// }
+	// 		return nil
+	// 	},
+	// 	Visible: func(record interface{}, context *admin.Context) bool {
+	// 		// if item, ok := record.(*aftersales.AfterSale); ok {
+	// 		// 	return item.State == "inquired"
+	// 		// }
+	// 		return true
+	// 	},
+	// 	Resource: notifyWorkerArgumentResource,
+	// 	Modes:    []string{"edit", "show", "menu_item"},
+	// })
 
 	// 审核
 	type auditActionArgument struct {
@@ -434,10 +431,12 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 				// db = argument.Context.GetDB()
 			)
 			for _, record := range argument.FindSelectedRecords() {
-				// item := record.(*aftersales.AfterSale)
-				// item.Fee = arg.Fee
 				argument.Context.GetDB().Model(record).UpdateColumn("fee", arg.Fee)
 				argument.Context.GetDB().Model(record).UpdateColumn("state", "audited")
+				// item := record.(*aftersales.AfterSale)
+				// item.Fee = arg.Fee
+				// aftersales.OrderState.Trigger("schedule", item, tx, "scheduled to")
+
 				// orders.OrderState.Trigger("schedule_setup", order, tx, "man to setup: "+arg.ManToSetup)
 				// if err := tx.Save(item).Error; err != nil {
 				// 	tx.Rollback()

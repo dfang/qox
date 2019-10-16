@@ -69,9 +69,9 @@ func init() {
 	}
 
 	if err == nil {
-		if os.Getenv("DEBUG") != "" {
-			DB.LogMode(true)
-		}
+		// if os.Getenv("DEBUG") != "" {
+		// 	DB.LogMode(true)
+		// }
 
 		// l10n.Global = "zh-CN"
 

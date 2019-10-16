@@ -24,6 +24,14 @@ zh-CN:
       IdentityCardNum: 身份证
       Mobile Phone: 手机号
 
+  workmen:
+    name:
+      plural: 师傅
+
+  operators:
+    name:
+      plural: 操作员
+
   after_sales:
     name:
       plural: 售后
@@ -44,8 +52,8 @@ zh-CN:
       "Filter By Source": 根据品牌筛选
       "Filter By Type": 根据服务类型筛选
       "Filter By Date": 根据创建时间快速筛选
-      "Filter By State": 
-        created: 已接收 
+      "Filter By State":
+        created: 已接收
         inquired: 已预约
         scheduled: 已指派
         overduled: 已超时
@@ -194,9 +202,8 @@ zh-CN:
 
       "User Management": 用户管理
       "Users": 用户
-      "Delivery Mens": 配送师傅
-      "Setup Mens": 安装师傅
       "Operators": 操作员
+      "Workmen": 师傅
 
       "Aftersale Management": 售后管理
       "After Sales": 售后单
