@@ -24,6 +24,14 @@ zh-CN:
       IdentityCardNum: 身份证
       Mobile Phone: 手机号
 
+  workmen:
+    name:
+      plural: 师傅
+
+  operators:
+    name:
+      plural: 操作员
+
   after_sales:
     name:
       plural: 售后
@@ -194,9 +202,8 @@ zh-CN:
 
       "User Management": 用户管理
       "Users": 用户
-      "Delivery Mens": 配送师傅
-      "Setup Mens": 安装师傅
       "Operators": 操作员
+      "Workmen": 师傅
 
       "Aftersale Management": 售后管理
       "After Sales": 售后单

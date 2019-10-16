@@ -8,8 +8,8 @@ import (
 	"github.com/qor/media/oss"
 )
 
-var ROLES_VALUES = []string{"admin", "operator", "setup_man", "delivery_man"}
-var ROLES_TEXTS = []string{"管理员", "调度员", "安装师傅", "配送师傅"}
+var ROLES_VALUES = []string{"admin", "operator", "workman"}
+var ROLES_TEXTS = []string{"管理员", "调度员", "师傅"}
 var GENDERS_VALUES = []string{"male", "female"}
 var GENDERS_TEXTS = []string{"男", "女"}
 
