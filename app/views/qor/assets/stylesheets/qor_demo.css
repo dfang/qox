@@ -56,3 +56,8 @@
 [qor-icon-name*="Aftersale"] > a::before {
     content: "\e7fd";
 }
+
+/* OVERRIDES */
+.qor-actions:first-child .qor-selector{
+  margin-right: 20px;
+}

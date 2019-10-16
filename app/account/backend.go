@@ -17,10 +17,9 @@ import (
 func (App) ConfigureAdmin(Admin *admin.Admin) {
 	Admin.AddMenu(&admin.Menu{Name: "User Management", Priority: 2})
 	user := Admin.AddResource(&users.User{}, &admin.Config{Menu: []string{"User Management"}})
-
 	user.SearchAttrs("name", "mobile_phone")
 
-	user.Meta(&admin.Meta{
+	genderMeta := admin.Meta{
 		Name:   "Gender",
 		Type:   "string",
 		Config: &admin.SelectOneConfig{Collection: []string{"男", "女"}},
@@ -60,12 +59,9 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 			}
 			record.(*users.User).Gender = m
 		},
-	})
+	}
 
-	user.Meta(&admin.Meta{Name: "Birthday", Type: "date"})
-
-	// user.Meta(&admin.Meta{Name: "Role", Config: &admin.SelectOneConfig{Collection: []string{"admin", "operator", "setup_man", "delivery_man"}}})
-	user.Meta(&admin.Meta{
+	roleMeta := admin.Meta{
 		Name:   "Role",
 		Type:   "string",
 		Config: &admin.SelectOneConfig{Collection: []string{"管理员", "调度员", "师傅"}},
@@ -124,7 +120,11 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 				return "调度员"
 			}
 		},
-	})
+	}
+
+	user.Meta(&genderMeta)
+	user.Meta(&roleMeta)
+	user.Meta(&admin.Meta{Name: "Birthday", Type: "date"})
 
 	user.Meta(&admin.Meta{Name: "Password",
 		Type:   "password",
@@ -212,6 +212,8 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	setupMan := Admin.AddResource(&users.User{}, &admin.Config{Name: "Workman", Menu: []string{"User Management"}})
 	setupMan.IndexAttrs("ID", "Name", "MobilePhone", "Gender", "Role")
 	setupMan.NewAttrs("ID", "Name", "Gender", "Role", "MobilePhone", "IdentityCardNum")
+	setupMan.Meta(&genderMeta)
+	setupMan.Meta(&roleMeta)
 	setupMan.ShowAttrs(
 		&admin.Section{
 			Title: "Basic Information",
@@ -243,6 +245,8 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	operator := Admin.AddResource(&users.User{}, &admin.Config{Name: "Operator", Menu: []string{"User Management"}})
 	operator.IndexAttrs("ID", "Name", "MobilePhone", "Gender", "Role")
 	operator.NewAttrs("ID", "Name", "Gender", "Role", "MobilePhone", "IdentityCardNum")
+	operator.Meta(&genderMeta)
+	operator.Meta(&roleMeta)
 	operator.ShowAttrs(
 		&admin.Section{
 			Title: "Basic Information",

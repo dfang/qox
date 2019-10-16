@@ -1,0 +1,69 @@
+{{$context := .}}
+{{$resource := .Resource}}
+
+<div class="mdl-cell mdl-cell--6-col">
+  <h4 class="qor-section-title">今日待办</h4>
+  <ul>
+    <li>
+      待预约
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/after_sales?scopes=created"><span style="background:#eae3d3">{{ .Result.ToReserve }}</span></a>
+        单
+      </span>
+    </li>
+
+    <li>
+      待指派师傅
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/after_sales?scopes=inquired"><span style="background:#eae3d3"> {{ .Result.ToSchedule }} </span></a>
+        单
+      </span>
+    </li>
+
+    <li>
+      待审核
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/after_sales?scopes=processed"><span style="background:#eae3d3"> {{ .Result.ToAudit }}</span></a>
+        单
+      </span>
+    </li>
+
+    <li>
+      审核失败
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/after_sales?scopes=audit_failed"><span style="background:#eae3d3">{{ .Result.FailedToAudit }}</span></a>
+        单
+      </span>
+    </li>
+  </ul>
+</div>
+
+<div class="mdl-cell mdl-cell--6-col">
+  <h4 class="qor-section-title">待监督</h4>
+
+  <ul>
+    <li>
+      指派已超时，需重新调度
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/after_sales?scopes=overduled"><span style="background:#eae3d3"> {{ .Result.Overduled }}</span></a>
+        单
+      </span>
+    </li>
+
+    <li>
+      师傅已接单，待上门服务
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/after_sales?scopes=processing"><span style="background:#eae3d3"> {{ .Result.ToProcess }}</span></a>
+        单
+      </span>
+    </li>
+
+    <li>
+      待提交服务完成证明
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/after_sales?scopes=processed"><span style="background:#eae3d3"> {{ .Result.ToAudit }}</span></a>
+        单
+      </span>
+    </li>
+  </ul>
+</div>

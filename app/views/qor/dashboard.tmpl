@@ -21,72 +21,7 @@
     -->
 
     <div class="mdl-grid">
-      <div class="mdl-cell mdl-cell--6-col">
-        <h4 class="qor-section-title">今日待办</h4>
-        <ul>
-          <li>
-            待预约
-            <span style="float: right">
-              <a rel="nofollow" href="/admin/after_sales?scopes=created"><span style="background:#eae3d3">1</span></a>
-              单
-            </span>
-          </li>
-
-          <li>
-            待指派师傅
-            <span style="float: right">
-              <a rel="nofollow" href="/admin/after_sales?scopes=inquired"><span style="background:#eae3d3">2</span></a>
-              单
-            </span>
-          </li>
-
-          <li>
-            指派已超时，需重新调度
-            <span style="float: right">
-              <a rel="nofollow" href="/admin/after_sales?scopes=overduled"><span style="background:#eae3d3">3</span></a>
-              单
-            </span>
-          </li>
-
-          <li>
-            待审核
-            <span style="float: right">
-              <a rel="nofollow" href="/admin/after_sales?scopes=processed"><span style="background:#eae3d3">4</span></a>
-              单
-            </span>
-          </li>
-
-          <li>
-            审核失败
-            <span style="float: right">
-              <a rel="nofollow" href="/admin/after_sales?scopes=audit_failed"><span style="background:#eae3d3">5</span></a>
-              单
-            </span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="mdl-cell mdl-cell--6-col">
-        <h4 class="qor-section-title">待监督</h4>
-
-        <ul>
-          <li>
-            待上门服务
-            <span style="float: right">
-              <a rel="nofollow" href="/admin/after_sales?scopes=processing"><span style="background:#eae3d3">1</span></a>
-              单
-            </span>
-          </li>
-
-          <li>
-            待提交服务完成证明
-            <span style="float: right">
-              <a rel="nofollow" href="/admin/after_sales?scopes=processed"><span style="background:#eae3d3">2</span></a>
-              单
-            </span>
-          </li>
-        </ul>
-      </div>
+      {{ render_today . }}
     </div>
   </div>
 
@@ -99,16 +34,14 @@
   </div>
 
   <!-- if have table please add qor-section__table className -->
-  <!--
-   <div class="qor-section qor-section__table qor-theme-slideout">
+  <div class="qor-section qor-section__table qor-theme-slideout">
     <div class="qor-section__header">
-      <h4 class="qor-section-title">{{t "Latest Orders"}}</h4>
+      <h4 class="qor-section-title">最近售后服务单</h4>
     </div>
     <div class="qor-section__body qor-table-container">
-      {{render_latest_order .}}
+      {{render_latest_aftersales .}}
     </div>
   </div>
-  -->
 
 </div>
 
