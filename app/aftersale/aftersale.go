@@ -153,9 +153,11 @@ func configureMetas(model *admin.Resource) {
 		case "scheduled":
 			return "已指派"
 		case "overdule":
-			return "已指派"
+			return "已过期"
 		case "audited":
-			return "已指派"
+			return "已审核"
+		case "processing":
+			return "待上门"
 		case "processed":
 			return "已服务"
 		default:
