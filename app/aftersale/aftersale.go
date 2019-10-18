@@ -375,7 +375,7 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 		},
 		Visible: func(record interface{}, context *admin.Context) bool {
 			if item, ok := record.(*aftersales.AfterSale); ok {
-				return item.State == "inquired"
+				return item.State == "inquired" || item.State == "scheduled"
 			}
 			return true
 		},
