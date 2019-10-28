@@ -2,12 +2,12 @@
 {{$resource := .Resource}}
 
 <div class="mdl-cell mdl-cell--6-col">
-  <h4 class="qor-section-title">今日待办</h4>
+  <h4 class="qor-section-title">待办</h4>
   <ul>
     <li>
       待预约
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=created"><span style="background:#eae3d3">{{ .Result.ToReserve }}</span></a>
+        <a rel="nofollow" href="/admin/after_sales?scopes=created"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToReserve }}</span></a>
         单
       </span>
     </li>
@@ -15,7 +15,7 @@
     <li>
       待指派师傅
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=inquired"><span style="background:#eae3d3"> {{ .Result.ToSchedule }} </span></a>
+        <a rel="nofollow" href="/admin/after_sales?scopes=inquired"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToSchedule }} </span></a>
         单
       </span>
     </li>
@@ -23,7 +23,7 @@
     <li>
       待审核
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=processed"><span style="background:#eae3d3"> {{ .Result.ToAudit }}</span></a>
+        <a rel="nofollow" href="/admin/after_sales?scopes=processed"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToAudit }}</span></a>
         单
       </span>
     </li>
@@ -31,7 +31,7 @@
     <li>
       审核失败
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=audit_failed"><span style="background:#eae3d3">{{ .Result.FailedToAudit }}</span></a>
+        <a rel="nofollow" href="/admin/after_sales?scopes=audit_failed"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.FailedToAudit }}</span></a>
         单
       </span>
     </li>
@@ -43,9 +43,16 @@
 
   <ul>
     <li>
+      已指派
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/after_sales?scopes=scheduled"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.Scheduled }}</span></a>
+        单
+      </span>
+    </li>
+    <li>
       指派已超时，需重新调度
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=overduled"><span style="background:#eae3d3"> {{ .Result.Overduled }}</span></a>
+        <a rel="nofollow" href="/admin/after_sales?scopes=overdue"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.Overdue }}</span></a>
         单
       </span>
     </li>
@@ -53,7 +60,7 @@
     <li>
       师傅已接单，待上门服务
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=processing"><span style="background:#eae3d3"> {{ .Result.ToProcess }}</span></a>
+        <a rel="nofollow" href="/admin/after_sales?scopes=processing"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToProcess }}</span></a>
         单
       </span>
     </li>
@@ -61,7 +68,7 @@
     <li>
       待提交服务完成证明
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=processed"><span style="background:#eae3d3"> {{ .Result.ToAudit }}</span></a>
+        <a rel="nofollow" href="/admin/after_sales?scopes=processed"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToAudit }}</span></a>
         单
       </span>
     </li>

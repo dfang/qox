@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
 
 	// _ "github.com/jinzhu/gorm/dialects/mysql"
@@ -26,9 +27,20 @@ import (
 
 // DB Global DB connection
 var DB *gorm.DB
+var RedisPool *redis.Pool
 
 func init() {
 	var err error
+
+	// Make a redis pool
+	RedisPool = &redis.Pool{
+		MaxActive: 5,
+		MaxIdle:   5,
+		Wait:      true,
+		Dial: func() (redis.Conn, error) {
+			return redis.Dial("tcp", ":6379")
+		},
+	}
 
 	// logger, _ := zap.NewDevelopment()
 	// logger.Info("Hello zap", zap.String("key", "value"), zap.Time("now", time.Now()))
@@ -69,9 +81,9 @@ func init() {
 	}
 
 	if err == nil {
-		// if os.Getenv("DEBUG") != "" {
-		// 	DB.LogMode(true)
-		// }
+		if os.Getenv("DEBUG") != "" {
+			DB.LogMode(true)
+		}
 
 		// l10n.Global = "zh-CN"
 

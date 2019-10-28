@@ -31,6 +31,7 @@ import (
 	"github.com/dfang/qor-demo/config"
 	"github.com/dfang/qor-demo/config/auth"
 	"github.com/dfang/qor-demo/config/db"
+	"github.com/dfang/qor-demo/models/aftersales"
 	"github.com/dfang/qor-demo/utils/funcmapmaker"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -40,6 +41,8 @@ import (
 	"github.com/qor/publish2"
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
+
+	"github.com/gocraft/work"
 
 	// https://github.com/qor/qor-example/issues/129
 	"github.com/dfang/qor-demo/config/db/migrations"
@@ -189,6 +192,21 @@ func main() {
 		Handler: bindatafs.AssetFS.FileServer(http.Dir("public"), "javascripts", "stylesheets", "images", "dist", "downloads", "fonts", "vendors", "favicon.ico"),
 	}))
 
+	fmt.Println("cron job")
+	// Periodic Enqueueing (Cron)
+	pool := work.NewWorkerPool(Context{}, 10, "qor", db.RedisPool)
+	pool.PeriodicallyEnqueue("1 * * * *", "expire_aftersales") // This will enqueue a "expire_aftersales" job every minutes
+	pool.Job("expire_aftersales", ExpireAfterSales)            // Still need to register a handler for this job separately
+	// Start processing jobs
+	pool.Start()
+	// // Wait for a signal to quit:
+	// signalChan := make(chan os.Signal, 1)
+	// signal.Notify(signalChan, os.Interrupt, os.Kill)
+	// <-signalChan
+
+	// // Stop the pool
+	// pool.Stop()
+
 	if *compileTemplate {
 		bindatafs.AssetFS.Compile()
 		os.Exit(0)
@@ -246,4 +264,40 @@ func DumpHTTPRequest(r *http.Request) {
 		return
 	}
 	fmt.Println(string(output))
+}
+
+// Context For gocraft/work
+type Context struct {
+	userID int64
+}
+
+// ExpireAfterSales 任务指派后 after_sale的状态为scheduled， 如果师傅20分钟之内没有响应，自动变为overdue状态
+func ExpireAfterSales(job *work.Job) error {
+	fmt.Println("Expires overdue aftersales ......")
+	db.DB.Model(aftersales.AfterSale{}).Where("state = ?", "scheduled").Where("updated_at <= NOW() - INTERVAL '20 minutes'").Update("state", "overdue")
+	fmt.Println("Expires overdue aftersales done ")
+
+	return nil
+}
+
+// FrozenAfterSales 已审核的服务单冻结7天
+func FrozenAfterSales(job *work.Job) error {
+	fmt.Println("frozen aftersales ......")
+	db.DB.Model(aftersales.AfterSale{}).Where("state = ?", "audited").Update("state", "frozen")
+	fmt.Println("frozen aftersales done ......")
+
+	return nil
+}
+
+// UnfreezeAfterSales 解冻超过7天的
+func UnfreezeAfterSales(job *work.Job) error {
+	fmt.Println("frozen aftersales ......")
+	var items []aftersales.AfterSale
+	db.DB.Model(aftersales.AfterSale{}).Where("state = ?", "frozen").Find(&items)
+	for _, item := range items {
+		aftersales.OrderState.Trigger("unfreeze", &item, db.DB, "unfreeze aftersale with id: "+fmt.Sprintf("%d", item.ID))
+	}
+	fmt.Println("frozen aftersales done ......")
+
+	return nil
 }
