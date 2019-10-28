@@ -46,7 +46,7 @@ var STATES = []string{
 
 	"scheduled", // 指派师傅之后
 
-	"overduled", // 指派师傅之后, 师傅未给用户打电话预约超时了
+	"overdue", // 指派师傅之后, 师傅未给用户打电话预约超时了
 
 	"processing", // 师傅给用户打过电话，确认了上门时间的状态
 
@@ -55,6 +55,10 @@ var STATES = []string{
 	"audited", // 审核通过
 
 	"audit_failed", // 审核不通过
+
+	"frozen", // 冻结， 审核通过后，结算金额需冻结7天
+
+	"completed", // 完成，解冻之后的状态
 }
 
 func init() {
@@ -101,6 +105,19 @@ func init() {
 
 	// 根据师傅上传的照片 审核服务是否完成
 	OrderState.Event("audit").To("audited").From("processed").After(func(value interface{}, tx *gorm.DB) (err error) {
+		return nil
+	})
+
+	// 冻结
+	OrderState.Event("freeze").To("frozen").From("audited").After(func(value interface{}, tx *gorm.DB) (err error) {
+		// item := value.(*AfterSale)
+		return nil
+	})
+
+	// 解冻
+	OrderState.Event("unfreeze").To("frozen").From("completed").After(func(value interface{}, tx *gorm.DB) (err error) {
+		// item := value.(*AfterSale)
+		// 加钱
 		return nil
 	})
 }

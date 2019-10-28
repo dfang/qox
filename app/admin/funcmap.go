@@ -61,13 +61,14 @@ func renderToday(context *admin.Context) template.HTML {
 	afterSaleContext.GetDB().Model(&aftersales.AfterSale{}).Where("state = ?", "created").Count(&t.ToReserve)
 	afterSaleContext.GetDB().Model(&aftersales.AfterSale{}).Where("state = ?", "inquired").Count(&t.ToSchedule)
 
+	afterSaleContext.GetDB().Model(&aftersales.AfterSale{}).Where("state = ?", "scheduled").Count(&t.Scheduled)
 	afterSaleContext.GetDB().Model(&aftersales.AfterSale{}).Where("state = ?", "processing").Count(&t.ToProcess)
 	afterSaleContext.GetDB().Model(&aftersales.AfterSale{}).Where("state = ?", "processed").Count(&t.ToAudit)
 
 	// 已指派的状态超过了20分钟就算超时了需要重新调度
-	afterSaleContext.GetDB().Model(&aftersales.AfterSale{}).Where("state = ?", "scheduled").Where("updated_at <= NOW() - INTERVAL '20 minutes'").Count(&t.Overduled)
+	afterSaleContext.GetDB().Model(&aftersales.AfterSale{}).Where("state = ?", "overdue").Count(&t.Overdue)
 
-	// t.Overduled = "0"
+	// t.Overdue = "0"
 	t.FailedToAudit = "0"
 
 	// fmt.Println(t.ToReserve)
@@ -86,7 +87,10 @@ type Today struct {
 	ToSchedule string
 
 	// 已超时
-	Overduled string
+	Overdue string
+
+	// 已指派
+	Scheduled string
 
 	// 审核不通过的
 	FailedToAudit string

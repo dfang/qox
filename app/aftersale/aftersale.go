@@ -152,8 +152,8 @@ func configureMetas(model *admin.Resource) {
 			return "已预约"
 		case "scheduled":
 			return "已指派"
-		case "overdule":
-			return "已过期"
+		case "overdue":
+			return "已超时"
 		case "audited":
 			return "已审核"
 		case "processing":
@@ -199,7 +199,7 @@ func configureScopes(model *admin.Resource) {
 			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 				// 两种写法都可以
 				// return db.Where(aftersales.AfterSale{State: item})
-				if item == "overduled" {
+				if item == "overdue" {
 					return db.Where("state = 'scheduled'").Where("updated_at <= NOW() - INTERVAL '20 minutes'")
 				}
 				return db.Where("state = ?", item)
@@ -366,7 +366,9 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 				// argument.Context.GetDB().Model(record).UpdateColumn("state", "scheduled")
 				item := record.(*aftersales.AfterSale)
 				item.UserID = arg.UserID
-				aftersales.OrderState.Trigger("schedule", item, tx, "scheduled to user_id: "+fmt.Sprintf("%d", arg.UserID))
+				// aftersales.OrderState.Trigger("schedule", item, tx, "scheduled to user_id: "+fmt.Sprintf("%d", arg.UserID))
+				// 无论是inquired、scheduled，还是overdue状态，通过指派按钮重新指派的时候都要变为schedued状态
+				item.State = "scheduled"
 				if err := tx.Save(item).Error; err != nil {
 					tx.Rollback()
 					return err
@@ -377,7 +379,7 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 		},
 		Visible: func(record interface{}, context *admin.Context) bool {
 			if item, ok := record.(*aftersales.AfterSale); ok {
-				return item.State == "inquired" || item.State == "scheduled"
+				return item.State == "inquired" || item.State == "scheduled" || item.State == "overdue"
 			}
 			return true
 		},
