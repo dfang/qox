@@ -57,7 +57,7 @@ zh-CN:
         created: 已接收
         inquired: 已预约
         scheduled: 已指派
-        overduled: 已超时
+        overdue: 已超时
         processing: 待处理
         processed: 已处理
         audited: 已审核
