@@ -14,6 +14,8 @@ require (
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/gin-gonic/gin v1.4.0 // indirect
 	github.com/go-chi/chi v4.0.2+incompatible
+	github.com/gocraft/work v0.5.1
+	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/schema v1.1.0
 	github.com/gorilla/sessions v1.2.0 // indirect
@@ -73,6 +75,7 @@ require (
 	github.com/qor/widget v0.0.0-20190314070448-e280f6f16615
 	github.com/qor/wildcard_router v0.0.0-20171031035524-56710e5bb5a4 // indirect
 	github.com/qor/worker v0.0.0-20190805090529-35a245417f70
+	github.com/robfig/cron v1.2.0 // indirect
 	github.com/rs/zerolog v1.15.0
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 // indirect
