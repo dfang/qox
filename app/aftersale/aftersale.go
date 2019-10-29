@@ -80,9 +80,22 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 			return m.State
 		}
 	}})
-
+	settlement.Meta(&admin.Meta{Name: "Amount", Type: "float32", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		m := record.(*aftersales.Settlement)
+		if m.Amount < 0 {
+			return (-m.Amount)
+		}
+		return m.Amount
+	}})
 	balance := Admin.AddResource(&aftersales.Balance{}, &admin.Config{Menu: []string{"Settlement Management"}, Priority: 1})
 	balance.IndexAttrs("-ID", "-CreatedAt", "-CreatedBy", "-UpdatedBy", "User", "FrozenAmount", "FreeAmount", "TotalAmount", "WithdrawAmount", "UpdatedAt")
+	balance.Meta(&admin.Meta{Name: "WithdrawAmount", Type: "float32", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		m := record.(*aftersales.Balance)
+		if m.WithdrawAmount < 0 {
+			return (-m.WithdrawAmount)
+		}
+		return m.WithdrawAmount
+	}})
 
 	aftersale.Meta(&admin.Meta{
 		Name: "ServiceType",
