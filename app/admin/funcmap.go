@@ -12,7 +12,7 @@ import (
 func initFuncMap(Admin *admin.Admin) {
 	// Admin.RegisterFuncMap("render_latest_order", renderLatestOrder)
 	// Admin.RegisterFuncMap("render_latest_products", renderLatestProduct)
-	Admin.RegisterFuncMap("render_latest_aftersales", renderLatestAfterSales)
+	Admin.RegisterFuncMap("render_latest_aftersales", renderLatestAftersales)
 	Admin.RegisterFuncMap("render_today", renderToday)
 }
 
@@ -38,8 +38,8 @@ func renderLatestProduct(context *admin.Context) template.HTML {
 	return template.HTML("")
 }
 
-func renderLatestAfterSales(context *admin.Context) template.HTML {
-	var productContext = context.NewResourceContext("AfterSale")
+func renderLatestAftersales(context *admin.Context) template.HTML {
+	var productContext = context.NewResourceContext("Aftersale")
 	productContext.Searcher.Pagination.PerPage = 10
 	// productContext.SetDB(productContext.GetDB().Where("state in (?)", []string{"paid"}))
 
@@ -50,7 +50,7 @@ func renderLatestAfterSales(context *admin.Context) template.HTML {
 }
 
 func renderToday(context *admin.Context) template.HTML {
-	var afterSaleContext = context.NewResourceContext("AfterSale")
+	var afterSaleContext = context.NewResourceContext("Aftersale")
 	t := Today{}
 
 	fmt.Println("test")
@@ -58,15 +58,18 @@ func renderToday(context *admin.Context) template.HTML {
 	// var count1 int
 	// var count2 int
 
-	afterSaleContext.GetDB().Model(&aftersales.AfterSale{}).Where("state = ?", "created").Count(&t.ToReserve)
-	afterSaleContext.GetDB().Model(&aftersales.AfterSale{}).Where("state = ?", "inquired").Count(&t.ToSchedule)
+	afterSaleContext.GetDB().Model(&aftersales.Aftersale{}).Where("state = ?", "created").Count(&t.ToReserve)
+	afterSaleContext.GetDB().Model(&aftersales.Aftersale{}).Where("state = ?", "inquired").Count(&t.ToSchedule)
 
-	afterSaleContext.GetDB().Model(&aftersales.AfterSale{}).Where("state = ?", "scheduled").Count(&t.Scheduled)
-	afterSaleContext.GetDB().Model(&aftersales.AfterSale{}).Where("state = ?", "processing").Count(&t.ToProcess)
-	afterSaleContext.GetDB().Model(&aftersales.AfterSale{}).Where("state = ?", "processed").Count(&t.ToAudit)
+	afterSaleContext.GetDB().Model(&aftersales.Aftersale{}).Where("state = ?", "scheduled").Count(&t.Scheduled)
+	afterSaleContext.GetDB().Model(&aftersales.Aftersale{}).Where("state = ?", "processing").Count(&t.ToProcess)
+	afterSaleContext.GetDB().Model(&aftersales.Aftersale{}).Where("state = ?", "processed").Count(&t.ToAudit)
+
+	afterSaleContext.GetDB().Model(&aftersales.Aftersale{}).Where("state = ?", "audited").Count(&t.Audited)
+	afterSaleContext.GetDB().Model(&aftersales.Aftersale{}).Where("state = ?", "frozen").Count(&t.Frozen)
 
 	// 已指派的状态超过了20分钟就算超时了需要重新调度
-	afterSaleContext.GetDB().Model(&aftersales.AfterSale{}).Where("state = ?", "overdue").Count(&t.Overdue)
+	afterSaleContext.GetDB().Model(&aftersales.Aftersale{}).Where("state = ?", "overdue").Count(&t.Overdue)
 
 	// t.Overdue = "0"
 	t.FailedToAudit = "0"
@@ -94,6 +97,12 @@ type Today struct {
 
 	// 审核不通过的
 	FailedToAudit string
+
+	// 已审核
+	Audited string
+
+	//已冻结
+	Frozen string
 
 	// 待上门
 	ToProcess string

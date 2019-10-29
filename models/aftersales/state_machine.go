@@ -17,8 +17,11 @@ import (
 )
 
 var (
-	// OrderState order's state machine
-	OrderState = transition.New(&AfterSale{})
+	// OrderStateMachine order's state machine
+	OrderStateMachine = transition.New(&Aftersale{})
+
+	// SettlementStateMachine 结算状态机
+	SettlementStateMachine = transition.New(&Settlement{})
 )
 
 var (
@@ -62,12 +65,26 @@ var STATES = []string{
 }
 
 func init() {
+	SettlementStateMachine.Initial("frozen")
+	SettlementStateMachine.State("free")
+	SettlementStateMachine.State("completed")
+	SettlementStateMachine.Event("unfreeze").To("free").From("frozen")
+
 	// Define Order's States
-	OrderState.Initial("created")
+	OrderStateMachine.Initial("created")
+	OrderStateMachine.State("inquired")
+	OrderStateMachine.State("scheduled")
+	OrderStateMachine.State("overdue")
+	OrderStateMachine.State("processing")
+	OrderStateMachine.State("processed")
+	OrderStateMachine.State("audited")
+	OrderStateMachine.State("audit_failed")
+	OrderStateMachine.State("frozen")
+	OrderStateMachine.State("completed")
 
 	// 和用户预约大概时间
-	OrderState.Event("inquire").To("inquired").From("created").After(func(value interface{}, tx *gorm.DB) (err error) {
-		// order := value.(*AfterSale)
+	OrderStateMachine.Event("inquire").To("inquired").From("created").After(func(value interface{}, tx *gorm.DB) (err error) {
+		// order := value.(*Aftersale)
 		// tx.Model(order).Association("OrderItems").Find(&order.OrderItems)
 		// for _, item := range order.OrderItems {
 		// }
@@ -75,9 +92,9 @@ func init() {
 	})
 
 	// 指派师傅
-	OrderState.Event("schedule").To("scheduled").From("inquired").After(func(value interface{}, tx *gorm.DB) (err error) {
+	OrderStateMachine.Event("schedule").To("scheduled").From("inquired").After(func(value interface{}, tx *gorm.DB) (err error) {
 		// 推送微信模版消息到师傅微信
-		item := value.(*AfterSale)
+		item := value.(*Aftersale)
 		u := users.User{}
 		tx.Where("id = ?", item.UserID).First(&u)
 		mobilePhone := u.MobilePhone
@@ -103,21 +120,43 @@ func init() {
 		return nil
 	})
 
+	OrderStateMachine.Event("expire").To("overdue").From("scheduled").After(func(value interface{}, tx *gorm.DB) (err error) {
+		return nil
+	})
+
 	// 根据师傅上传的照片 审核服务是否完成
-	OrderState.Event("audit").To("audited").From("processed").After(func(value interface{}, tx *gorm.DB) (err error) {
+	OrderStateMachine.Event("audit").To("audited").From("processed").After(func(value interface{}, tx *gorm.DB) (err error) {
 		return nil
 	})
 
 	// 冻结
-	OrderState.Event("freeze").To("frozen").From("audited").After(func(value interface{}, tx *gorm.DB) (err error) {
-		// item := value.(*AfterSale)
+	OrderStateMachine.Event("freeze").To("frozen").From("audited").After(func(value interface{}, tx *gorm.DB) (err error) {
+		item := value.(*Aftersale)
+		// 结算里加一笔,
+		if item.Fee > 0 {
+			// 需要判断
+			s := Settlement{
+				UserID:      item.UserID,
+				Amount:      item.Fee,
+				Direction:   "收入",
+				AftersaleID: item.ID,
+			}
+
+			tx.Model(Settlement{}).Save(&s)
+		}
+
 		return nil
 	})
 
 	// 解冻
-	OrderState.Event("unfreeze").To("frozen").From("completed").After(func(value interface{}, tx *gorm.DB) (err error) {
-		// item := value.(*AfterSale)
-		// 加钱
+	OrderStateMachine.Event("unfreeze").To("completed").From("frozen").After(func(value interface{}, tx *gorm.DB) (err error) {
+		item := value.(*Aftersale)
+		var settlement Settlement
+		tx.Model(Settlement{}).Where("aftersale_id = ?", item.ID).Find(&settlement)
+
+		SettlementStateMachine.Trigger("unfreeze", &settlement, tx, "unfreeze aftersale with id: "+fmt.Sprintf("%d", item.ID))
+		tx.Model(Settlement{}).Save(&settlement)
+
 		return nil
 	})
 }

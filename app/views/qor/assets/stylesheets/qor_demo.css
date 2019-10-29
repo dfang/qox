@@ -47,14 +47,19 @@
     margin-right: 8px;
 }
 
-
-
-
-
-
 /* OVERRIDES */
+/* https://yamatonamiki.com/blog/196/ */
+
 [qor-icon-name*="Aftersale"] > a::before {
-    content: "\e7fd";
+    content: "\e639";
+}
+
+[qor-icon-name*="Settlement"] > a::before {
+    content: "\e227";
+}
+
+[qor-icon-name*="Pages"] > a::before {
+    content: "\e2c7";
 }
 
 /* OVERRIDES */

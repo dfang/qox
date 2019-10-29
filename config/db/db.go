@@ -21,8 +21,6 @@ import (
 	"github.com/qor/sorting"
 	"github.com/qor/validations"
 	"github.com/rs/zerolog/log"
-
-	"github.com/dfang/qor-demo/models/aftersales"
 )
 
 // DB Global DB connection
@@ -42,29 +40,7 @@ func init() {
 		},
 	}
 
-	// logger, _ := zap.NewDevelopment()
-	// logger.Info("Hello zap", zap.String("key", "value"), zap.Time("now", time.Now()))
-	// logger.Logger.Info("Hello zap", zap.String("key", "value"), zap.Time("now", time.Now()))
-
 	dbConfig := config.Config.DB
-	// Logger, _ := zap.NewDevelopment()
-	// zap.ReplaceGlobals(Logger)
-	// // zap.L().Debug("Connection info from config/database.yml or env",
-	// // 	zap.String("adapter", dbConfig.Adapter),
-	// // 	zap.String("host", dbConfig.Host),
-	// // 	zap.String("db", dbConfig.Name),
-	// // 	zap.String("port", dbConfig.Port),
-	// // 	zap.String("user", dbConfig.User),
-	// // 	zap.String("password", dbConfig.Password),
-	// // )
-	// zap.S().Debugw("database connection info",
-	// 	"adapter", dbConfig.Adapter,
-	// 	"host", dbConfig.Host,
-	// 	"db", dbConfig.Name,
-	// 	"port", dbConfig.Port,
-	// 	"user", dbConfig.User,
-	// 	"password", dbConfig.Password,
-	// )
 
 	if config.Config.DB.Adapter == "mysql" {
 		log.Debug().Msg(fmt.Sprintf("%v:%v@tcp(%v:%v)/%v?parseTime=True&loc=Local", dbConfig.User, dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.Name))
@@ -94,12 +70,8 @@ func init() {
 		media.RegisterCallbacks(DB)
 		publish2.RegisterCallbacks(DB)
 
-		aftersales.RegisterCallbacks(DB)
+		// aftersales.RegisterCallbacks(DB)
 	} else {
 		panic(err)
 	}
 }
-
-// func GetDB() *gorm.DB {
-
-// }

@@ -173,6 +173,34 @@ $(document).ready(function () {
   // document.getElementById('endDate').addEventListener('onOk', function () {
   //   this.value = x.time.toString();
   // });
+
+
+
+
+  if ($('.qor-settlements, .qor-balances').length > 0) {
+    console.log("fuck")
+
+    // hide big new button
+    $('.qor-button--new').hide()
+
+    // disable click to open url in tables
+    // $(document).off("click.qor.openUrl", ".qor-table-container tr[data-url]")
+
+    $(document).off("click.qor.openUrl", "[data-url]")
+    // $(document).off("click.qor.openUrl", "[data-url]")
+
+    // hide qor-actions dropdown
+    $('.qor-table__actions').hide()
+
+    // hide search button
+    $('.qor-search__label').hide()
+  }
+
+  if ($('.qor-brands, .qor-servcie_types, .qor-wechat_profiles, .qor-manufacturers').length > 0) {
+    // disable click to open url
+    $(document).off("click.qor.openUrl", "[data-url]")
+  }
+
 });
 
 

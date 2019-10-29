@@ -57,13 +57,13 @@ func (app App) ConfigureApplication(application *application.Application) {
 	// API.AddResource(&users.User{})
 	user := API.AddResource(&users.User{})
 	user.AddSubResource("Orders")
-	// afterSales, _ := User.AddSubResource("AfterSales")
-	user.AddSubResource("AfterSales")
+	// afterSales, _ := User.AddSubResource("Aftersales")
+	user.AddSubResource("Aftersales")
 	// // userOrders.AddSubResource("OrderItems", &admin.Config{Name: "Items"})
 
 	// API.AddResource(&products.Category{})
 
-	API.AddResource(&aftersales.AfterSale{})
+	API.AddResource(&aftersales.Aftersale{})
 
 	application.Router.Mount(app.Config.Prefix, API.NewServeMux(app.Config.Prefix))
 }
