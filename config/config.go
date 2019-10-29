@@ -92,6 +92,10 @@ var (
 
 func init() {
 
+	// // Auto Reload
+	// if err := configor.New(&configor.Config{AutoReload: true, AutoReloadInterval: time.Minute, AutoReloadCallback: func(config interface{}) {
+	// 	fmt.Printf("%v changed", config)
+	// }}).Load(&Config, "config/database.yml", "config/smtp.yml", "config/application.yml"); err != nil {
 	if err := configor.Load(&Config, "config/database.yml", "config/smtp.yml", "config/application.yml"); err != nil {
 		panic(err)
 	}

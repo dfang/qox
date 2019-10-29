@@ -83,7 +83,7 @@ require (
 	github.com/unrolled/render v1.0.1
 	github.com/yosssi/gohtml v0.0.0-20190915184251-7ff6f235ecaf // indirect
 	golang.org/x/crypto v0.0.0-20191010185427-af544f31c8ac
-	syreclabs.com/go/faker v1.2.0 // indirect
+	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 )
 
 replace github.com/qor/auth v0.0.0-20190603071357-709ba0ce943b => github.com/dfang/auth v0.0.0-20190711063714-408e41c1a2cc
