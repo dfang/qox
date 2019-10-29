@@ -25,9 +25,12 @@ import (
 
 // DB Global DB connection
 var DB *gorm.DB
+
+// RedisPool Workpool connection
 var RedisPool *redis.Pool
 
-func init() {
+// Initialize changed init to Initialize
+func Initialize() {
 	var err error
 
 	// Make a redis pool

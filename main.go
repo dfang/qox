@@ -31,6 +31,7 @@ import (
 	"github.com/dfang/qor-demo/config"
 	"github.com/dfang/qor-demo/config/auth"
 	"github.com/dfang/qor-demo/config/db"
+	"github.com/dfang/qor-demo/config/i18n"
 	"github.com/dfang/qor-demo/utils/funcmapmaker"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -53,19 +54,22 @@ var (
 )
 
 func main() {
-	start := time.Now()
-	fmt.Println("\nSTART is ", start.Format("2006-01-02 15:04:05"))
-
-	fmt.Println("check required enviroments variables ......")
-	checkRequiredEnvs()
-
-	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	cmdLine := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	compileTemplate := cmdLine.Bool("compile-templates", false, "Compile Templates")
 	isDebug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
 	debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
 	runMigration := cmdLine.Bool("migrate", false, "Run migration")
 	// runSeed := cmdLine.Bool("seed", false, "Run seed")
 	cmdLine.Parse(os.Args[1:])
+
+	start := time.Now()
+	fmt.Println("\nSTART is ", start.Format("2006-01-02 15:04:05"))
+
+	fmt.Println("check required enviroments variables ......")
+	checkRequiredEnvs()
+
+	fmt.Println("initialze configurations ......")
+	initialzeConfigs()
 
 	fmt.Println("setup log level ......")
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
@@ -144,6 +148,14 @@ func checkRequiredEnvs() {
 		}
 	}
 }
+
+func initialzeConfigs() {
+	config.Initialize()
+	db.Initialize()
+	i18n.Initialize()
+	auth.Initialize()
+}
+
 func setupMiddlewaresAndRoutes() {
 	Router = chi.NewRouter()
 	Admin = admin.New(&admin.AdminConfig{

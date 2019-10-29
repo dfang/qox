@@ -90,7 +90,8 @@ var (
 	})
 )
 
-func init() {
+// Initialize changed init to Initialize
+func Initialize() {
 
 	// // Auto Reload
 	// if err := configor.New(&configor.Config{AutoReload: true, AutoReloadInterval: time.Minute, AutoReloadCallback: func(config interface{}) {
