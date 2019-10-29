@@ -69,6 +69,31 @@ Released under the MIT License.
 ```
 ````
 
+## How to run this locally
+
+```
+go run main.go background_job.go health_check.go
+
+or 
+
+gin 
+
+or 
+
+fresh
+```
+
+- [gin](https://github.com/codegangsta/gin)
+- [fresh](https://github.com/gravityblast/fresh)
+- [godev](https://github.com/zephinzer/godev)
+
+## About health check
+
+[liveness and readiness probe](https://github.com/heptiolabs/healthcheck#http-endpoints)
+
+- /live: liveness endpoint (HTTP 200 if healthy, HTTP 503 if unhealthy)
+- /ready: readiness endpoint (HTTP 200 if healthy, HTTP 503 if unhealthy)
+Pass the ?full=1 query parameter to see the full check results as JSON. These are omitted by default for performance.
 
 
 

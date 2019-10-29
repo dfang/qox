@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"fmt"
 	"html/template"
 
 	"github.com/dfang/qor-demo/models/aftersales"
@@ -52,8 +51,6 @@ func renderLatestAftersales(context *admin.Context) template.HTML {
 func renderToday(context *admin.Context) template.HTML {
 	var afterSaleContext = context.NewResourceContext("Aftersale")
 	t := Today{}
-
-	fmt.Println("test")
 
 	// var count1 int
 	// var count2 int

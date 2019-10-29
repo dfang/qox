@@ -57,7 +57,7 @@ func init() {
 	}
 
 	if err == nil {
-		if os.Getenv("DEBUG") != "" {
+		if os.Getenv("DEBUG") != "false" {
 			DB.LogMode(true)
 		}
 
