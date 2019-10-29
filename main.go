@@ -72,12 +72,7 @@ func main() {
 	initialzeConfigs()
 
 	fmt.Println("setup log level ......")
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	log.Logger = log.With().Caller().Logger()
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	if *debug {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	}
+	setupLogLevel(*debug)
 
 	if *runMigration {
 		fmt.Println("just run migrations ......")
@@ -146,6 +141,15 @@ func checkRequiredEnvs() {
 		if os.Getenv(e) != "" {
 			fmt.Printf("\tfound env var %s=%s\n", e, os.Getenv(e))
 		}
+	}
+}
+
+func setupLogLevel(debug bool) {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	log.Logger = log.With().Caller().Logger()
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	if debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 }
 
