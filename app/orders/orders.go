@@ -66,7 +66,6 @@ func (app App) ConfigureApplication(application *application.Application) {
 
 // ConfigureAdmin configure admin interface
 func (App) ConfigureAdmin(Admin *admin.Admin) {
-	Admin.AddMenu(&admin.Menu{Name: "Order Management", Priority: 3})
 	// Add Order
 	order := Admin.AddResource(&orders.Order{}, &admin.Config{Menu: []string{"Order Management"}})
 

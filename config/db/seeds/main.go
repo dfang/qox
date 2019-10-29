@@ -24,6 +24,7 @@ import (
 	"github.com/qor/auth/providers/password"
 
 	// _ "github.com/dfang/qor-demo/config/db/migrations"
+	"github.com/dfang/qor-demo/models/aftersales"
 	"github.com/dfang/qor-demo/models/blogs"
 	"github.com/dfang/qor-demo/models/orders"
 	"github.com/dfang/qor-demo/models/products"
@@ -48,10 +49,12 @@ import (
 	"github.com/qor/slug"
 	"github.com/qor/sorting"
 	"github.com/qor/transition"
+
+	"syreclabs.com/go/faker"
 )
 
 /* How to run this script
-   $ go run db/seeds/main.go db/seeds/seeds.go
+$ go run config/db/seeds/main.go config/db/seeds/seeds.go
 */
 
 /* How to upload file
@@ -117,7 +120,48 @@ func main() {
 
 	// createRecords()
 	createAdminUsers()
+
+	createAftersales()
 	fmt.Println("--> Created admin users.")
+}
+
+func createAftersales() {
+	service_types := []string{
+		"安装",
+		"维修",
+		"清洗",
+	}
+	sources := []string{
+		"海尔",
+		"格力",
+		"奥克斯",
+		"小米电视",
+		"春兰空调",
+		"长虹",
+		"康佳",
+	}
+	rand.Seed(time.Now().UnixNano())
+
+	var afs []aftersales.Aftersale
+	for i := 0; i < 100; i++ {
+		a := aftersales.Aftersale{
+			CustomerName:    faker.Name().Name(),
+			CustomerPhone:   faker.PhoneNumber().CellPhone(),
+			CustomerAddress: faker.Address().StreetAddress(),
+
+			ServiceType:    service_types[rand.Intn(3)],
+			ServiceContent: faker.Lorem().String(),
+			Source:         sources[rand.Intn(7)],
+		}
+
+		afs = append(afs, a)
+	}
+
+	for _, s := range afs {
+		if err := DraftDB.Create(&s).Error; err != nil {
+			log.Fatalf("create aftersale (%v) failure, got err %v", s, err)
+		}
+	}
 }
 
 func importUsers() {
@@ -287,7 +331,7 @@ func createAdminUsers() {
 	AdminUser.Confirmed = true
 	AdminUser.Name = "QOR Admin"
 	AdminUser.Role = "Admin"
-	DraftDB.Create(AdminUser)
+	DraftDB.FirstOrCreate(AdminUser)
 
 	provider := auth.Auth.GetProvider("password").(*password.Provider)
 	hashedPassword, _ := provider.Encryptor.Digest("testing")

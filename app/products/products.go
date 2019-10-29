@@ -59,7 +59,6 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	// fmt.Println(permission.HasPermission(roles.Read, "operator"))
 
 	// only admin can see products management menu and crud on products
-	Admin.AddMenu(&admin.Menu{Name: "Product Management", Priority: 2, Permission: permission})
 	product := Admin.AddResource(&products.Product{}, &admin.Config{
 		Name:       "Product",
 		Menu:       []string{"Product Management"},

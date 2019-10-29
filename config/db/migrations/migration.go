@@ -23,12 +23,14 @@ import (
 	"github.com/qor/transition"
 )
 
-// Migrate
+// Migrate Run Migration
 func Migrate() {
 	fmt.Println("running migration .......")
 
-	AutoMigrate(&aftersales.AfterSale{})
+	AutoMigrate(&aftersales.Aftersale{})
 	AutoMigrate(&aftersales.Manufacturer{})
+	AutoMigrate(&aftersales.Settlement{})
+	AutoMigrate(&aftersales.Balance{})
 
 	AutoMigrate(&products.Product{}, &products.ProductVariation{}, &products.ProductImage{}, &products.ColorVariation{}, &products.ColorVariationImage{}, &products.SizeVariation{})
 	AutoMigrate(&products.Color{}, &products.Size{}, &products.Material{}, &products.Category{}, &products.Collection{})

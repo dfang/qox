@@ -47,19 +47,42 @@ func (app App) ConfigureApplication(application *application.Application) {
 
 // ConfigureAdmin configure admin interface
 func (App) ConfigureAdmin(Admin *admin.Admin) {
-	Admin.AddMenu(&admin.Menu{Name: "Aftersale Management", Priority: 2})
 
 	db.DB.Select("name, id").Find(&brands)
 	db.DB.Select("name, id").Find(&service_types)
 	db.DB.Select("name, id").Where("role = ?", "workman").Find(&workmen)
 
-	// Add Aftersale
-	aftersale := Admin.AddResource(&aftersales.AfterSale{}, &admin.Config{Menu: []string{"Aftersale Management"}, Priority: 1})
+	aftersale := Admin.AddResource(&aftersales.Aftersale{}, &admin.Config{Menu: []string{"Aftersale Management"}, Priority: 1})
 	manufacturer := Admin.AddResource(&aftersales.Manufacturer{}, &admin.Config{Menu: []string{"Aftersale Management"}, Priority: 4})
 	Admin.AddResource(&settings.Brand{}, &admin.Config{Name: "Brand", Menu: []string{"Aftersale Management"}, Priority: 3})
 	Admin.AddResource(&settings.ServiceType{}, &admin.Config{Name: "ServiceType", Menu: []string{"Aftersale Management"}, Priority: 2})
-
 	Admin.AddResource(&users.WechatProfile{}, &admin.Config{Name: "WechatProfile", Menu: []string{"Aftersale Management"}, Priority: 5})
+
+	settlement := Admin.AddResource(&aftersales.Settlement{}, &admin.Config{Menu: []string{"Settlement Management"}, Priority: 2})
+	settlement.IndexAttrs("-CreatedBy", "-UpdatedBy", "ID", "User", "Amount", "Direction", "Aftersale", "State", "CreatedAt")
+	settlement.Meta(&admin.Meta{
+		Name:       "Direction",
+		Type:       "select_one",
+		Collection: []string{"收入", "提现"},
+	})
+
+	settlement.Meta(&admin.Meta{Name: "State", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		m := record.(*aftersales.Settlement)
+		switch m.State {
+		case "frozen":
+			return "冻结中"
+		case "free":
+			return "已解冻"
+		case "withdrawed":
+			return "已提现"
+		default:
+			// return "N/A"
+			return m.State
+		}
+	}})
+
+	balance := Admin.AddResource(&aftersales.Balance{}, &admin.Config{Menu: []string{"Settlement Management"}, Priority: 1})
+	balance.IndexAttrs("-ID", "-CreatedAt", "-CreatedBy", "-UpdatedBy", "User", "FrozenAmount", "FreeAmount", "TotalAmount", "WithdrawAmount", "UpdatedAt")
 
 	aftersale.Meta(&admin.Meta{
 		Name: "ServiceType",
@@ -124,6 +147,9 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	configureActions(Admin, aftersale)
 	configureScopes(aftersale)
 
+	configureScopesForSettlements(settlement)
+	configureScopesForBalances(balance)
+
 	// aftersale.UseTheme("grid")
 	// aftersale.UseTheme("publish2")
 	aftersale.UseTheme("fancy")
@@ -140,11 +166,9 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 func configureMetas(model *admin.Resource) {
 	model.EditAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
 	model.NewAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
-	model.IndexAttrs("-UserID", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-Fee", "-Remark")
-
+	model.IndexAttrs("-UserID", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-Fee", "-Remark", "-ServiceContent", "-ReservedServiceTime", "-Source")
 	model.Meta(&admin.Meta{Name: "State", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
-		m := record.(*aftersales.AfterSale)
-
+		m := record.(*aftersales.Aftersale)
 		switch m.State {
 		case "created":
 			return "已接收"
@@ -168,6 +192,39 @@ func configureMetas(model *admin.Resource) {
 }
 
 func configureScopes(model *admin.Resource) {
+	// filter by order state
+	for _, item := range aftersales.STATES {
+		var item = item // 这句必须有否则会报错，永远都是最后一个值
+		model.Scope(&admin.Scope{
+			Name:  item,
+			Label: item,
+			Group: "Filter By State",
+			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+				// 两种写法都可以
+				// return db.Where(aftersales.Aftersale{State: item})
+				// if item == "overdue" {
+				// return db.Where("state = 'scheduled'").Where("updated_at <= NOW() - INTERVAL '20 minutes'")
+				// return db.Where("state = 'scheduled'")
+				// }
+				return db.Where("state = ?", item)
+			},
+		})
+	}
+
+	// filter by order type
+	for _, item := range service_types {
+		var item = item // 这句必须有否则会报错，永远都是最后一个值
+		model.Scope(&admin.Scope{
+			Name:  item.Name,
+			Label: item.Name,
+			Group: "Filter By Type",
+			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+				// 两种写法都可以
+				return db.Where("service_type = ?", item.Name)
+			},
+		})
+	}
+
 	// filter by order source
 	// var brands = []settings.Brand{
 	// 	settings.Brand{
@@ -185,38 +242,6 @@ func configureScopes(model *admin.Resource) {
 			Group: "Filter By Source",
 			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 				return db.Where("source = ?", item.Name)
-			},
-		})
-	}
-
-	// filter by order state
-	for _, item := range aftersales.STATES {
-		var item = item // 这句必须有否则会报错，永远都是最后一个值
-		model.Scope(&admin.Scope{
-			Name:  item,
-			Label: item,
-			Group: "Filter By State",
-			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-				// 两种写法都可以
-				// return db.Where(aftersales.AfterSale{State: item})
-				if item == "overdue" {
-					return db.Where("state = 'scheduled'").Where("updated_at <= NOW() - INTERVAL '20 minutes'")
-				}
-				return db.Where("state = ?", item)
-			},
-		})
-	}
-
-	// filter by order type
-	for _, item := range service_types {
-		var item = item // 这句必须有否则会报错，永远都是最后一个值
-		model.Scope(&admin.Scope{
-			Name:  item.Name,
-			Label: item.Name,
-			Group: "Filter By Type",
-			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-				// 两种写法都可以
-				return db.Where("service_type = ?", item.Name)
 			},
 		})
 	}
@@ -319,7 +344,7 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 			return nil
 		},
 		Visible: func(record interface{}, context *admin.Context) bool {
-			if item, ok := record.(*aftersales.AfterSale); ok {
+			if item, ok := record.(*aftersales.Aftersale); ok {
 				return item.State == "created"
 			}
 			return false
@@ -343,8 +368,8 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 		// },
 		Collection: func(value interface{}, context *qor.Context) (options [][]string) {
 			var setupMen []users.User
-			// context.GetDB().Where("role = ?", "setup_man").Find(&setupMen)
-			context.GetDB().Find(&setupMen)
+			context.GetDB().Where("role = ?", "workman").Find(&setupMen)
+			// context.GetDB().Find(&setupMen)
 			for _, m := range setupMen {
 				idStr := fmt.Sprintf("%d", m.ID)
 				var option = []string{idStr, m.Name}
@@ -364,7 +389,7 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 			for _, record := range argument.FindSelectedRecords() {
 				// argument.Context.GetDB().Model(record).UpdateColumn("user_id", arg.UserID)
 				// argument.Context.GetDB().Model(record).UpdateColumn("state", "scheduled")
-				item := record.(*aftersales.AfterSale)
+				item := record.(*aftersales.Aftersale)
 				item.UserID = arg.UserID
 				// aftersales.OrderState.Trigger("schedule", item, tx, "scheduled to user_id: "+fmt.Sprintf("%d", arg.UserID))
 				// 无论是inquired、scheduled，还是overdue状态，通过指派按钮重新指派的时候都要变为schedued状态
@@ -378,8 +403,41 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 			return nil
 		},
 		Visible: func(record interface{}, context *admin.Context) bool {
-			if item, ok := record.(*aftersales.AfterSale); ok {
-				return item.State == "inquired" || item.State == "scheduled" || item.State == "overdue"
+			if item, ok := record.(*aftersales.Aftersale); ok {
+				return item.State == "inquired"
+			}
+			return true
+		},
+		Resource: setupActionArgumentResource,
+		Modes:    []string{"edit", "show", "menu_item"},
+	})
+
+	aftersale.Action(&admin.Action{
+		Name: "重新指派",
+		Handler: func(argument *admin.ActionArgument) error {
+			var (
+				tx  = argument.Context.GetDB().Begin()
+				arg = argument.Argument.(*setupActionArgument)
+			)
+			for _, record := range argument.FindSelectedRecords() {
+				// argument.Context.GetDB().Model(record).UpdateColumn("user_id", arg.UserID)
+				// argument.Context.GetDB().Model(record).UpdateColumn("state", "scheduled")
+				item := record.(*aftersales.Aftersale)
+				item.UserID = arg.UserID
+				// aftersales.OrderState.Trigger("schedule", item, tx, "scheduled to user_id: "+fmt.Sprintf("%d", arg.UserID))
+				// 无论是inquired、scheduled，还是overdue状态，通过指派按钮重新指派的时候都要变为schedued状态
+				item.State = "scheduled"
+				if err := tx.Save(item).Error; err != nil {
+					tx.Rollback()
+					return err
+				}
+			}
+			tx.Commit()
+			return nil
+		},
+		Visible: func(record interface{}, context *admin.Context) bool {
+			if item, ok := record.(*aftersales.Aftersale); ok {
+				return item.State == "scheduled" || item.State == "overdue"
 			}
 			return true
 		},
@@ -404,7 +462,7 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 	// 		return nil
 	// 	},
 	// 	Visible: func(record interface{}, context *admin.Context) bool {
-	// 		// if item, ok := record.(*aftersales.AfterSale); ok {
+	// 		// if item, ok := record.(*aftersales.Aftersale); ok {
 	// 		// 	return item.State == "inquired"
 	// 		// }
 	// 		return true
@@ -430,7 +488,7 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 	// 		return nil
 	// 	},
 	// 	Visible: func(record interface{}, context *admin.Context) bool {
-	// 		// if item, ok := record.(*aftersales.AfterSale); ok {
+	// 		// if item, ok := record.(*aftersales.Aftersale); ok {
 	// 		// 	return item.State == "inquired"
 	// 		// }
 	// 		return true
@@ -455,7 +513,7 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 			for _, record := range argument.FindSelectedRecords() {
 				argument.Context.GetDB().Model(record).UpdateColumn("fee", arg.Fee)
 				argument.Context.GetDB().Model(record).UpdateColumn("state", "audited")
-				// item := record.(*aftersales.AfterSale)
+				// item := record.(*aftersales.Aftersale)
 				// item.Fee = arg.Fee
 				// aftersales.OrderState.Trigger("schedule", item, tx, "scheduled to")
 
@@ -471,13 +529,43 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 			return nil
 		},
 		Visible: func(record interface{}, context *admin.Context) bool {
-			// if item, ok := record.(*aftersales.AfterSale); ok {
-			// 	return item.State == "processed"
-			// }
+			if item, ok := record.(*aftersales.Aftersale); ok {
+				return item.State == "processed"
+			}
 			return true
 		},
 		Resource: auditActionArgumentResource,
 		Modes:    []string{"edit", "show", "menu_item"},
 	})
 
+}
+
+func configureScopesForSettlements(model *admin.Resource) {
+	for _, item := range workmen {
+		var item = item
+		model.Scope(&admin.Scope{
+			Name:  item.Name,
+			Label: item.Name,
+			Group: "Filter By Workman",
+			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+				// 两种写法都可以
+				return db.Where("user_id = ?", item.ID)
+			},
+		})
+	}
+}
+
+func configureScopesForBalances(model *admin.Resource) {
+	for _, item := range workmen {
+		var item = item
+		model.Scope(&admin.Scope{
+			Name:  item.Name,
+			Label: item.Name,
+			Group: "Filter By Workman",
+			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+				// 两种写法都可以
+				return db.Where("user_id = ?", item.ID)
+			},
+		})
+	}
 }

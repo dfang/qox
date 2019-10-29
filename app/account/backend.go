@@ -15,7 +15,6 @@ import (
 
 // ConfigureAdmin configure admin interface
 func (App) ConfigureAdmin(Admin *admin.Admin) {
-	Admin.AddMenu(&admin.Menu{Name: "User Management", Priority: 2})
 	user := Admin.AddResource(&users.User{}, &admin.Config{Menu: []string{"User Management"}})
 	user.SearchAttrs("name", "mobile_phone")
 

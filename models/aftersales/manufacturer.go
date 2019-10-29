@@ -4,7 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// Manufacturer AfterSale 售后厂家管理
+// Manufacturer Aftersale 售后厂家管理
 type Manufacturer struct {
 	gorm.Model
 

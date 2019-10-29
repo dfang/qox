@@ -32,7 +32,7 @@ zh-CN:
     name:
       plural: 操作员
 
-  after_sales:
+  aftersales:
     name:
       plural: 售后
     attributes:
@@ -40,9 +40,9 @@ zh-CN:
       Customer Phone: 客户电话
       Customer Address: 客户地址
       Service Type: 售后类型
-      Reserverd Service Time: 预约服务时间
+      Reserverd Service Time: 师傅和客户预约的服务时间
       Service Content: 服务内容
-      Remark: 备注
+      Remark: 备注给师傅
       User: 已指派给
       Source: 品牌
       State: 状态
@@ -54,14 +54,16 @@ zh-CN:
       "Filter By Date": 根据创建时间快速筛选
       "Filter By Workman": 根据师傅快速筛选
       "Filter By State":
-        created: 已接收
-        inquired: 已预约
-        scheduled: 已指派
-        overdue: 已超时
-        processing: 待处理
-        processed: 已处理
+        created: 已接收待预约客户
+        inquired: 已预约待指派
+        scheduled: 已指派待响应
+        overdue: 已超时待重新指派
+        processing: 待上门服务
+        processed: 已完成服务待审核
         audited: 已审核
         audit_failed: 审核失败
+        frozen: 已冻结
+        completed: 已解冻
       "Filter By Date":
         "Today": "今天"
         "Yesterday": "昨天"
@@ -87,7 +89,32 @@ zh-CN:
       plural: 品牌管理
     attributes:
       Name: 名称
-
+  settlements:
+    name:
+      plural: 结算明细表
+    attributes:
+      User: 师傅
+      Amount: 金额
+      Direction: 收支
+      Aftersale: 售后单
+      State: 状态
+      Created At: 更新于
+    scopes:
+      "Filter By Date": "按日期"
+      "Filter By Workman": "按师傅筛选"
+  balances:
+    name:
+      plural: 结算统计
+    attributes:
+      User: 师傅
+      Frozen Amount: 剩余冻结金额
+      Free Amount: 剩余可提现金额
+      Total Amount: 历史总收入
+      Withdraw Amount: 历史提现总金额
+      UpdatedAt: 最后更新于
+    scopes:
+      "Filter By Date": "按日期"
+      "Filter By Workman": "按师傅筛选"
   orders:
     scopes:
       "Order Status": "按订单状态"
@@ -183,6 +210,11 @@ zh-CN:
       Exception Handling: "异常处理结果"
 
   qor_admin:
+    layout:
+      title: "控制台"
+    search_center:
+      title: "Search Center"
+
     menus:
       "Site Management": 站点管理
       "Pages Management": 页面管理
@@ -198,6 +230,10 @@ zh-CN:
 
       "Store Management": 店面管理
 
+      "Settlement Management": 结算管理
+      "Settlements": 结算明细
+      "Balances": 实时额度统计
+
       "installs": "京东订单"
       "Abandoned Orders": 废弃订单
 
@@ -207,7 +243,7 @@ zh-CN:
       "Workmen": 师傅
 
       "Aftersale Management": 售后管理
-      "After Sales": 售后单
+      "Aftersales": 服务单
       "Manufacturers": 厂家后台
       "Brands": 品牌
       "ServiceTypes": 服务类型

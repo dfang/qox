@@ -57,10 +57,16 @@ func (app App) ConfigureApplication(application *application.Application) {
 
 	// Add Setting
 	Admin.AddResource(&settings.Setting{}, &admin.Config{Name: "Shop Setting", Menu: []string{"Site Management"}, Singleton: true, Priority: 1})
-	
+
 	// Add Help
 	Admin.AddResource(&help.QorHelpEntry{}, &admin.Config{Name: "Help", Menu: []string{"Site Management"}, Singleton: true, Priority: 1})
 
+	// 一级菜单
+	Admin.AddMenu(&admin.Menu{Name: "Aftersale Management", Priority: 2})
+	Admin.AddMenu(&admin.Menu{Name: "Settlement Management", Priority: 3})
+	Admin.AddMenu(&admin.Menu{Name: "User Management", Priority: 3})
+	Admin.AddMenu(&admin.Menu{Name: "Order Management", Priority: 4})
+	Admin.AddMenu(&admin.Menu{Name: "Product Management", Priority: 5})
 
 	SetupNotification(Admin)
 	SetupWorker(Admin)

@@ -7,7 +7,7 @@
     <li>
       待预约
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=created"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToReserve }}</span></a>
+        <a rel="nofollow" href="/admin/aftersales?scopes=created"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToReserve }}</span></a>
         单
       </span>
     </li>
@@ -15,7 +15,15 @@
     <li>
       待指派师傅
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=inquired"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToSchedule }} </span></a>
+        <a rel="nofollow" href="/admin/aftersales?scopes=inquired"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToSchedule }} </span></a>
+        单
+      </span>
+    </li>
+
+    <li>
+      指派已超时，需重新调度
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/aftersales?scopes=overdue"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.Overdue }}</span></a>
         单
       </span>
     </li>
@@ -23,7 +31,7 @@
     <li>
       待审核
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=processed"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToAudit }}</span></a>
+        <a rel="nofollow" href="/admin/aftersales?scopes=processed"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToAudit }}</span></a>
         单
       </span>
     </li>
@@ -31,7 +39,7 @@
     <li>
       审核失败
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=audit_failed"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.FailedToAudit }}</span></a>
+        <a rel="nofollow" href="/admin/aftersales?scopes=audit_failed"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.FailedToAudit }}</span></a>
         单
       </span>
     </li>
@@ -43,16 +51,9 @@
 
   <ul>
     <li>
-      已指派
+      已指派师傅，待响应
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=scheduled"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.Scheduled }}</span></a>
-        单
-      </span>
-    </li>
-    <li>
-      指派已超时，需重新调度
-      <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=overdue"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.Overdue }}</span></a>
+        <a rel="nofollow" href="/admin/aftersales?scopes=scheduled"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.Scheduled }}</span></a>
         单
       </span>
     </li>
@@ -60,15 +61,31 @@
     <li>
       师傅已接单，待上门服务
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=processing"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToProcess }}</span></a>
+        <a rel="nofollow" href="/admin/aftersales?scopes=processing"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToProcess }}</span></a>
         单
       </span>
     </li>
     
     <li>
-      待提交服务完成证明
+      师傅已完成服务待审核完成证明
       <span style="float: right">
-        <a rel="nofollow" href="/admin/after_sales?scopes=processed"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToAudit }}</span></a>
+        <a rel="nofollow" href="/admin/aftersales?scopes=processed"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToAudit }}</span></a>
+        单
+      </span>
+    </li>
+
+     <li>
+      已审核
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/aftersales?scopes=audited"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.Audited }} </span></a>
+        单
+      </span>
+    </li>
+
+     <li>
+      已冻结
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/aftersales?scopes=frozen"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.Frozen }}</span></a>
         单
       </span>
     </li>
