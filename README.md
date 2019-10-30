@@ -72,7 +72,7 @@ Released under the MIT License.
 ## How to run this locally
 
 ```
-go run main.go background_job.go health_check.go
+go run main.go background_job.go health_check.go web_ui.go
 
 or
 

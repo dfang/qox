@@ -9,11 +9,13 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
 	github.com/aws/aws-sdk-go v1.25.10 // indirect
 	github.com/azumads/faker v0.0.0-20150921074035-6cae71ddb107
+	github.com/braintree/manners v0.0.0-20160418043613-82a8879fc5fd // indirect
 	github.com/dfang/wechat-work-go v0.0.0-20190622161907-748e836f69d3 // indirect
 	github.com/disintegration/imaging v1.6.1 // indirect
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/gin-gonic/gin v1.4.0 // indirect
 	github.com/go-chi/chi v4.0.2+incompatible
+	github.com/gocraft/web v0.0.0-20190207150652-9707327fb69b // indirect
 	github.com/gocraft/work v0.5.1
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/google/uuid v1.1.1
