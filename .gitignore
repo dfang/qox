@@ -36,3 +36,7 @@ draft.toml
 charts
 .draft-tasks.toml
 .draftignore
+
+
+# vendor 文件夹里的views 文件都是通过命令拷贝的，详见docs/gomod.md， 没必要提交到git
+vendor

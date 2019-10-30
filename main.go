@@ -59,6 +59,7 @@ func main() {
 	isDebug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
 	debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
 	runMigration := cmdLine.Bool("migrate", false, "Run migration")
+	ui := cmdLine.Bool("ui", false, "Serves gocraft/work ui")
 	// runSeed := cmdLine.Bool("seed", false, "Run seed")
 	cmdLine.Parse(os.Args[1:])
 
@@ -97,6 +98,11 @@ func main() {
 
 	fmt.Println("start health check ......")
 	go startHealthCheck()
+
+	if *ui || os.Getenv("UI") == "true" {
+		fmt.Println("serves gocraft/work web ui ......")
+		go startWorkWebUI()
+	}
 
 	if os.Getenv("HTTPS") == "true" && os.Getenv("DOMAIN") == "" {
 		log.Info().Msg("If set HTTPS=true, this app will get ssl certificates automatically and serve on 443,  so you must also set DOMAIN")
