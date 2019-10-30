@@ -9,6 +9,7 @@ import (
 	"github.com/qor/help"
 	"github.com/qor/media/asset_manager"
 	"github.com/qor/media/media_library"
+	"github.com/qor/roles"
 )
 
 // ActionBar admin action bar
@@ -63,11 +64,17 @@ func (app App) ConfigureApplication(application *application.Application) {
 	Admin.AddResource(&help.QorHelpEntry{}, &admin.Config{Name: "Help", Menu: []string{"Site Management"}, Singleton: true, Priority: 1})
 
 	// 一级菜单
+	// https://doc.getqor.com/admin/authentication.html#authorization
+	// Hide some menus for operator role
 	Admin.AddMenu(&admin.Menu{Name: "Aftersale Management", Priority: 2})
 	Admin.AddMenu(&admin.Menu{Name: "Settlement Management", Priority: 3})
 	Admin.AddMenu(&admin.Menu{Name: "User Management", Priority: 3})
-	Admin.AddMenu(&admin.Menu{Name: "Order Management", Priority: 4})
-	Admin.AddMenu(&admin.Menu{Name: "Product Management", Priority: 5})
+	Admin.AddMenu(&admin.Menu{Name: "Order Management", Priority: 4, Permission: roles.Deny(roles.Read, "operator")})
+	Admin.AddMenu(&admin.Menu{Name: "Product Management", Priority: 5, Permission: roles.Deny(roles.Read, "operator")})
+	Admin.AddMenu(&admin.Menu{Name: "Pages Management", Priority: 6, Permission: roles.Deny(roles.Read, "operator")})
+	Admin.AddMenu(&admin.Menu{Name: "Site Management", Priority: 7, Permission: roles.Deny(roles.Read, "operator")})
+	// publish2
+	Admin.AddMenu(&admin.Menu{Name: "Publishing", Priority: 8, Permission: roles.Deny(roles.Read, "operator")})
 
 	SetupNotification(Admin)
 	SetupWorker(Admin)
