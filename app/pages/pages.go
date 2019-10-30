@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	adminapp "github.com/dfang/qor-demo/app/admin"
-	"github.com/qor/application"
 	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/models/blogs"
 	"github.com/dfang/qor-demo/utils/funcmapmaker"
 	"github.com/qor/admin"
+	"github.com/qor/application"
 	"github.com/qor/page_builder"
 	"github.com/qor/qor"
 	"github.com/qor/qor/resource"
@@ -47,8 +47,6 @@ func (app App) ConfigureApplication(application *application.Application) {
 
 // ConfigureAdmin configure admin interface
 func (App) ConfigureAdmin(Admin *admin.Admin) {
-	Admin.AddMenu(&admin.Menu{Name: "Pages Management", Priority: 4})
-
 	// Blog Management
 	article := Admin.AddResource(&blogs.Article{}, &admin.Config{Menu: []string{"Pages Management"}})
 	article.IndexAttrs("ID", "VersionName", "ScheduledStartAt", "ScheduledEndAt", "Author", "Title")
