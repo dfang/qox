@@ -55,7 +55,9 @@ go build之后，删掉 整个vendor 文件夹， 运行可执行文件 ./admin-
 
 ```
 go mod vendor
-modvendor -copy="**/*.tmpl **/*.css **/*.js **/*woff **/*woff2 **/*ttf **/*jpg **/*png **/*ico" -v
+
+modvendor -copy="**/*.tmpl **/*.css **/*.js **/*.woff **/*.woff2 **/*.ttf **/*.jpg **/*.png **/*.ico **/*.yml **/*.yaml" -v
+
 ```
 
 之后进入 vendor文件夹删掉除了views 之外的所有文件夹， 打包到线上的时候需要 一个可执行文件加上 vendor文件夹，这样Docker镜像会很小
@@ -63,8 +65,8 @@ modvendor -copy="**/*.tmpl **/*.css **/*.js **/*woff **/*woff2 **/*ttf **/*jpg *
 用命令来操作就是
 
 ```
-find ./vendor  -name "*views*" | xargs -I {} rsync -aR --delete {} ./tmp
-\rsync -avP --delete ./tmp/vendor .
+find ./vendor  -name "views" | xargs -I {} rsync -aR --delete {} ./tmp
+rsync -avP --delete ./tmp/vendor .
 ```
 
 可以用此方法来进行测试：
