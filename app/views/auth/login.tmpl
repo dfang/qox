@@ -19,8 +19,6 @@
 
     {{if .Auth.GetProvider "password"}}
       <form action="{{.AuthURL "password/login"}}" method="POST">
-        <b>Demo Account: dev@getqor.com / testing</b>
-
         <ul class="auth-form">
           <li>
             <label for="email">{{t "auth.form.email"}}</label>

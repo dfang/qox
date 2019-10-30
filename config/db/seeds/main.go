@@ -327,7 +327,7 @@ func createSetting() {
 
 func createAdminUsers() {
 	AdminUser = &users.User{}
-	AdminUser.Email = "dev@getqor.com"
+	AdminUser.Email = "admin@example.com"
 	AdminUser.Confirmed = true
 	AdminUser.Name = "QOR Admin"
 	AdminUser.Role = "Admin"
@@ -378,7 +378,7 @@ func createUsers() {
 		}
 
 		provider := auth.Auth.GetProvider("password").(*password.Provider)
-		hashedPassword, _ := provider.Encryptor.Digest("testing")
+		hashedPassword, _ := provider.Encryptor.Digest("admin")
 		authIdentity := &auth_identity.AuthIdentity{}
 		authIdentity.Provider = "password"
 		authIdentity.UID = user.Email
