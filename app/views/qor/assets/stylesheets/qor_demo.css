@@ -62,6 +62,10 @@
     content: "\e2c7";
 }
 
+[qor-icon-name*="Dashboard"] > a::before {
+    content: "\e88a";
+}
+
 /* OVERRIDES */
 .qor-actions:first-child .qor-selector{
   margin-right: 20px;
