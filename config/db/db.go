@@ -39,7 +39,8 @@ func Initialize() {
 		MaxIdle:   5,
 		Wait:      true,
 		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", ":6379")
+			log.Debug().Msg(fmt.Sprintf("%s:%s", config.Config.Redis.Host, config.Config.Redis.Port))
+			return redis.Dial("tcp", fmt.Sprintf("%s:%s", config.Config.Redis.Host, config.Config.Redis.Port))
 		},
 	}
 

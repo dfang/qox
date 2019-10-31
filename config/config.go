@@ -36,7 +36,11 @@ type SMTPConfig struct {
 var Config = struct {
 	HTTPS bool `default:"false" env:"HTTPS"`
 	Port  uint `default:"7000" env:"PORT"`
-	DB    struct {
+	Redis struct {
+		Host string `env:"REDIS_HOST" default:"localhost"`
+		Port string `env:"REDIS_PORT" default:"6379"`
+	}
+	DB struct {
 		Name     string `env:"DBName" default:"qor_example"`
 		Adapter  string `env:"DBAdapter" default:"postgres"`
 		Host     string `env:"DBHost" default:"localhost"`
