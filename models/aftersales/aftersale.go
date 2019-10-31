@@ -1,6 +1,8 @@
 package aftersales
 
 import (
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 	"github.com/qor/audited"
 	"github.com/qor/transition"
@@ -42,6 +44,15 @@ type Aftersale struct {
 // BeforeCreate 初始状态
 func (item *Aftersale) BeforeCreate(scope *gorm.Scope) error {
 	scope.SetColumn("State", "created")
+	return nil
+}
+
+// BeforeSave 验证费用
+func (item *Aftersale) BeforeSave(scope *gorm.Scope) error {
+	if item.Fee <= 0 {
+		return fmt.Errorf("费用不能小于或这等于0")
+	}
+
 	return nil
 }
 
