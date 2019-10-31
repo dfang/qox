@@ -67,6 +67,9 @@ modvendor -copy="**/*.tmpl **/*.css **/*.js **/*.woff **/*.woff2 **/*.ttf **/*.j
 ```
 find ./vendor  -name "views" | xargs -I {} rsync -aR --delete {} ./tmp
 rsync -avP --delete ./tmp/vendor .
+
+cd vendor
+fd test | xargs rm -rf
 ```
 
 可以用此方法来进行测试：
@@ -140,15 +143,14 @@ public 文件夹的内容也可以复制过来
 
 ```
 go build
-mkdir /tmp/test
-cp .env qor-demo /tmp/test
-cp -r --parents config/locales /tmp/test/
-cp -r --parents public /tmp/test/
-cp -r --parents vendor /tmp/test/
+mkdir ~/tmp/test
+cp .env ~/tmp/test
+cp qor-demo ~/tmp/test
+cp -r --parents config/locales ~/tmp/test/
+cp -r --parents public ~/tmp/test/
+cp -r --parents vendor ~/tmp/test/
+cp -r --parents app/views ~/tmp/test/
 
-mkdir -p app/views/qor/assets/stylesheets/
-cp --parents app/views/qor/assets/stylesheets/qor_demo.css /tmp/test
-
-cd /tmp/test/
+cd ~/tmp/test/
 ./qor-demo
 ```
