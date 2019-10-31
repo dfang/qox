@@ -11,6 +11,7 @@ import (
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/now"
+	"github.com/qor/activity"
 	"github.com/qor/admin"
 	"github.com/qor/application"
 	"github.com/qor/qor"
@@ -57,6 +58,8 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	Admin.AddResource(&settings.Brand{}, &admin.Config{Name: "Brand", Menu: []string{"Aftersale Management"}, Priority: 3})
 	Admin.AddResource(&settings.ServiceType{}, &admin.Config{Name: "ServiceType", Menu: []string{"Aftersale Management"}, Priority: 2})
 	Admin.AddResource(&users.WechatProfile{}, &admin.Config{Name: "WechatProfile", Menu: []string{"Aftersale Management"}, Priority: 5})
+
+	activity.Register(aftersale)
 
 	settlement := Admin.AddResource(&aftersales.Settlement{}, &admin.Config{Menu: []string{"Settlement Management"}, Priority: 2})
 	settlement.IndexAttrs("-CreatedBy", "-UpdatedBy", "ID", "User", "Amount", "Direction", "Aftersale", "State", "CreatedAt")
