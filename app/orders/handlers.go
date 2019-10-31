@@ -32,8 +32,9 @@ func (ctrl Controller) Cart(w http.ResponseWriter, req *http.Request) {
 	log.Println("Order ID is ", order.ID)
 
 	var orderItems []orders.OrderItem
-	// tx.Where("order_id = ?", order.ID).Preload("SizeVariation").Find(&orderItems)
 	tx.Model(&order).Preload("SizeVariation.Size").Preload("ColorVariation").Find(&orderItems)
+
+	// tx.Where("order_id = ?", order.ID).Preload("SizeVariation").Find(&orderItems)
 	// tx.Model(&order).Association("SizeVariation").Find(&orderItems)
 	// tx.Where("order_id = ?", order.ID).Association("ColorVariation").Find(&orderItems)
 	log.Println("order.OrderItems count is", len(orderItems))
