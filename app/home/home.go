@@ -30,8 +30,10 @@ func (App) ConfigureApplication(application *application.Application) {
 	controller := &Controller{View: render.New(&render.Config{AssetFileSystem: application.AssetFS.NameSpace("home")}, "app/home/views")}
 	// controller := &Controller{ View: render.New( &render.Config{ AssetFileSystem: bindatafs.AssetFS.NameSpace("home"), }),
 
-	application.Router.Get("/", controller.RedirectToAdmin)
 	funcmapmaker.AddFuncMapMaker(controller.View)
+
+	application.Router.Get("/", controller.RedirectToAdmin)
 	// application.Router.Get("/", controller.Index)
+
 	application.Router.Get("/switch_locale", controller.SwitchLocale)
 }

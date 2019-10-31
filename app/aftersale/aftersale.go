@@ -349,10 +349,13 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 		Handler: func(argument *admin.ActionArgument) error {
 			var (
 				arg = argument.Argument.(*reserveActionArgument)
+				tx  = argument.Context.GetDB()
 			)
 			for _, record := range argument.FindSelectedRecords() {
-				argument.Context.GetDB().Model(record).UpdateColumn("remark", arg.Remark)
-				argument.Context.GetDB().Model(record).UpdateColumn("state", "inquired")
+				item := record.(*aftersales.Aftersale)
+				aftersales.OrderStateMachine.Trigger("inquire", item, tx, "from created to inquired")
+				item.Remark = arg.Remark
+				tx.Model(aftersales.Aftersale{}).Save(&item)
 			}
 			return nil
 		},
@@ -404,9 +407,9 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 				// argument.Context.GetDB().Model(record).UpdateColumn("state", "scheduled")
 				item := record.(*aftersales.Aftersale)
 				item.UserID = arg.UserID
-				// aftersales.OrderState.Trigger("schedule", item, tx, "scheduled to user_id: "+fmt.Sprintf("%d", arg.UserID))
+				aftersales.OrderStateMachine.Trigger("schedule", item, tx, "scheduled to user_id: "+fmt.Sprintf("%d", arg.UserID))
 				// 无论是inquired、scheduled，还是overdue状态，通过指派按钮重新指派的时候都要变为schedued状态
-				item.State = "scheduled"
+				// item.State = "scheduled" // 直接这样不触发event
 				if err := tx.Save(item).Error; err != nil {
 					tx.Rollback()
 					return err
@@ -434,12 +437,12 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 			)
 			for _, record := range argument.FindSelectedRecords() {
 				// argument.Context.GetDB().Model(record).UpdateColumn("user_id", arg.UserID)
-				// argument.Context.GetDB().Model(record).UpdateColumn("state", "scheduled")
 				item := record.(*aftersales.Aftersale)
 				item.UserID = arg.UserID
+				aftersales.OrderStateMachine.Trigger("reschedule", item, tx, "rescheduled to user_id: "+fmt.Sprintf("%d", arg.UserID))
 				// aftersales.OrderState.Trigger("schedule", item, tx, "scheduled to user_id: "+fmt.Sprintf("%d", arg.UserID))
 				// 无论是inquired、scheduled，还是overdue状态，通过指派按钮重新指派的时候都要变为schedued状态
-				item.State = "scheduled"
+				// item.State = "scheduled"
 				if err := tx.Save(item).Error; err != nil {
 					tx.Rollback()
 					return err
@@ -516,29 +519,22 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 	}
 	auditActionArgumentResource := Admin.NewResource(&auditActionArgument{})
 	aftersale.Action(&admin.Action{
-		Name: "审核",
+		Name: "审核通过",
 		Handler: func(argument *admin.ActionArgument) error {
 			var (
-				// tx  = argument.Context.GetDB().Begin()
+				tx  = argument.Context.GetDB().Begin()
 				arg = argument.Argument.(*auditActionArgument)
-				// db = argument.Context.GetDB()
 			)
 			for _, record := range argument.FindSelectedRecords() {
-				argument.Context.GetDB().Model(record).UpdateColumn("fee", arg.Fee)
-				argument.Context.GetDB().Model(record).UpdateColumn("state", "audited")
-				// item := record.(*aftersales.Aftersale)
-				// item.Fee = arg.Fee
-				// aftersales.OrderState.Trigger("schedule", item, tx, "scheduled to")
-
-				// orders.OrderState.Trigger("schedule_setup", order, tx, "man to setup: "+arg.ManToSetup)
-				// if err := tx.Save(item).Error; err != nil {
-				// 	tx.Rollback()
-				// 	return err
-				// }
-				// tx.Commit()
-				// return nil
+				item := record.(*aftersales.Aftersale)
+				item.Fee = arg.Fee
+				aftersales.OrderStateMachine.Trigger("audit", item, tx, "audit ok")
+				if err := tx.Save(item).Error; err != nil {
+					tx.Rollback()
+					return err
+				}
 			}
-			// tx.Commit()
+			tx.Commit()
 			return nil
 		},
 		Visible: func(record interface{}, context *admin.Context) bool {
@@ -550,7 +546,31 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 		Resource: auditActionArgumentResource,
 		Modes:    []string{"edit", "show", "menu_item"},
 	})
-
+	aftersale.Action(&admin.Action{
+		Name: "审核不通过",
+		Handler: func(argument *admin.ActionArgument) error {
+			var (
+				tx = argument.Context.GetDB().Begin()
+			)
+			for _, record := range argument.FindSelectedRecords() {
+				item := record.(*aftersales.Aftersale)
+				aftersales.OrderStateMachine.Trigger("audit_failed", item, tx, "audit failed")
+				if err := tx.Save(item).Error; err != nil {
+					tx.Rollback()
+					return err
+				}
+			}
+			tx.Commit()
+			return nil
+		},
+		Visible: func(record interface{}, context *admin.Context) bool {
+			if item, ok := record.(*aftersales.Aftersale); ok {
+				return item.State == "processed"
+			}
+			return true
+		},
+		Modes: []string{"edit", "show", "menu_item"},
+	})
 }
 
 func configureScopesForSettlements(model *admin.Resource) {

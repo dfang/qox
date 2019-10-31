@@ -1,9 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
 
+	"github.com/dfang/qor-demo/config"
 	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/models/aftersales"
 	"github.com/dfang/qor-demo/models/users"
@@ -15,18 +19,29 @@ import (
 // just run `go startWorkerPool()` in main.go
 // run workwebui -redis="redis:6379" -ns="qor" -listen=":5040"
 // open localhost:5040 to view jobs ui
+// https://crontab.guru/
+// https://crontab.guru/examples.html
 func startWorkerPool() {
+
 	// Periodic Enqueueing (Cron)
 	pool := work.NewWorkerPool(Context{}, 10, "qor", db.RedisPool)
-	pool.PeriodicallyEnqueue("30 * * * * *", "expire_aftersales") // This will enqueue a "expire_aftersales" job every minutes
-	pool.PeriodicallyEnqueue("30 * * * * *", "freeze_audited_aftersales")
-	pool.PeriodicallyEnqueue("5 * * * *", "unfreeze_aftersales")
-	pool.PeriodicallyEnqueue("30 * * * * *", "update_balances")
+	// pool.PeriodicallyEnqueue("30 * * * * *", "expire_aftersales") // This will enqueue a "expire_aftersales" job every minutes
+	// pool.PeriodicallyEnqueue("30 * * * * *", "freeze_audited_aftersales")
+	// pool.PeriodicallyEnqueue("5 * * * *", "unfreeze_aftersales")
+	// pool.PeriodicallyEnqueue("30 * * * * *", "update_balances")
+	pool.Middleware(Log)
 
-	pool.Job("expire_aftersales", ExpireAftersales) // Still need to register a handler for this job separately
+	pool.PeriodicallyEnqueue(config.Config.Cron.ExpireAftersales, "expire_aftersales")
+	pool.PeriodicallyEnqueue(config.Config.Cron.FreezeAuditedAftersales, "freeze_audited_aftersales")
+	pool.PeriodicallyEnqueue(config.Config.Cron.UnfreezeAftersales, "unfreeze_aftersales")
+	pool.PeriodicallyEnqueue(config.Config.Cron.UpdateBalances, "update_balances")
+
+	pool.Job("expire_aftersales", ExpireAftersales)
 	pool.Job("freeze_audited_aftersales", FreezeAftersales)
 	pool.Job("unfreeze_aftersales", UnfreezeAftersales)
 	pool.Job("update_balances", UpdateBalances)
+
+	pool.Job("send_wechat_template_msg", SendWechatTemplateMsg)
 
 	// Start processing jobs
 	pool.Start()
@@ -42,6 +57,12 @@ func startWorkerPool() {
 // Context For gocraft/work
 type Context struct {
 	userID int64
+}
+
+// Log 开始执行任务的时候输出日志
+func Log(job *work.Job, next work.NextMiddlewareFunc) error {
+	log.Info().Msgf("Starting job: %s", job.Name)
+	return next()
 }
 
 // ExpireAftersales 任务指派后 after_sale的状态为scheduled， 如果师傅20分钟之内没有响应，自动变为overdue状态
@@ -162,4 +183,71 @@ func UpdateBalances(job *work.Job) error {
 	log.Debug().Msgf("now is %s", time.Now().Format("2006-01-02 15:04:05"))
 	log.Debug().Msg("update balances done ......")
 	return nil
+}
+
+// SendWechatTemplateMsg 发送微信模版消息（当任务指派给师傅或者订单解冻了，需要给师傅推送一条微信模板消息)
+func SendWechatTemplateMsg(job *work.Job) error {
+	c := job.ArgString("contents")
+	contents := []byte(c)
+	tkn := job.ArgString("token")
+	// https://mp.weixin.qq.com/advanced/tmplmsg?action=faq&token=1545649248&lang=zh_CN
+	// tkn := getToken()
+	url := "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + tkn
+	fmt.Println("URL:>", url)
+
+	// var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
+	// req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(contents))
+	fmt.Println("Request Body:> ", string(contents))
+
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	fmt.Println("response Status:", resp.Status)
+	fmt.Println("response Headers:", resp.Header)
+	// body, _ := ioutil.ReadAll(resp.Body)
+	// fmt.Println("response Body:", string(body))
+	var rsp TemplateMsgResp
+	if err := json.NewDecoder(resp.Body).Decode(&rsp); err != nil {
+		log.Printf("Error decoding body: %s", err)
+	}
+
+	fmt.Printf("%+v\n", rsp)
+
+	if rsp.ErrCode != 0 || rsp.ErrMsg != "ok" {
+		// return errors.New(fmt.Sprintf("发送模板消息失败, errcode: %d, errmsg: %s", rsp.ErrCode, rsp.ErrMsg))
+		return fmt.Errorf("发送模板消息失败, errcode: %d, errmsg: %s", rsp.ErrCode, rsp.ErrMsg)
+	}
+
+	return nil
+}
+
+// UnclutterOldNotifications 干掉太久的已读通知
+func UnclutterOldNotifications(job *work.Job) error {
+	// TODO: to implement
+	return nil
+}
+
+// AlertOverdueAftersales 超时告警
+func AlertOverdueAftersales(job *work.Job) error {
+	// TODO: chrome web push notifications
+	return nil
+}
+
+// AlertToAudit 待审核告警
+func AlertToAudit(job *work.Job) error {
+	// TODO: chrome web push notifications
+	return nil
+}
+
+// TemplateMsgResp 发送模板消息返回结果
+type TemplateMsgResp struct {
+	ErrCode int    `json:"errcode"`
+	ErrMsg  string `json:"errmsg"`
+	MsgID   int64  `json:"msgid"`
 }

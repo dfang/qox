@@ -26,8 +26,10 @@ import (
 	"github.com/dfang/qor-demo/app/api"
 	"github.com/dfang/qor-demo/app/home"
 	"github.com/dfang/qor-demo/app/orders"
+	"github.com/dfang/qor-demo/app/pages"
 	"github.com/dfang/qor-demo/app/products"
 	"github.com/dfang/qor-demo/app/static"
+	"github.com/dfang/qor-demo/app/stores"
 	"github.com/dfang/qor-demo/config"
 	"github.com/dfang/qor-demo/config/auth"
 	"github.com/dfang/qor-demo/config/db"
@@ -238,8 +240,8 @@ func setupMiddlewaresAndRoutes() {
 	Application.Use(home.NewWithDefault())
 	Application.Use(products.NewWithDefault())
 	Application.Use(orders.NewWithDefault())
-	// Application.Use(pages.NewWithDefault())
-	// Application.Use(stores.NewWithDefault())
+	Application.Use(pages.NewWithDefault())
+	Application.Use(stores.NewWithDefault())
 
 	// Application.Use(enterprise.New(&enterprise.Config{}))
 

@@ -68,6 +68,14 @@ var Config = struct {
 		Sandbox      bool   `env:"AmazonPaySandbox"`
 		CurrencyCode string `env:"AmazonPayCurrencyCode" default:"JPY"`
 	}
+
+	Cron struct {
+		ExpireAftersales        string `env:"EXPIRE_AFTERSALES"`
+		FreezeAuditedAftersales string `env:"FREEZE_AUDITED_AFTERSALES"`
+		UnfreezeAftersales      string `env:"UNFREEZE_AFTERSALES"`
+		UpdateBalances          string `env:"UPDATE_BALANCES"`
+	}
+
 	SMTP         SMTPConfig
 	Github       github.Config
 	Google       google.Config
@@ -100,6 +108,27 @@ func Initialize() {
 	if err := configor.Load(&Config, "config/database.yml", "config/smtp.yml", "config/application.yml"); err != nil {
 		panic(err)
 	}
+
+	log.Println(Config.Cron)
+
+	if Config.Cron.ExpireAftersales == "" {
+		// 0/30 * * * * *
+		Config.Cron.ExpireAftersales = "*/30 * * * * *"
+	}
+
+	if Config.Cron.FreezeAuditedAftersales == "" {
+		Config.Cron.FreezeAuditedAftersales = "*/30 * * * * *"
+	}
+
+	if Config.Cron.UnfreezeAftersales == "" {
+		Config.Cron.UnfreezeAftersales = "*/30 * * * * *"
+	}
+
+	if Config.Cron.UpdateBalances == "" {
+		Config.Cron.UpdateBalances = "*/30 * * * * *"
+	}
+
+	log.Println(Config.Cron)
 
 	location.GoogleAPIKey = Config.GoogleAPIKey
 	location.BaiduAPIKey = Config.BaiduAPIKey
