@@ -31,6 +31,9 @@ func startHealthCheck() {
 	health.AddReadinessCheck("worker", healthcheck.HTTPGetCheck("http://localhost:5040/worker_pools", 5*time.Second))
 	health.AddLivenessCheck("worker", healthcheck.HTTPGetCheck("http://localhost:5040/worker_pools", 5*time.Second))
 
+	//check web is live
+	health.AddLivenessCheck("web", healthcheck.HTTPGetCheck("http://localhost:7000/health", 5*time.Second))
+
 	// go http.ListenAndServe("0.0.0.0:8086", health)
 	http.ListenAndServe("0.0.0.0:8086", health)
 }
