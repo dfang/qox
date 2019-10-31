@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/dfang/qor-demo/config"
 	"github.com/dfang/qor-demo/config/db"
 	"github.com/heptiolabs/healthcheck"
 )
@@ -18,8 +20,16 @@ func startHealthCheck() {
 	// 	"upstream-dep-dns",
 	// 	healthcheck.DNSResolveCheck("upstream.example.com", 50*time.Millisecond))
 
-	// Our app is not ready if we can't connect to our database (`var db *sql.DB`) in <1s.
-	health.AddReadinessCheck("database", healthcheck.DatabasePingCheck(db.DB.DB(), 5*time.Second))
+	// check postgres
+	// Our app is not ready if we can't connect to our database (`var db *sql.DB`) in <5s.
+	health.AddReadinessCheck("postgres", healthcheck.DatabasePingCheck(db.DB.DB(), 5*time.Second))
+
+	// check redis
+	health.AddReadinessCheck("redis", healthcheck.TCPDialCheck(fmt.Sprintf("%s:%s", config.Config.Redis.Host, config.Config.Redis.Port), 5*time.Second))
+
+	// check worker
+	health.AddReadinessCheck("worker", healthcheck.HTTPGetCheck("http://localhost:5040/worker_pools", 5*time.Second))
+	health.AddLivenessCheck("worker", healthcheck.HTTPGetCheck("http://localhost:5040/worker_pools", 5*time.Second))
 
 	// go http.ListenAndServe("0.0.0.0:8086", health)
 	http.ListenAndServe("0.0.0.0:8086", health)
