@@ -1,6 +1,7 @@
 <div class="qor-layout__sidebar">
   <div class="sidebar-header">
-    {{t "qor_admin.layout.logo" "<a href=\"{{.Prefix}}\"><span class=\"visuallyhidden\">QOR</span></a><a href=\"/\" target=\"_blank\">View Site <i class=\"material-icons md-14\" aria-hidden=\"true\">open_in_new</i></a>" .Admin.GetRouter}}
+    <a href="/admin"><span class="visuallyhidden">QOR</span></a>
+    <a href="javascript:void(0)" style="width:auto;float:right"><i class="material-icons md-16"></i></a>
   </div>
   <div class="sidebar-userinfo">
     {{if .CurrentUser}}

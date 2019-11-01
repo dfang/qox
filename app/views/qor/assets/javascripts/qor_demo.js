@@ -222,7 +222,7 @@ $(document).ready(function () {
     showDrawer()
   });
 
-  $(document).on('click', '.sidebar-footer', function (e) {
+  $(document).on('click', '.sidebar-footer, .sidebar-header a:last', function (e) {
     hideDrawer()
   });
 
@@ -282,7 +282,7 @@ function showDrawer() {
 function hideDrawer() {
   console.log("hide drawer")
   $('.mdl-layout').addClass('hidden-drawer')
-  $('.mdl-layout__obfuscator.is-visible').hide()
+  $('.mdl-layout__obfuscator.is-visible').hide("slow")
 
   setCookie('drawer_state', '0', 365)
 }
