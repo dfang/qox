@@ -34,3 +34,15 @@ gulp realease_js
 gulp realease_css
 gulp 
 ``
+
+
+Clean
+
+```
+rm app/views/qor/assets/stylesheets/vendors.css
+rm app/views/qor/assets/stylesheets/qor_admin_default.css
+rm app/views/qor/assets/stylesheets/vendors.js
+rm app/views/qor/assets/stylesheets/qor_admin_default.js
+rm app/views/qor/assets/stylesheets/qor.js
+rm app/views/qor/assets/stylesheets/app.js
+```

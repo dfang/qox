@@ -9,6 +9,7 @@ let gulp = require("gulp"),
   sass = require("gulp-sass"),
   uglify = require("gulp-uglify"),
   autoprefixer = require("gulp-autoprefixer"),
+  del = require('del'),
   fs = require("fs"),
   path = require("path"),
   es = require("event-stream"),
@@ -19,20 +20,24 @@ let pathto = function (file) {
   return "app/views/qor/assets/" + file;
 };
 
+let vendorPathTo = function (file) {
+  return "vendor/github.com/qor/admin/views/assets/" + file;
+};
+
 let scripts = {
-  src: pathto("javascripts/app/*.js"),
+  src: vendorPathTo("javascripts/app/*.js"),
   dest: pathto("javascripts"),
-  qor: pathto("javascripts/qor/*.js"),
-  qorInit: pathto("javascripts/qor/qor-config.js"),
-  qorCommon: pathto("javascripts/qor/qor-common.js"),
+  qor: vendorPathTo("javascripts/qor/*.js"),
+  qorInit: vendorPathTo("javascripts/qor/qor-config.js"),
+  qorCommon: vendorPathTo("javascripts/qor/qor-common.js"),
   qorAdmin: [pathto("javascripts/qor.js"), pathto("javascripts/app.js")],
   all: ["gulpfile.js", pathto("javascripts/qor/*.js")],
 };
 
 let styles = {
-  src: pathto("stylesheets/scss/{app,qor}.scss"),
+  src: vendorPathTo("stylesheets/scss/{app,qor}.scss"),
   dest: pathto("stylesheets"),
-  vendors: pathto("stylesheets/vendors"),
+  vendors: vendorPathTo("stylesheets/vendors"),
   main: pathto("stylesheets/{qor,app}.css"),
   qorAdmin: [
     pathto("stylesheets/vendors.css"),
@@ -74,7 +79,8 @@ gulp.task(
 gulp.task("combineJavaScriptVendor", function () {
   return gulp
     .src([
-      "app/views/qor/assets/javascripts/vendors/jquery.min.js",
+      "vendor/github.com/qor/admin/views/assets/javascripts/vendors/jquery.min.js",
+      "vendor/github.com/qor/admin/views/assets/javascripts/vendors/*.js",
       "app/views/qor/assets/javascripts/vendors/*.js",
     ])
     .pipe(concat("vendors.js"))
@@ -110,7 +116,10 @@ gulp.task("combineDatetimePicker", function () {
 
 gulp.task("compressCSSVendor", function () {
   return gulp
-    .src("app/views/qor/assets/stylesheets/vendors/*.css")
+    .src([
+      "vendor/github.com/qor/admin/views/assets/stylesheets/vendors/*.css",
+      "app/views/qor/assets/stylesheets/vendors/*.css"
+    ])
     .pipe(concat("vendors.css"))
     .pipe(gulp.dest("app/views/qor/assets/stylesheets"));
 });
@@ -158,6 +167,11 @@ gulp.task("release_js", gulp.series("combineJavaScriptVendor", "qor+", "app+", f
     .src(scripts.qorAdmin)
     .pipe(concat("qor_admin_default.js"))
     .pipe(gulp.dest(scripts.dest));
+}, function () {
+  return del([
+    "app/views/qor/assets/javascripts/qor.js",
+    "app/views/qor/assets/javascripts/app.js",
+  ])
 }));
 
 // 生成qor.css 和 app.css
@@ -186,17 +200,27 @@ gulp.task("release_css", gulp.series("compressCSSVendor", "css", function () {
     .src(styles.qorAdmin)
     .pipe(concat("qor_admin_default.css"))
     .pipe(gulp.dest(styles.dest));
+}, function () {
+  return del([
+    "app/views/qor/assets/stylesheets/qor.css",
+    "app/views/qor/assets/stylesheets/app.css",
+  ])
 }));
 
 
 gulp.task("default", gulp.series(["release_js", "release_css"]))
 
-gulp.task("clean", function () {
-  // app/views/qor/assets/stylesheets/vendors.css
-  // app/views/qor/assets/stylesheets/qor_admin_default.css
-  // app/views/qor/assets/stylesheets/vendors.js
-  // app/views/qor/assets/stylesheets/qor_admin_default.js
-  // app/views/qor/assets/stylesheets/qor.js
-  // app/views/qor/assets/stylesheets/app.js
-})
-
+gulp.task('clean', function () {
+  return del([
+    "app/views/qor/assets/stylesheets/vendors.css",
+    "app/views/qor/assets/stylesheets/qor.css",
+    "app/views/qor/assets/stylesheets/app.css",
+    "app/views/qor/assets/stylesheets/qor_admin_default.css",
+    "app/views/qor/assets/javascripts/vendors.js",
+    "app/views/qor/assets/javascripts/qor_admin_default.js",
+    "app/views/qor/assets/javascripts/qor.js",
+    "app/views/qor/assets/javascripts/app.js",
+    // we don't want to clean this file though so we negate the pattern
+    // '!dist/mobile/deploy.json'
+  ]);
+});
