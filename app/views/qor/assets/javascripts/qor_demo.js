@@ -1,3 +1,9 @@
+// qor admin 是如何打包的，需要研究下这个
+// https://github.com/qor/qor/blob/master/gulpfile.js
+
+// 暂时需要引入https://github.com/ccampbell/mousetrap/blob/master/mousetrap.min.js
+// 本应该打包到vendors.js, 暂时直接放这里
+
 moment.locale('en', {
   dow: 1, // Monday is the first day of the week.
 })
@@ -200,8 +206,10 @@ $(document).ready(function () {
     // disable click to open url
     $(document).off("click.qor.openUrl", "[data-url]")
   }
+});
 
 
+$(document).ready(function () {
   // restore Drawer state from cookie
   var x = getCookie('drawer_state');
   if (x == "1") {
@@ -210,20 +218,74 @@ $(document).ready(function () {
     $('.mdl-layout').addClass('hidden-drawer')
   }
 
-  $(document).off('click', '.mdl-layout__drawer-button')
   $(document).on('click', '.mdl-layout__drawer-button', function (e) {
-    $('.mdl-layout').removeClass('hidden-drawer')
-    setCookie('drawer_state', '1', 365)
+    showDrawer()
   });
 
   $(document).on('click', '.sidebar-footer', function (e) {
-    console.log("hide drawer")
-    $('.mdl-layout').addClass('hidden-drawer')
-    $('.mdl-layout__obfuscator.is-visible').hide()
-
-    setCookie('drawer_state', '0', 365)
+    hideDrawer()
   });
-});
+
+  // go to dashboard
+  Mousetrap.bind('g d', function () {
+    window.location.href = "/admin"
+  });
+
+  // go to aftersales
+  Mousetrap.bind('g a', function () {
+    window.location.href = "/admin/aftersales"
+  });
+
+  Mousetrap.bind('g s', function () {
+    window.location.href = "/admin/settlements"
+  });
+
+  Mousetrap.bind('g b', function () {
+    window.location.href = "/admin/balances"
+  });
+
+  // New action
+  Mousetrap.bind('g n', function () {
+    $('.qor-button--new').click()
+  });
+
+  Mousetrap.bind('s', function () {
+    toggleDrawer()
+  });
+
+  Mousetrap.bind('d', function () {
+    toggleDrawer()
+  });
+
+  // notifictions
+  Mousetrap.bind('n', function () {
+    $('.qor-notifications__badges:last').click()
+  });
+
+
+})
+
+function toggleDrawer() {
+  var x = getCookie('drawer_state');
+  if (x == "1") {
+    hideDrawer()
+  } else {
+    showDrawer()
+  }
+}
+
+function showDrawer() {
+  $('.mdl-layout').removeClass('hidden-drawer')
+  setCookie('drawer_state', '1', 365)
+}
+
+function hideDrawer() {
+  console.log("hide drawer")
+  $('.mdl-layout').addClass('hidden-drawer')
+  $('.mdl-layout__obfuscator.is-visible').hide()
+
+  setCookie('drawer_state', '0', 365)
+}
 
 // setCookie('hide_drawer', '1', 365);
 function setCookie(name, value, days) {
