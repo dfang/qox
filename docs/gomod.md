@@ -56,7 +56,7 @@ go build之后，删掉 整个vendor 文件夹， 运行可执行文件 ./admin-
 ```
 go mod vendor
 
-modvendor -copy="**/*.tmpl **/*.css **/*.js **/*.woff **/*.woff2 **/*.ttf **/*.jpg **/*.png **/*.ico **/*.yml **/*.yaml" -v
+modvendor -copy="**/*.tmpl **/*.scss **/*.css **/*.js **/*.woff **/*.woff2 **/*.ttf **/*.jpg **/*.png **/*.ico **/*.yml **/*.yaml" -v
 
 ```
 
