@@ -245,7 +245,7 @@ $(document).ready(function () {
   });
 
   // New action
-  Mousetrap.bind('g n', function () {
+  Mousetrap.bind('n', function () {
     $('.qor-button--new').click()
   });
 
@@ -258,11 +258,14 @@ $(document).ready(function () {
   });
 
   // notifictions
-  Mousetrap.bind('n', function () {
+  Mousetrap.bind('g n', function () {
     $('.qor-notifications__badges:last').click()
   });
 
-
+  // help
+  Mousetrap.bind('g h', function () {
+    $('.qor-notifications__badges:first').click()
+  });
 })
 
 function toggleDrawer() {
