@@ -74,7 +74,7 @@ gulp.task(
 gulp.task("combineJavaScriptVendor", function () {
   return gulp
     .src([
-      "!../admin/views/assets/javascripts/vendors/jquery.min.js",
+      "app/views/qor/assets/javascripts/vendors/jquery.min.js",
       "app/views/qor/assets/javascripts/vendors/*.js",
     ])
     .pipe(concat("vendors.js"))
