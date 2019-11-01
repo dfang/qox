@@ -201,7 +201,48 @@ $(document).ready(function () {
     $(document).off("click.qor.openUrl", "[data-url]")
   }
 
+
+  // restore Drawer state from cookie
+  var x = getCookie('drawer_state');
+  if (x == "1") {
+    $('.mdl-layout').removeClass('hidden-drawer')
+  } else {
+    $('.mdl-layout').addClass('hidden-drawer')
+  }
+
+  $(document).off('click', '.mdl-layout__drawer-button')
+  $(document).on('click', '.mdl-layout__drawer-button', function (e) {
+    $('.mdl-layout').removeClass('hidden-drawer')
+    setCookie('drawer_state', '1', 365)
+  });
+
+  $(document).on('click', '.sidebar-footer', function (e) {
+    console.log("hide drawer")
+    $('.mdl-layout').addClass('hidden-drawer')
+    $('.mdl-layout__obfuscator.is-visible').hide()
+
+    setCookie('drawer_state', '0', 365)
+  });
 });
 
+// setCookie('hide_drawer', '1', 365);
+function setCookie(name, value, days) {
+  var expires = "";
+  if (days) {
+    var date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}
 
-
+function getCookie(name) {
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(';');
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+  }
+  return null;
+}
