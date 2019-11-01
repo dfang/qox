@@ -17,6 +17,10 @@ var (
 	ItemState = transition.New(&OrderItem{})
 )
 
+var (
+	DraftState = "draft"
+)
+
 func init() {
 	// Define Order's States
 	OrderState.Initial("draft")
