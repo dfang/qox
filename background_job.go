@@ -89,7 +89,6 @@ func ExpireAftersales(job *work.Job) error {
 // FreezeAftersales 已审核的服务单冻结7天才能结算
 func FreezeAftersales(job *work.Job) error {
 	log.Debug().Msgf("now is %s", time.Now().Format("2006-01-02 15:04:05"))
-	// time.Sleep(70 * time.Second)
 	log.Debug().Msg("freeze aftersales ......")
 
 	var items []aftersales.Aftersale
@@ -108,11 +107,10 @@ func FreezeAftersales(job *work.Job) error {
 // UnfreezeAftersales 解冻超过7天的，自动结算，金额算到师傅名下
 func UnfreezeAftersales(job *work.Job) error {
 	log.Debug().Msgf("now is %s", time.Now().Format("2006-01-02 15:04:05"))
-	// time.Sleep(55 * time.Second)
 	log.Debug().Msg("unfreeze aftersales ......")
 
 	var items []aftersales.Aftersale
-	db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "frozen").Find(&items)
+	db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "frozen").Where("updated_at <= NOW() - INTERVAL '7 days'").Find(&items)
 	for _, item := range items {
 		aftersales.OrderStateMachine.Trigger("unfreeze", &item, db.DB, "unfreeze aftersale with id: "+fmt.Sprintf("%d", item.ID))
 		db.DB.Save(&item)
