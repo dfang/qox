@@ -54,6 +54,8 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	db.DB.Select("name, id").Where("role = ?", "workman").Find(&workmen)
 
 	aftersale := Admin.AddResource(&aftersales.Aftersale{}, &admin.Config{Menu: []string{"Aftersale Management"}, Priority: 1})
+	aftersale.Meta(&admin.Meta{Name: "User", Type: "aftersale_user_field"})
+
 	manufacturer := Admin.AddResource(&aftersales.Manufacturer{}, &admin.Config{Menu: []string{"Aftersale Management"}, Priority: 4})
 	Admin.AddResource(&settings.Brand{}, &admin.Config{Name: "Brand", Menu: []string{"Aftersale Management"}, Priority: 3})
 	Admin.AddResource(&settings.ServiceType{}, &admin.Config{Name: "ServiceType", Menu: []string{"Aftersale Management"}, Priority: 2})
@@ -66,9 +68,22 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	settlement.Meta(&admin.Meta{
 		Name:       "Direction",
 		Type:       "select_one",
-		Collection: []string{"收入", "提现"},
+		Collection: []string{"收入", "提现", "罚款", "奖励"},
 	})
-
+	settlement.Meta(&admin.Meta{
+		Name: "User",
+		Type: "select_one",
+		Collection: func(_ interface{}, context *admin.Context) (options [][]string) {
+			var users []users.User
+			context.GetDB().Where("role = ?", "workman").Find(&users)
+			for _, n := range users {
+				idStr := fmt.Sprintf("%d", n.ID)
+				var option = []string{idStr, n.Name}
+				options = append(options, option)
+			}
+			return options
+		},
+	})
 	settlement.Meta(&admin.Meta{Name: "State", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
 		m := record.(*aftersales.Settlement)
 		switch m.State {
@@ -83,13 +98,14 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 			return m.State
 		}
 	}})
-	settlement.Meta(&admin.Meta{Name: "Amount", Type: "float32", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
-		m := record.(*aftersales.Settlement)
-		if m.Amount < 0 {
-			return (-m.Amount)
-		}
-		return m.Amount
-	}})
+	// settlement.Meta(&admin.Meta{Name: "Amount", Type: "float32", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+	// 	m := record.(*aftersales.Settlement)
+	// 	if m.Amount < 0 {
+	// 		return (-m.Amount)
+	// 	}
+	// 	return m.Amount
+	// }})
+
 	balance := Admin.AddResource(&aftersales.Balance{}, &admin.Config{Menu: []string{"Settlement Management"}, Priority: 1})
 	balance.IndexAttrs("-ID", "-CreatedAt", "-CreatedBy", "-UpdatedBy", "User", "FrozenAmount", "FreeAmount", "TotalAmount", "WithdrawAmount", "UpdatedAt")
 	balance.Meta(&admin.Meta{Name: "WithdrawAmount", Type: "float32", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
@@ -99,6 +115,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		}
 		return m.WithdrawAmount
 	}})
+	balance.Meta(&admin.Meta{Name: "User", Type: "balance_user_field", Label: "师傅"})
 
 	aftersale.Meta(&admin.Meta{
 		Name: "ServiceType",
@@ -136,7 +153,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 		Config: &admin.SelectOneConfig{
 			Collection: func(_ interface{}, context *admin.Context) (options [][]string) {
 				var users []users.User
-				context.GetDB().Where("role = ?", "setup_man").Find(&users)
+				context.GetDB().Where("role = ?", "workman").Find(&users)
 				for _, n := range users {
 					idStr := fmt.Sprintf("%d", n.ID)
 					var option = []string{idStr, n.Name}

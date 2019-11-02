@@ -14,8 +14,8 @@ type Settlement struct {
 	UserID uint
 	User   users.User
 
-	Amount    float32
 	Direction string
+	Amount    float32
 
 	AftersaleID uint
 	Aftersale   Aftersale
@@ -45,6 +45,11 @@ func (item *Settlement) BeforeSave(scope *gorm.Scope) error {
 		}
 	}
 
+	if item.Direction == "罚款" {
+		if item.Amount > 0 {
+			item.Amount = -item.Amount
+		}
+	}
 	// 检查是否可提现
 	if item.Direction == "提现" {
 		// Amount <= Balance.FreeAmount

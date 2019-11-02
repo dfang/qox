@@ -181,22 +181,25 @@ $(document).ready(function () {
   // });
 
 
-
-
-  if ($('.qor-settlements, .qor-balances').length > 0) {
-    console.log("fuck")
-
+  if ($('.qor-balances').length > 0) {
     // hide big new button
     $('.qor-button--new').hide()
 
     // disable click to open url in tables
-    // $(document).off("click.qor.openUrl", ".qor-table-container tr[data-url]")
-
     $(document).off("click.qor.openUrl", "[data-url]")
-    // $(document).off("click.qor.openUrl", "[data-url]")
 
     // hide qor-actions dropdown
     $('.qor-table__actions').hide()
+
+    // hide search button
+    $('.qor-search__label').hide()
+  }
+
+
+  if ($('.qor-settlements').length > 0) {
+    // $(document).off("click.qor.openUrl", ".qor-table-container tr[data-url]")
+
+    // $(document).off("click.qor.openUrl", "[data-url]")
 
     // hide search button
     $('.qor-search__label').hide()
