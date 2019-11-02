@@ -11,7 +11,7 @@ RUN go mod download
 COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags 'bindatafs' -a -o /go/bin/qor-demo
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o /go/bin/seeds config/db/seeds/main/main.go
+# RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o /go/bin/seeds config/db/seeds/main/main.go
 
 # -----------------------------------------------------------------------------
 # step 2: exec
@@ -24,7 +24,7 @@ RUN apk update && apk add --no-cache openssl ca-certificates curl netcat-openbsd
 
 RUN mkdir /qor
 WORKDIR /qor
-COPY --from=build-step /go/bin/qor-demo /go/bin/seeds ./
+# COPY --from=build-step /go/bin/qor-demo /go/bin/seeds ./
 # COPY --from=build-step /go/pkg/mod /go/pkg/mod
 EXPOSE 7000
 COPY app ./app
