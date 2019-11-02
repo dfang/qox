@@ -64,23 +64,43 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	activity.Register(aftersale)
 
 	settlement := Admin.AddResource(&aftersales.Settlement{}, &admin.Config{Menu: []string{"Settlement Management"}, Priority: 2})
-	settlement.IndexAttrs("-CreatedBy", "-UpdatedBy", "ID", "User", "Amount", "Direction", "Aftersale", "State", "CreatedAt")
+	settlement.IndexAttrs("-CreatedBy", "-UpdatedBy", "ID", "Workman", "Amount", "Direction", "Aftersale", "State", "CreatedAt")
 	settlement.Meta(&admin.Meta{
 		Name:       "Direction",
 		Type:       "select_one",
 		Collection: []string{"收入", "提现", "罚款", "奖励"},
 	})
+	// 虚拟field， 仅为在列表页正确显示师傅姓名和链接，又不影响form里的下拉框
+	settlement.Meta(&admin.Meta{
+		Name: "Workman",
+		Type: "settlement_user_field",
+		Valuer: func(record interface{}, context *qor.Context) interface{} {
+			if p, ok := record.(*aftersales.Settlement); ok {
+				// fmt.Println("ok")
+				var user users.User
+				context.GetDB().Model(users.User{}).Where("id = ?", p.UserID).Find(&user)
+				// fmt.Println(p)
+				// fmt.Println(p.User)
+				return user
+			}
+
+			return record
+		},
+	})
+
 	settlement.Meta(&admin.Meta{
 		Name: "User",
 		Type: "select_one",
 		Collection: func(_ interface{}, context *admin.Context) (options [][]string) {
 			var users []users.User
 			context.GetDB().Where("role = ?", "workman").Find(&users)
+
 			for _, n := range users {
 				idStr := fmt.Sprintf("%d", n.ID)
 				var option = []string{idStr, n.Name}
 				options = append(options, option)
 			}
+
 			return options
 		},
 	})
