@@ -1,8 +1,9 @@
 package config
 
 import (
-	"log"
+	"fmt"
 	"os"
+	"time"
 
 	_ "github.com/joho/godotenv/autoload"
 
@@ -24,6 +25,9 @@ import (
 	"github.com/qor/redirect_back"
 	"github.com/qor/session/manager"
 	"github.com/unrolled/render"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 type SMTPConfig struct {
@@ -100,44 +104,58 @@ var (
 		SessionManager:  manager.SessionManager,
 		IgnoredPrefixes: []string{"/auth"},
 	})
+
+	StartUpStartTime *time.Time
 )
 
 // Initialize changed init to Initialize
 func Initialize() {
+	start := time.Now()
+	StartUpStartTime = &start
+	fmt.Println("STARTUP begins at", start.Format("2006-01-02 15:04:05"))
+
+	if os.Getenv("DEBUG") != "true" {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	}
 
 	// // Auto Reload
-	// if err := configor.New(&configor.Config{AutoReload: true, AutoReloadInterval: time.Minute, AutoReloadCallback: func(config interface{}) {
-	// 	fmt.Printf("%v changed", config)
-	// }}).Load(&Config, "config/database.yml", "config/smtp.yml", "config/application.yml"); err != nil {
-	if err := configor.Load(&Config, "config/database.yml", "config/smtp.yml", "config/application.yml"); err != nil {
+	if err := configor.New(&configor.Config{AutoReload: true, AutoReloadInterval: time.Minute, AutoReloadCallback: func(config interface{}) {
+		fmt.Printf("%v changed", config)
+	}}).Load(&Config, "config/database.yml", "config/smtp.yml", "config/application.yml"); err != nil {
+		// if err := configor.Load(&Config, "config/database.yml", "config/smtp.yml", "config/application.yml"); err != nil {
 		panic(err)
 	}
 
-	log.Println(Config.Cron)
-
 	if Config.Cron.ExpireAftersales == "" {
-		// 0/30 * * * * *
-		Config.Cron.ExpireAftersales = "*/30 * * * * *"
+		// every 60 seconds
+		Config.Cron.ExpireAftersales = "*/60 * * * * *"
 	}
 
 	if Config.Cron.FreezeAuditedAftersales == "" {
-		Config.Cron.FreezeAuditedAftersales = "*/30 * * * * *"
+		// every 2 minutes
+		Config.Cron.FreezeAuditedAftersales = "0 */2 * * * *"
 	}
 
 	if Config.Cron.UnfreezeAftersales == "" {
-		Config.Cron.UnfreezeAftersales = "*/30 * * * * *"
+		// every 5 minutes
+		Config.Cron.UnfreezeAftersales = "0 */5 * * * *"
 	}
 
 	if Config.Cron.UpdateBalances == "" {
-		Config.Cron.UpdateBalances = "*/30 * * * * *"
+		// every 5 minutes
+		Config.Cron.UpdateBalances = "0 */5 * * * *"
 	}
 
-	log.Println(Config.Cron)
+	log.Debug().Msg("Cron settings: ")
+	log.Debug().Msgf("ExpireAftersales: %s", Config.Cron.ExpireAftersales)
+	log.Debug().Msgf("FreezeAuditedAftersales: %s", Config.Cron.FreezeAuditedAftersales)
+	log.Debug().Msgf("UnfreezeAftersales: %s", Config.Cron.UnfreezeAftersales)
+	log.Debug().Msgf("UpdateBalances: %s", Config.Cron.UpdateBalances)
 
 	location.GoogleAPIKey = Config.GoogleAPIKey
 	location.BaiduAPIKey = Config.BaiduAPIKey
 
-	log.Println(Config.Qiniu)
+	// log.Println(Config.Qiniu)
 
 	// if Config.S3.AccessKeyID == "" {
 	// 	log.Println("Please set env QOR_AWS_ACCESS_KEY_ID")

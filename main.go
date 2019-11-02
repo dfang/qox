@@ -45,6 +45,7 @@ import (
 
 	// https://github.com/qor/qor-example/issues/129
 	"github.com/dfang/qor-demo/config/db/migrations"
+	"github.com/dfang/qor-demo/config/db/seeds"
 )
 
 const version = "0.0.1" // must follow semver spec, https://github.com/motemen/gobump
@@ -61,24 +62,22 @@ func main() {
 	isDebug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
 	debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
 	runMigration := cmdLine.Bool("migrate", false, "Run migration")
+	runSeeds := cmdLine.Bool("seeds", false, "Run seeds, never run this on production")
 	ui := cmdLine.Bool("ui", false, "Serves gocraft/work ui")
 	// runSeed := cmdLine.Bool("seed", false, "Run seed")
 	cmdLine.Parse(os.Args[1:])
 
-	start := time.Now()
-	fmt.Println("\nSTART is ", start.Format("2006-01-02 15:04:05"))
-
-	fmt.Println("check required enviroments variables ......")
-	checkRequiredEnvs()
+	fmt.Println("check availables enviroments variables ......")
+	checkAvailableEnvs()
 
 	fmt.Println("initialze configurations ......")
 	initialzeConfigs()
 
-	fmt.Println("setup log level ......")
+	fmt.Println("set log level ......")
 	setupLogLevel(*debug)
 
 	if *runMigration {
-		fmt.Println("just run migrations ......")
+		fmt.Println("just run migrations and exit ......")
 		migrations.Migrate()
 		os.Exit(0)
 	}
@@ -86,11 +85,21 @@ func main() {
 	fmt.Println("start auto migrations ......")
 	migrations.Migrate()
 
+	if *runSeeds && os.Getenv("QOR_ENV") != "production" {
+		fmt.Println("just run seeds and exit ......")
+		fmt.Println("start truncate tables ......")
+		seeds.TruncateTables()
+		fmt.Println("start seeding samples data for testing ......")
+		seeds.Run()
+		fmt.Println("seeding done, exit ......")
+		os.Exit(0)
+	}
+
 	fmt.Println("setup middlewares and routes ......")
 	setupMiddlewaresAndRoutes()
 
 	if *compileTemplate {
-		fmt.Println("just compile templates ......")
+		fmt.Println("just compile templates and exit ......")
 		bindatafs.AssetFS.Compile()
 		os.Exit(0)
 	}
@@ -114,7 +123,7 @@ func main() {
 	}
 
 	fmt.Println("NOW is ", time.Now().Format("2006-01-02 15:04:05"))
-	elapsed := time.Since(start)
+	elapsed := time.Since(*config.StartUpStartTime)
 	fmt.Printf("Startup took %s\n", elapsed)
 
 	fmt.Printf("Listening on: %v\n\n", config.Config.Port)
@@ -141,10 +150,21 @@ func main() {
 	}
 }
 
-func checkRequiredEnvs() {
+func checkAvailableEnvs() {
 	envs := []string{
-		"GO_ENV", "DEBUG", "HTTPS", "DOMAIN", "PORT",
+		"QOR_ENV",
+		"DEBUG",
+		"HTTPS",
+		"DOMAIN",
+		"PORT",
+		"DBAdapter",
+		"DBName",
+		"DBPort",
+		"DBHost",
+		"DBUser",
+		"DBPassword",
 	}
+
 	for _, e := range envs {
 		if os.Getenv(e) != "" {
 			fmt.Printf("\tfound env var %s=%s\n", e, os.Getenv(e))
@@ -162,8 +182,8 @@ func setupLogLevel(debug bool) {
 }
 
 func initialzeConfigs() {
-	config.Initialize()
-	db.Initialize()
+	// config.Initialize()
+	// db.Initialize()
 	i18n.Initialize()
 	auth.Initialize()
 }

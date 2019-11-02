@@ -1,10 +1,9 @@
 package migrations
 
 import (
-	"fmt"
-
 	"github.com/dfang/qor-demo/app/admin"
 	"github.com/dfang/qor-demo/config/db"
+	"github.com/dfang/qor-demo/config/db/seeds"
 	"github.com/dfang/qor-demo/models/aftersales"
 	"github.com/dfang/qor-demo/models/blogs"
 	"github.com/dfang/qor-demo/models/orders"
@@ -25,8 +24,6 @@ import (
 
 // Migrate Run Migration
 func Migrate() {
-	fmt.Println("running migration .......")
-
 	AutoMigrate(&aftersales.Aftersale{})
 	AutoMigrate(&aftersales.Manufacturer{})
 	AutoMigrate(&aftersales.Settlement{})
@@ -36,13 +33,10 @@ func Migrate() {
 	AutoMigrate(&products.Color{}, &products.Size{}, &products.Material{}, &products.Category{}, &products.Collection{})
 
 	AutoMigrate(&users.User{}, &users.Address{})
-
+	AutoMigrate(&auth_identity.AuthIdentity{})
 	AutoMigrate(&users.WechatProfile{})
 
-	AutoMigrate(&auth_identity.AuthIdentity{})
-
 	AutoMigrate(&orders.Order{}, &orders.OrderItem{}, &orders.OrderFollowUp{})
-
 	AutoMigrate(&orders.DeliveryMethod{})
 
 	AutoMigrate(&stores.Store{})
@@ -60,6 +54,8 @@ func Migrate() {
 
 	AutoMigrate(&blogs.Page{}, &blogs.Article{})
 	AutoMigrate(&help.QorHelpEntry{})
+
+	seeds.CreateRootUser()
 }
 
 // AutoMigrate run auto migration

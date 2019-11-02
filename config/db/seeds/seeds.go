@@ -1,23 +1,21 @@
-package main
+package seeds
 
 import (
-	"math/rand"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/azumads/faker"
-	"github.com/jinzhu/configor"
-	"github.com/qor/publish2"
 
 	"github.com/dfang/qor-demo/config/db"
 )
 
 var Fake *faker.Faker
+
 var (
 	Root, _ = os.Getwd()
-	DraftDB = db.DB.Set(publish2.VisibleMode, publish2.ModeOff).Set(publish2.ScheduleMode, publish2.ModeOff)
+	DraftDB = db.DB
 )
+
 var Seeds = struct {
 	Categories []struct {
 		Name string
@@ -144,7 +142,6 @@ var Seeds = struct {
 		Kind  string
 		Value string
 	}
-
 	Users []struct {
 		Name   string `form:"name"`
 		Gender string
@@ -169,14 +166,16 @@ var Seeds = struct {
 }{}
 
 func init() {
-	Fake, _ = faker.New("en")
-	Fake.Rand = rand.New(rand.NewSource(42))
-	rand.Seed(time.Now().UnixNano())
+	// db.DB.Set(publish2.VisibleMode, publish2.ModeOff).Set(publish2.ScheduleMode, publish2.ModeOff)
 
-	filepaths, _ := filepath.Glob(filepath.Join("config", "db", "seeds", "data", "*.yml"))
-	if err := configor.Load(&Seeds, filepaths...); err != nil {
-		panic(err)
-	}
+	// Fake, _ = faker.New("en")
+	// Fake.Rand = rand.New(rand.NewSource(42))
+	// rand.Seed(time.Now().UnixNano())
+
+	// filepaths, _ := filepath.Glob(filepath.Join("config", "db", "seeds", "data", "*.yml"))
+	// if err := configor.Load(&Seeds, filepaths...); err != nil {
+	// 	panic(err)
+	// }
 }
 
 // TruncateTables Truncate tables

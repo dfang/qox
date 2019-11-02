@@ -60,8 +60,12 @@ func Initialize() {
 		panic(errors.New("not supported database adapter"))
 	}
 
+	if err := DB.DB().Ping(); err != nil {
+		log.Panic().Msgf("database/sql db.ping() failed with err: %s", err.Error())
+	}
+
 	if err == nil {
-		if os.Getenv("DEBUG") != "false" {
+		if os.Getenv("DEBUG") != "false" && os.Getenv("DEBUG_GORM_LOG_SQL") == "true" {
 			DB.LogMode(true)
 		}
 
@@ -78,4 +82,9 @@ func Initialize() {
 	} else {
 		panic(err)
 	}
+}
+
+func init() {
+	config.Initialize()
+	Initialize()
 }

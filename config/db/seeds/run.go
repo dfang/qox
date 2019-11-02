@@ -1,6 +1,4 @@
-// +build ignore
-
-package main
+package seeds
 
 import (
 	"encoding/json"
@@ -23,12 +21,11 @@ import (
 	"github.com/qor/auth/auth_identity"
 	"github.com/qor/auth/providers/password"
 
-	// _ "github.com/dfang/qor-demo/config/db/migrations"
 	"github.com/dfang/qor-demo/models/aftersales"
 	"github.com/dfang/qor-demo/models/blogs"
 	"github.com/dfang/qor-demo/models/orders"
 	"github.com/dfang/qor-demo/models/products"
-	"github.com/dfang/qor-demo/models/seo"
+	adminseo "github.com/dfang/qor-demo/models/seo"
 	"github.com/dfang/qor-demo/models/settings"
 	"github.com/dfang/qor-demo/models/stores"
 	"github.com/dfang/qor-demo/models/users"
@@ -46,16 +43,12 @@ import (
 	"github.com/qor/notification/channels/database"
 	"github.com/qor/publish2"
 	"github.com/qor/qor"
+	"github.com/qor/seo"
 	"github.com/qor/slug"
 	"github.com/qor/sorting"
 	"github.com/qor/transition"
-
 	"syreclabs.com/go/faker"
 )
-
-/* How to run this script
-$ go run config/db/seeds/main.go config/db/seeds/seeds.go
-*/
 
 /* How to upload file
  * $ brew install s3cmd
@@ -90,8 +83,7 @@ var (
 		&settings.Setting{},
 		&settings.MediaLibrary{},
 		&admin.QorWidgetSetting{},
-		// &adminseo.MySEOSetting{},
-		&seo.MySEOSetting{},
+		&adminseo.MySEOSetting{},
 
 		&asset_manager.AssetManager{},
 		&banner_editor.QorBannerEditorSetting{},
@@ -112,20 +104,25 @@ var (
 	}
 )
 
-func main() {
+func Run() {
 	Notification.RegisterChannel(database.New(&database.Config{}))
 
 	// fmt.Println("Truncate tables .....")
 	// TruncateTables(Tables...)
 
-	// createRecords()
-	createAdminUsers()
+	// fmt.Println("Run migrations .....")
+	// migrations.Migrate()
 
-	createAftersales()
-	fmt.Println("--> Created admin users.")
+	fmt.Println("Create root user .....")
+	CreateRootUser()
+
+	fmt.Println("Create aftersales .....")
+	CreateAftersales()
+
+	// createRecords()
 }
 
-func createAftersales() {
+func CreateAftersales() {
 	service_types := []string{
 		"安装",
 		"维修",
@@ -152,6 +149,7 @@ func createAftersales() {
 			ServiceType:    service_types[rand.Intn(3)],
 			ServiceContent: faker.Lorem().String(),
 			Source:         sources[rand.Intn(7)],
+			Fee:            1,
 		}
 
 		afs = append(afs, a)
@@ -219,7 +217,7 @@ func createRecords() {
 	// createSeo()
 	// fmt.Println("--> Created seo.")
 
-	createAdminUsers()
+	CreateRootUser()
 	fmt.Println("--> Created admin users.")
 
 	importUsers()
@@ -265,6 +263,29 @@ func createRecords() {
 	fmt.Println("--> Done!")
 }
 
+// CreateRootUser the system should have at least one root user
+func CreateRootUser() {
+	AdminUser = &users.User{}
+	AdminUser.Email = "admin@example.com"
+	AdminUser.Confirmed = true
+	AdminUser.Name = "QOR Admin"
+	AdminUser.Role = "Admin"
+	DraftDB.FirstOrCreate(AdminUser)
+
+	provider := auth.Auth.GetProvider("password").(*password.Provider)
+	hashedPassword, _ := provider.Encryptor.Digest("admin")
+	now := time.Now()
+
+	authIdentity := &auth_identity.AuthIdentity{}
+	authIdentity.Provider = "password"
+	authIdentity.UID = AdminUser.Email
+	authIdentity.EncryptedPassword = hashedPassword
+	authIdentity.UserID = fmt.Sprint(AdminUser.ID)
+	authIdentity.ConfirmedAt = &now
+
+	DraftDB.FirstOrCreate(authIdentity)
+}
+
 func createSetting() {
 	setting := settings.Setting{}
 
@@ -285,75 +306,44 @@ func createSetting() {
 	}
 }
 
-// func createSeo() {
-// 	globalSeoSetting := adminseo.MySEOSetting{}
-// 	globalSetting := make(map[string]string)
-// 	globalSetting["SiteName"] = "Qor Demo"
-// 	seo.Setting{GlobalSetting: globalSetting}
-// 	globalSeoSetting.Name = "QorSeoGlobalSettings"
-// 	globalSeoSetting.LanguageCode = "en-US"
-// 	globalSeoSetting.QorSEOSetting.SetIsGlobalSEO(true)
+func createSeo() {
+	globalSeoSetting := adminseo.MySEOSetting{}
+	globalSetting := make(map[string]string)
+	globalSetting["SiteName"] = "Qor Demo"
+	globalSeoSetting.Setting = seo.Setting{GlobalSetting: globalSetting}
+	globalSeoSetting.Name = "QorSeoGlobalSettings"
+	globalSeoSetting.LanguageCode = "en-US"
+	globalSeoSetting.QorSEOSetting.SetIsGlobalSEO(true)
 
-// 	if err := db.DB.Create(&globalSeoSetting).Error; err != nil {
-// 		log.Fatalf("create seo (%v) failure, got err %v", globalSeoSetting, err)
-// 	}
+	if err := db.DB.Create(&globalSeoSetting).Error; err != nil {
+		log.Fatalf("create seo (%v) failure, got err %v", globalSeoSetting, err)
+	}
 
-// 	defaultSeo := adminseo.MySEOSetting{}
-// 	defaultSeo.Setting = seo.Setting{Title: "{{SiteName}}", Description: "{{SiteName}} - Default Description", Keywords: "{{SiteName}} - Default Keywords", Type: "Default Page"}
-// 	defaultSeo.Name = "Default Page"
-// 	defaultSeo.LanguageCode = "en-US"
-// 	if err := db.DB.Create(&defaultSeo).Error; err != nil {
-// 		log.Fatalf("create seo (%v) failure, got err %v", defaultSeo, err)
-// 	}
+	defaultSeo := adminseo.MySEOSetting{}
+	defaultSeo.Setting = seo.Setting{Title: "{{SiteName}}", Description: "{{SiteName}} - Default Description", Keywords: "{{SiteName}} - Default Keywords", Type: "Default Page"}
+	defaultSeo.Name = "Default Page"
+	defaultSeo.LanguageCode = "en-US"
+	if err := db.DB.Create(&defaultSeo).Error; err != nil {
+		log.Fatalf("create seo (%v) failure, got err %v", defaultSeo, err)
+	}
 
-// 	productSeo := adminseo.MySEOSetting{}
-// 	productSeo.Setting = seo.Setting{Title: "{{SiteName}}", Description: "{{SiteName}} - {{Name}} - {{Code}}", Keywords: "{{SiteName}},{{Name}},{{Code}}", Type: "Product Page"}
-// 	productSeo.Name = "Product Page"
-// 	productSeo.LanguageCode = "en-US"
-// 	if err := db.DB.Create(&productSeo).Error; err != nil {
-// 		log.Fatalf("create seo (%v) failure, got err %v", productSeo, err)
-// 	}
+	productSeo := adminseo.MySEOSetting{}
+	productSeo.Setting = seo.Setting{Title: "{{SiteName}}", Description: "{{SiteName}} - {{Name}} - {{Code}}", Keywords: "{{SiteName}},{{Name}},{{Code}}", Type: "Product Page"}
+	productSeo.Name = "Product Page"
+	productSeo.LanguageCode = "en-US"
+	if err := db.DB.Create(&productSeo).Error; err != nil {
+		log.Fatalf("create seo (%v) failure, got err %v", productSeo, err)
+	}
 
-// 	// seoSetting := models.SEOSetting{}
-// 	// seoSetting.SiteName = Seeds.Seo.SiteName
-// 	// seoSetting.DefaultPage = seo.Setting{Title: Seeds.Seo.DefaultPage.Title, Description: Seeds.Seo.DefaultPage.Description, Keywords: Seeds.Seo.DefaultPage.Keywords}
-// 	// seoSetting.HomePage = seo.Setting{Title: Seeds.Seo.HomePage.Title, Description: Seeds.Seo.HomePage.Description, Keywords: Seeds.Seo.HomePage.Keywords}
-// 	// seoSetting.ProductPage = seo.Setting{Title: Seeds.Seo.ProductPage.Title, Description: Seeds.Seo.ProductPage.Description, Keywords: Seeds.Seo.ProductPage.Keywords}
+	// seoSetting := models.SEOSetting{}
+	// seoSetting.SiteName = Seeds.Seo.SiteName
+	// seoSetting.DefaultPage = seo.Setting{Title: Seeds.Seo.DefaultPage.Title, Description: Seeds.Seo.DefaultPage.Description, Keywords: Seeds.Seo.DefaultPage.Keywords}
+	// seoSetting.HomePage = seo.Setting{Title: Seeds.Seo.HomePage.Title, Description: Seeds.Seo.HomePage.Description, Keywords: Seeds.Seo.HomePage.Keywords}
+	// seoSetting.ProductPage = seo.Setting{Title: Seeds.Seo.ProductPage.Title, Description: Seeds.Seo.ProductPage.Description, Keywords: Seeds.Seo.ProductPage.Keywords}
 
-// 	// if err := DraftDB.Create(&seoSetting).Error; err != nil {
-// 	// 	log.Fatalf("create seo (%v) failure, got err %v", seoSetting, err)
-// 	// }
-// }
-
-func createAdminUsers() {
-	AdminUser = &users.User{}
-	AdminUser.Email = "admin@example.com"
-	AdminUser.Confirmed = true
-	AdminUser.Name = "QOR Admin"
-	AdminUser.Role = "Admin"
-	DraftDB.FirstOrCreate(AdminUser)
-
-	provider := auth.Auth.GetProvider("password").(*password.Provider)
-	hashedPassword, _ := provider.Encryptor.Digest("testing")
-	now := time.Now()
-
-	authIdentity := &auth_identity.AuthIdentity{}
-	authIdentity.Provider = "password"
-	authIdentity.UID = AdminUser.Email
-	authIdentity.EncryptedPassword = hashedPassword
-	authIdentity.UserID = fmt.Sprint(AdminUser.ID)
-	authIdentity.ConfirmedAt = &now
-
-	DraftDB.Create(authIdentity)
-
-	// Send welcome notification
-	Notification.Send(&notification.Message{
-		From:        AdminUser,
-		To:          AdminUser,
-		Title:       "Welcome To QOR Admin",
-		Body:        "Welcome To QOR Admin",
-		MessageType: "info",
-	}, &qor.Context{DB: DraftDB})
+	// if err := DraftDB.Create(&seoSetting).Error; err != nil {
+	// 	log.Fatalf("create seo (%v) failure, got err %v", seoSetting, err)
+	// }
 }
 
 func createUsers() {
