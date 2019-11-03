@@ -139,6 +139,10 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	}})
 	balance.Meta(&admin.Meta{Name: "User", Type: "balance_user_field", Label: "师傅"})
 
+	manufacturer.Meta(&admin.Meta{Name: "URL", Type: "manufacturer_url_field", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		m := record.(*aftersales.Manufacturer)
+		return m
+	}})
 	manufacturer.Action(&admin.Action{
 		Name: "打开厂家后台网站",
 		URL: func(record interface{}, context *admin.Context) string {
