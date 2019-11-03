@@ -28,6 +28,7 @@ func Migrate() {
 	AutoMigrate(&aftersales.Manufacturer{})
 	AutoMigrate(&aftersales.Settlement{})
 	AutoMigrate(&aftersales.Balance{})
+	AutoMigrate(&settings.Brand{}, &settings.ServiceType{}, &settings.Source{})
 
 	AutoMigrate(&products.Product{}, &products.ProductVariation{}, &products.ProductImage{}, &products.ColorVariation{}, &products.ColorVariationImage{}, &products.SizeVariation{})
 	AutoMigrate(&products.Color{}, &products.Size{}, &products.Material{}, &products.Category{}, &products.Collection{})
@@ -46,7 +47,7 @@ func Migrate() {
 	AutoMigrate(&transition.StateChangeLog{})
 	AutoMigrate(&activity.QorActivity{})
 
-	AutoMigrate(&settings.Setting{}, &settings.MediaLibrary{}, &settings.Brand{}, &settings.ServiceType{})
+	AutoMigrate(&settings.Setting{}, &settings.MediaLibrary{})
 	AutoMigrate(&asset_manager.AssetManager{})
 	AutoMigrate(&admin.QorWidgetSetting{})
 	AutoMigrate(&banner_editor.QorBannerEditorSetting{})

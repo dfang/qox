@@ -39,17 +39,20 @@ zh-CN:
       Customer Name: 客户姓名
       Customer Phone: 客户电话
       Customer Address: 客户地址
-      Service Type: 售后类型
       Reserverd Service Time: 师傅和客户预约的服务时间
-      Service Content: 服务内容
-      Remark: 备注给师傅
+      Service Content: 服务描述
+      Remark: 备注
       User: 已指派给
-      Source: 品牌
+      Source: 来源
+      Brand: 品牌
+      Service Type: 售后类型
       State: 状态
       Fee: 费用
+      Remark: 备注
     scopes:
       "Filter By State": 根据状态筛选
-      "Filter By Source": 根据品牌筛选
+      "Filter By Source": 根据来源筛选
+      "Filter By Brand": 根据品牌筛选
       "Filter By Type": 根据服务类型筛选
       "Filter By Date": 根据创建时间快速筛选
       "Filter By Workman": 根据师傅快速筛选
@@ -72,7 +75,6 @@ zh-CN:
         "This Quarter": 本季度
         "This Year": 本年
 
-
   manufacturers:
     name:
       plural: 厂家后台地址管理
@@ -82,6 +84,11 @@ zh-CN:
   service_types:
     name:
       plural: 服务类型管理
+    attributes:
+      Name: 名称
+  sources:
+    name:
+      plural: 来源
     attributes:
       Name: 名称
   brands:
@@ -245,6 +252,7 @@ zh-CN:
       "Aftersale Management": 售后管理
       "Aftersales": 服务单
       "Manufacturers": 厂家后台
+      "Sources": 来源
       "Brands": 品牌
       "ServiceTypes": 服务类型
 

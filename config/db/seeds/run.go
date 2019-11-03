@@ -119,16 +119,58 @@ func Run() {
 	fmt.Println("Create aftersales .....")
 	CreateAftersales()
 
+	fmt.Println("Create sources .....")
+	CreateSources()
+
+	fmt.Println("Create brands .....")
+	CreateBrands()
+
+	fmt.Println("Create service_types .....")
+	CreateServiceTypes()
 	// createRecords()
 }
 
-func CreateAftersales() {
-	service_types := []string{
-		"安装",
-		"维修",
-		"清洗",
-	}
+func CreateSources() {
 	sources := []string{
+		"京东",
+		"苏宁",
+		"天猫",
+		"线下",
+	}
+
+	for i := 0; i < len(sources); i++ {
+		a := settings.Source{
+			Name: sources[i],
+		}
+
+		if err := DraftDB.Create(&a).Error; err != nil {
+			log.Fatalf("create source (%v) failure, got err %v", a, err)
+		}
+	}
+}
+
+func CreateServiceTypes() {
+	service_types := []string{
+		"安装调试服务",
+		"售后维修服务",
+		"清洗养护服务",
+		"家装保洁服务",
+	}
+
+	// var afs []settings.ServiceType
+	for i := 0; i < len(service_types); i++ {
+		a := settings.ServiceType{
+			Name: service_types[i],
+		}
+
+		if err := DraftDB.Create(&a).Error; err != nil {
+			log.Fatalf("create service type (%v) failure, got err %v", a, err)
+		}
+	}
+}
+
+func CreateBrands() {
+	brands := []string{
 		"海尔",
 		"格力",
 		"奥克斯",
@@ -137,6 +179,40 @@ func CreateAftersales() {
 		"长虹",
 		"康佳",
 	}
+
+	for i := 0; i < len(brands); i++ {
+		a := settings.Brand{
+			Name: brands[i],
+		}
+
+		if err := DraftDB.Create(&a).Error; err != nil {
+			log.Fatalf("create brand (%v) failure, got err %v", a, err)
+		}
+	}
+}
+
+func CreateAftersales() {
+	service_types := []string{
+		"安装调试服务",
+		"售后维修服务",
+	}
+	sources := []string{
+		"京东",
+		"苏宁",
+		"天猫",
+		"线下",
+	}
+
+	brands := []string{
+		"海尔",
+		"格力",
+		"奥克斯",
+		"小米电视",
+		"春兰空调",
+		"长虹",
+		"康佳",
+	}
+
 	rand.Seed(time.Now().UnixNano())
 
 	var afs []aftersales.Aftersale
@@ -146,9 +222,10 @@ func CreateAftersales() {
 			CustomerPhone:   faker.PhoneNumber().CellPhone(),
 			CustomerAddress: faker.Address().StreetAddress(),
 
-			ServiceType:    service_types[rand.Intn(3)],
+			ServiceType:    service_types[rand.Intn(1)],
 			ServiceContent: faker.Lorem().String(),
-			Source:         sources[rand.Intn(7)],
+			Source:         sources[rand.Intn(3)],
+			Brand:          brands[rand.Intn(7)],
 			Fee:            1,
 		}
 

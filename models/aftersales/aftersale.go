@@ -26,8 +26,10 @@ type Aftersale struct {
 	// 预约安装时间
 	ReservedServiceTime string
 
-	// 品牌
 	Source string
+
+	// 品牌
+	Brand string
 
 	Fee float32
 

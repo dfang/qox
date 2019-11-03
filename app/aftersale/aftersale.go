@@ -36,6 +36,7 @@ type App struct {
 type Config struct {
 }
 
+var sources []settings.Source
 var brands []settings.Brand
 var service_types []settings.ServiceType
 var workmen []users.User
@@ -51,15 +52,18 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 
 	db.DB.Select("name, id").Find(&brands)
 	db.DB.Select("name, id").Find(&service_types)
+	db.DB.Select("name, id").Find(&sources)
 	db.DB.Select("name, id").Where("role = ?", "workman").Find(&workmen)
 
 	aftersale := Admin.AddResource(&aftersales.Aftersale{}, &admin.Config{Menu: []string{"Aftersale Management"}, Priority: 1})
 	aftersale.Meta(&admin.Meta{Name: "User", Type: "aftersale_user_field"})
 
-	manufacturer := Admin.AddResource(&aftersales.Manufacturer{}, &admin.Config{Menu: []string{"Aftersale Management"}, Priority: 4})
+	Admin.AddResource(&settings.Source{}, &admin.Config{Name: "Source", Menu: []string{"Aftersale Management"}, Priority: 2})
 	Admin.AddResource(&settings.Brand{}, &admin.Config{Name: "Brand", Menu: []string{"Aftersale Management"}, Priority: 3})
-	Admin.AddResource(&settings.ServiceType{}, &admin.Config{Name: "ServiceType", Menu: []string{"Aftersale Management"}, Priority: 2})
-	Admin.AddResource(&users.WechatProfile{}, &admin.Config{Name: "WechatProfile", Menu: []string{"Aftersale Management"}, Priority: 5})
+	Admin.AddResource(&settings.ServiceType{}, &admin.Config{Name: "ServiceType", Menu: []string{"Aftersale Management"}, Priority: 4})
+	manufacturer := Admin.AddResource(&aftersales.Manufacturer{}, &admin.Config{Menu: []string{"Aftersale Management"}, Priority: 5})
+
+	Admin.AddResource(&users.WechatProfile{}, &admin.Config{Name: "WechatProfile", Menu: []string{"User Management"}, Priority: 5})
 
 	activity.Register(aftersale)
 
@@ -137,53 +141,6 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	}})
 	balance.Meta(&admin.Meta{Name: "User", Type: "balance_user_field", Label: "师傅"})
 
-	aftersale.Meta(&admin.Meta{
-		Name: "ServiceType",
-		Type: "select_one",
-		// Collection: []string{"安装", "维修", "清洗"},
-		Collection: func(value interface{}, context *qor.Context) (options [][]string) {
-			for _, m := range service_types {
-				idStr := fmt.Sprintf("%s", m.Name)
-				var option = []string{idStr, m.Name}
-				options = append(options, option)
-			}
-			return options
-		},
-	})
-
-	aftersale.Meta(&admin.Meta{
-		Name: "Source",
-		Type: "select_one",
-		Collection: func(value interface{}, context *qor.Context) (options [][]string) {
-			for _, m := range brands {
-				idStr := fmt.Sprintf("%s", m.Name)
-				var option = []string{idStr, m.Name}
-				options = append(options, option)
-			}
-			return options
-		},
-	})
-
-	// https://doc.getqor.com/admin/metas/select-one.html
-	// Generate options by data from the database
-	aftersale.Meta(&admin.Meta{
-		Name:  "UserID",
-		Type:  "select_one",
-		Label: "分配",
-		Config: &admin.SelectOneConfig{
-			Collection: func(_ interface{}, context *admin.Context) (options [][]string) {
-				var users []users.User
-				context.GetDB().Where("role = ?", "workman").Find(&users)
-				for _, n := range users {
-					idStr := fmt.Sprintf("%d", n.ID)
-					var option = []string{idStr, n.Name}
-					options = append(options, option)
-				}
-				return options
-			},
-			AllowBlank: true,
-		}})
-
 	manufacturer.Action(&admin.Action{
 		Name: "打开厂家后台网站",
 		URL: func(record interface{}, context *admin.Context) string {
@@ -217,8 +174,8 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 }
 
 func configureMetas(model *admin.Resource) {
-	model.EditAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
-	model.NewAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
+	// model.EditAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
+	// model.NewAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
 	model.IndexAttrs("-UserID", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-Remark", "-ServiceContent", "-ReservedServiceTime", "-Source")
 	model.Meta(&admin.Meta{Name: "State", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
 		m := record.(*aftersales.Aftersale)
@@ -242,6 +199,91 @@ func configureMetas(model *admin.Resource) {
 			return m.State
 		}
 	}})
+
+	// Structure the new form to make it tidy and clean with `Section`
+	model.NewAttrs(
+		"CustomerName",
+		"CustomerPhone",
+		"CustomerAddress",
+		"Source",
+		"Brand",
+		"ServiceType",
+		"Fee",
+		"ServiceContent",
+		"ReservedServiceTime",
+	)
+
+	model.EditAttrs(
+		"CustomerName",
+		"CustomerPhone",
+		"CustomerAddress",
+		"Source",
+		"Brand",
+		"ServiceType",
+		"Fee",
+		"ServiceContent",
+		"ReservedServiceTime",
+	)
+
+	model.Meta(&admin.Meta{
+		Name: "ServiceType",
+		Type: "select_one",
+		// Collection: []string{"安装", "维修", "清洗"},
+		Collection: func(value interface{}, context *qor.Context) (options [][]string) {
+			for _, m := range service_types {
+				idStr := fmt.Sprintf("%s", m.Name)
+				var option = []string{idStr, m.Name}
+				options = append(options, option)
+			}
+			return options
+		},
+	})
+
+	model.Meta(&admin.Meta{
+		Name: "Source",
+		Type: "select_one",
+		Collection: func(value interface{}, context *qor.Context) (options [][]string) {
+			for _, m := range sources {
+				idStr := fmt.Sprintf("%s", m.Name)
+				var option = []string{idStr, m.Name}
+				options = append(options, option)
+			}
+			return options
+		},
+	})
+
+	model.Meta(&admin.Meta{
+		Name: "Brand",
+		Type: "select_one",
+		Collection: func(value interface{}, context *qor.Context) (options [][]string) {
+			for _, m := range brands {
+				idStr := fmt.Sprintf("%s", m.Name)
+				var option = []string{idStr, m.Name}
+				options = append(options, option)
+			}
+			return options
+		},
+	})
+
+	// https://doc.getqor.com/admin/metas/select-one.html
+	// Generate options by data from the database
+	model.Meta(&admin.Meta{
+		Name:  "UserID",
+		Type:  "select_one",
+		Label: "分配",
+		Config: &admin.SelectOneConfig{
+			Collection: func(_ interface{}, context *admin.Context) (options [][]string) {
+				var users []users.User
+				context.GetDB().Where("role = ?", "workman").Find(&users)
+				for _, n := range users {
+					idStr := fmt.Sprintf("%d", n.ID)
+					var option = []string{idStr, n.Name}
+					options = append(options, option)
+				}
+				return options
+			},
+			AllowBlank: true,
+		}})
 }
 
 func configureScopes(model *admin.Resource) {
@@ -278,23 +320,26 @@ func configureScopes(model *admin.Resource) {
 		})
 	}
 
-	// filter by order source
-	// var brands = []settings.Brand{
-	// 	settings.Brand{
-	// 		Name: "海尔",
-	// 	},
-	// 	settings.Brand{
-	// 		Name: "格力",
-	// 	},
-	// }
+	for _, item := range []string{"京东", "苏宁", "天猫", "线下"} {
+		var item = item
+		model.Scope(&admin.Scope{
+			Name:  item,
+			Label: item,
+			Group: "Filter By Source",
+			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+				return db.Where("source = ?", item)
+			},
+		})
+	}
+
 	for _, item := range brands {
 		var item = item
 		model.Scope(&admin.Scope{
 			Name:  item.Name,
 			Label: item.Name,
-			Group: "Filter By Source",
+			Group: "Filter By Brand",
 			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-				return db.Where("source = ?", item.Name)
+				return db.Where("brand = ?", item.Name)
 			},
 		})
 	}
