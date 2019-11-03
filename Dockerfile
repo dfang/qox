@@ -13,6 +13,9 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags 'bindatafs' -a -o /go/bin/qor-demo
 # RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o /go/bin/seeds config/db/seeds/main/main.go
 
+# COPY ["app", "vendor", "config", "./tmp/"]
+RUN  cp -r app vendor config ./tmp && rm tmp/app/*/*.go && rm tmp/config/*/*.go
+
 # -----------------------------------------------------------------------------
 # step 2: exec
 # FROM phusion/baseimage:0.11
@@ -25,12 +28,7 @@ RUN apk update && apk add --no-cache openssl ca-certificates curl netcat-openbsd
 RUN mkdir /qor
 WORKDIR /qor
 COPY --from=build-step /go/bin/qor-demo ./qor
+COPY --from=build-step /go-app/tmp .
 # COPY --from=build-step /go/pkg/mod /go/pkg/mod
-EXPOSE 7000
-COPY app ./app
-COPY vendor ./vendor
-COPY config/locales ./config/locales
-COPY config/db/seeds/data ./config/db/seeds/data
-RUN rm app/*/*.go
 
 CMD ./qor

@@ -16,14 +16,6 @@ import (
 	"github.com/qor/render"
 )
 
-// // AdminRedirector redirector
-// type AdminRedirector struct{}
-
-// // Redirect always redirect to /admin
-// func (cr AdminRedirector) Redirect(w http.ResponseWriter, req *http.Request, action string) {
-// 	http.Redirect(w, req, "/admin", 301)
-// }
-
 var (
 	// Auth initialize Auth for Authentication
 	Auth = clean.New(&auth.Config{
