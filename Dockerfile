@@ -14,7 +14,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags 'bindatafs' -a -o /go/b
 # RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o /go/bin/seeds config/db/seeds/main/main.go
 
 # COPY ["app", "vendor", "config", "./tmp/"]
-RUN  mkdir tmp && cp -r app vendor config ./tmp && rm tmp/app/*/*.go && rm tmp/config/*/*.go
+RUN  mkdir tmp && cp -r app vendor config ./tmp && rm tmp/app/*/*.go && rm tmp/config/*/*/*.go
 
 # -----------------------------------------------------------------------------
 # step 2: exec
