@@ -15,7 +15,7 @@ import (
 
 // ConfigureAdmin configure admin interface
 func (App) ConfigureAdmin(Admin *admin.Admin) {
-	user := Admin.AddResource(&users.User{}, &admin.Config{Menu: []string{"User Management"}})
+	user := Admin.AddResource(&users.User{}, &admin.Config{Menu: []string{"User Management"}, Priority: 3})
 	user.SearchAttrs("name", "mobile_phone")
 
 	genderMeta := admin.Meta{
@@ -208,7 +208,9 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	// user.UseTheme("grid")
 
 	// Add  submenu
-	setupMan := Admin.AddResource(&users.User{}, &admin.Config{Name: "Workman", Menu: []string{"User Management"}})
+	Admin.AddResource(&users.WechatProfile{}, &admin.Config{Name: "WechatProfile", Menu: []string{"User Management"}, Priority: 9})
+
+	setupMan := Admin.AddResource(&users.User{}, &admin.Config{Name: "Workman", Menu: []string{"User Management"}, Priority: 1})
 	setupMan.IndexAttrs("ID", "Name", "MobilePhone", "Gender", "Role")
 	setupMan.NewAttrs("ID", "Name", "Gender", "Role", "MobilePhone", "IdentityCardNum")
 	setupMan.Meta(&genderMeta)
@@ -241,7 +243,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	})
 
 	// Add  submenu
-	operator := Admin.AddResource(&users.User{}, &admin.Config{Name: "Operator", Menu: []string{"User Management"}})
+	operator := Admin.AddResource(&users.User{}, &admin.Config{Name: "Operator", Menu: []string{"User Management"}, Priority: 2})
 	operator.IndexAttrs("ID", "Name", "MobilePhone", "Gender", "Role")
 	operator.NewAttrs("ID", "Name", "Gender", "Role", "MobilePhone", "IdentityCardNum")
 	operator.Meta(&genderMeta)
