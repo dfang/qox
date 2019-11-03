@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/acme/autocert"
@@ -28,7 +29,6 @@ import (
 	"github.com/dfang/qor-demo/app/orders"
 	"github.com/dfang/qor-demo/app/pages"
 	"github.com/dfang/qor-demo/app/products"
-	"github.com/dfang/qor-demo/app/static"
 	"github.com/dfang/qor-demo/app/stores"
 	"github.com/dfang/qor-demo/config"
 	"github.com/dfang/qor-demo/config/auth"
@@ -279,14 +279,21 @@ func setupMiddlewaresAndRoutes() {
 	// 	bindatafs.AssetFS.RegisterPath(filepath.Join(config.Root, v))
 	// }
 
-	Application.Use(static.New(&static.Config{
-		Prefixs: []string{"/system"},
-		Handler: utils.FileServer(http.Dir(filepath.Join(config.Root, "public"))),
-	}))
-	Application.Use(static.New(&static.Config{
-		Prefixs: []string{"javascripts", "stylesheets", "images", "dist", "fonts", "vendors", "downloads", "favicon.ico"},
-		Handler: bindatafs.AssetFS.FileServer(http.Dir("public"), "javascripts", "stylesheets", "images", "dist", "downloads", "fonts", "vendors", "favicon.ico"),
-	}))
+	Router.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("PONG"))
+	})
+
+	// fs := http.FileServer(http.Dir("public/"))
+	// http.Handle("/", http.StripPrefix("/", fs))
+	// Router.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	// Router.Handle("/static/", http.RedirectHandler("http://baidu.com", 303))
+	// Router.Handle("/public/", http.StripPrefix("/public/", fs))
+
+	workDir, _ := os.Getwd()
+	filesDir := filepath.Join(workDir, "public")
+	FileServer(Router, "/", http.Dir(filesDir))
+
 }
 
 // DumpHTTPRequest for debugging
@@ -297,4 +304,25 @@ func DumpHTTPRequest(r *http.Request) {
 		return
 	}
 	fmt.Println(string(output))
+}
+
+// FileServer conveniently sets up a http.FileServer handler to serve
+// static files from a http.FileSystem.
+// https://github.com/go-chi/chi/blob/master/_examples/fileserver/main.go
+func FileServer(r chi.Router, path string, root http.FileSystem) {
+	if strings.ContainsAny(path, "{}*") {
+		panic("FileServer does not permit URL parameters.")
+	}
+
+	fs := http.StripPrefix(path, http.FileServer(root))
+
+	if path != "/" && path[len(path)-1] != '/' {
+		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
+		path += "/"
+	}
+	path += "*"
+
+	r.Get(path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fs.ServeHTTP(w, r)
+	}))
 }
