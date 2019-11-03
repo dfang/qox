@@ -24,7 +24,7 @@ RUN apk update && apk add --no-cache openssl ca-certificates curl netcat-openbsd
 
 RUN mkdir /qor
 WORKDIR /qor
-# COPY --from=build-step /go/bin/qor-demo /go/bin/seeds ./
+COPY --from=build-step /go/bin/qor-demo ./qor
 # COPY --from=build-step /go/pkg/mod /go/pkg/mod
 EXPOSE 7000
 COPY app ./app
@@ -33,4 +33,4 @@ COPY config/locales ./config/locales
 COPY config/db/seeds/data ./config/db/seeds/data
 RUN rm app/*/*.go
 
-CMD ./qor-demo
+CMD ./qor
