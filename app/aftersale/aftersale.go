@@ -178,7 +178,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 func configureMetas(model *admin.Resource) {
 	// model.EditAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
 	// model.NewAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
-	model.IndexAttrs("-UserID", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-Remark", "-ServiceContent", "-ReservedServiceTime", "-Source")
+	model.IndexAttrs("ID", "CustomerName", "CustomerPhone", "CustomerAddress", "Source", "Brand", "ServiceType", "Fee", "User", "State", "UpdatedAt")
 	model.Meta(&admin.Meta{Name: "State", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
 		m := record.(*aftersales.Aftersale)
 		switch m.State {
@@ -225,7 +225,12 @@ func configureMetas(model *admin.Resource) {
 		"Fee",
 		"ServiceContent",
 		"ReservedServiceTime",
+		"CreatedAt",
+		"UpdatedAt",
 	)
+
+	model.Meta(&admin.Meta{Name: "CreatedAt", Type: "readonly"})
+	model.Meta(&admin.Meta{Name: "UpdatedAt", Type: "readonly"})
 
 	model.Meta(&admin.Meta{
 		Name: "ServiceType",

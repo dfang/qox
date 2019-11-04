@@ -163,6 +163,8 @@ func checkAvailableEnvs() {
 		"DBHost",
 		"DBUser",
 		"DBPassword",
+		"REDIS_HOST",
+		"REDIS_PORT",
 	}
 
 	for _, e := range envs {

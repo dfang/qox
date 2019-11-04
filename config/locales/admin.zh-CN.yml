@@ -39,7 +39,7 @@ zh-CN:
       Customer Name: 客户姓名
       Customer Phone: 客户电话
       Customer Address: 客户地址
-      Reserverd Service Time: 师傅和客户预约的服务时间
+      Reserved Service Time: 师傅和客户预约的服务时间
       Service Content: 服务描述
       Remark: 备注
       User: 已指派给
@@ -49,6 +49,8 @@ zh-CN:
       State: 状态
       Fee: 费用
       Remark: 备注
+      Created At: 创建于
+      Updated At: 最后更新于
     scopes:
       "Filter By State": 根据状态筛选
       "Filter By Source": 根据来源筛选
