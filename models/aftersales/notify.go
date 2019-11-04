@@ -41,7 +41,7 @@ const AUDIT_OK_TPL = `
   "topcolor": "#FF0000",
   "data": {
     "first": {
-      "value": "你好，订单{{.ID}}完成证明已经审核了",
+      "value": "你好，订单#{{.ID}}完成证明已经审核了",
       "color": "#173177"
     },
     "keyword1": {
@@ -53,7 +53,7 @@ const AUDIT_OK_TPL = `
       "color": "#173177"
     },
     "remark": {
-      "value": "你好订单{{.ID}}完成证明已经通过审核了， 按照约定， 该订单会进入冻结期，服务费用会在解冻之后可以提现， 如有疑问， 请咨询客服!",
+      "value": "你好订单#{{.ID}}完成证明已经通过审核了， 按照约定， 该订单会进入冻结期，服务费用会在解冻之后可以提现， 如有疑问， 请咨询客服!",
       "color": "#173177"
     }
   }
@@ -69,7 +69,7 @@ const AUDIT_FAILED_TPL = `
   "topcolor": "#FF0000",
   "data": {
     "first": {
-      "value": "你好，订单{{.ID}}完成证明审核不通过",
+      "value": "你好，订单#{{.ID}}完成证明审核不通过",
       "color": "#173177"
     },
     "keyword1": {
@@ -81,7 +81,7 @@ const AUDIT_FAILED_TPL = `
       "color": "#173177"
     },
     "remark": {
-      "value": "你好订单{{.ID}}完成证明未通过审核， 如有疑问， 请咨询客服!",
+      "value": "你好订单#{{.ID}}完成证明未通过审核， 如有疑问， 请咨询客服!",
       "color": "#173177"
     }
   }
@@ -97,7 +97,7 @@ const UNFREEZE_TPL = `
   "topcolor": "#FF0000",
   "data": {
     "first": {
-      "value": "你好，订单{{.ID}}已经解冻",
+      "value": "你好，订单#{{.ID}}已经解冻",
       "color": "#173177"
     },
     "keyword1": {
@@ -109,7 +109,7 @@ const UNFREEZE_TPL = `
       "color": "#173177"
     },
     "remark": {
-      "value": "你好订单{{.ID}}已经解冻， 该订单的服务费用转为可结算状态!",
+      "value": "你好订单#{{.ID}}已经解冻， 该订单的服务费用转为可结算状态!",
       "color": "#173177"
     }
   }
