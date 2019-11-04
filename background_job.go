@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/dfang/qor-demo/config"
@@ -35,6 +36,20 @@ func startWorkerPool() {
 	pool.PeriodicallyEnqueue(config.Config.Cron.FreezeAuditedAftersales, "freeze_audited_aftersales")
 	pool.PeriodicallyEnqueue(config.Config.Cron.UnfreezeAftersales, "unfreeze_aftersales")
 	pool.PeriodicallyEnqueue(config.Config.Cron.UpdateBalances, "update_balances")
+
+	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
+		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_inquire")
+		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_schedule")
+		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_process")
+		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_finish")
+		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_audit")
+
+		pool.Job("auto_inquire", AutoInquire)
+		pool.Job("auto_schedule", AutoSchedule)
+		pool.Job("auto_process", AutoProcess)
+		pool.Job("auto_finish", AutoFinish)
+		pool.Job("auto_audit", AutoAudit)
+	}
 
 	pool.Job("expire_aftersales", ExpireAftersales)
 	pool.Job("freeze_audited_aftersales", FreezeAftersales)
@@ -71,7 +86,12 @@ func ExpireAftersales(job *work.Job) error {
 	log.Debug().Msgf("now is %s", time.Now().Format("2006-01-02 15:04:05"))
 	log.Debug().Msg("expires all scheduled aftersales that idle for 20 minutes ......")
 	var items []aftersales.Aftersale
-	db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "scheduled").Where("updated_at <= NOW() - INTERVAL '20 minutes'").Find(&items)
+
+	if os.Getenv("QOR_ENV") != "production" {
+		db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "scheduled").Where("updated_at <= NOW() - INTERVAL '2 minutes'").Find(&items)
+	} else {
+		db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "scheduled").Where("updated_at <= NOW() - INTERVAL '20 minutes'").Find(&items)
+	}
 	// .Update("state", "overdue")
 	for _, item := range items {
 		log.Debug().Msgf("before expire: %s", item.State)
@@ -110,7 +130,11 @@ func UnfreezeAftersales(job *work.Job) error {
 	log.Debug().Msg("unfreeze aftersales ......")
 
 	var items []aftersales.Aftersale
-	db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "frozen").Where("updated_at <= NOW() - INTERVAL '7 days'").Find(&items)
+	if os.Getenv("QOR_ENV") != "production" {
+		db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "frozen").Where("updated_at <= NOW() - INTERVAL '2 minutes'").Find(&items)
+	} else {
+		db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "frozen").Where("updated_at <= NOW() - INTERVAL '7 days'").Find(&items)
+	}
 	for _, item := range items {
 		aftersales.OrderStateMachine.Trigger("unfreeze", &item, db.DB, "unfreeze aftersale with id: "+fmt.Sprintf("%d", item.ID))
 		db.DB.Save(&item)
@@ -128,53 +152,7 @@ func UpdateBalances(job *work.Job) error {
 	log.Debug().Msg("update balances ......")
 
 	for _, item := range workmen {
-		// 计算frozen_amount
-		// 计算free_amount
-		// update balance by user_id
-		var balance aftersales.Balance
-		db.DB.Model(aftersales.Balance{}).Where("user_id = ?", item.ID).Assign(aftersales.Balance{UserID: item.ID}).FirstOrInit(&balance)
-
-		// select sum(amount) from settlements where user_id = 73 and state='frozen';
-
-		// var frozenResult float32
-		// var freeResult float32
-		// db.DB.Table("settlements").Select("sum(amount)").Where("state = 'frozen'").Where("user_id = ?", item.ID).Take(&frozenResult)
-		// db.DB.Table("settlements").Select("sum(amount)").Where("state = 'free'").Where("user_id = ?", item.ID).Take(&freeResult)
-		type Result struct {
-			State string
-			Total float32
-		}
-		// rows, err :=
-		var results []Result
-		var f1, f2, f3 float32
-
-		db.DB.Table("settlements").Select("state, sum(amount) as total").Group("state").Where("user_id = ?", item.ID).Scan(&results)
-		for _, i := range results {
-			// fmt.Println(i.State)
-			// fmt.Println(i.Total)
-			if i.State == "frozen" {
-				f1 = i.Total
-			}
-
-			if i.State == "free" {
-				f2 = i.Total
-			}
-
-			if i.State == "withdrawed" {
-				f3 = i.Total
-			}
-		}
-
-		balance.FrozenAmount = f1
-		balance.FreeAmount = f2 + f3
-		balance.WithdrawAmount = f3
-		balance.TotalAmount = f2 + f1
-
-		// balance.FrozenAmount = balance.FrozenAmount + balance.FreeAmount + balance.WithdrawAmount
-
-		// balance.UserID = item.ID
-		// balance.FrozenAmount = frozenResult
-		// balance.FreeAmount = freeResult
+		balance := aftersales.UpdateBalanceFor(item.ID)
 		db.DB.Save(&balance)
 	}
 
@@ -248,4 +226,77 @@ type TemplateMsgResp struct {
 	ErrCode int    `json:"errcode"`
 	ErrMsg  string `json:"errmsg"`
 	MsgID   int64  `json:"msgid"`
+}
+
+/* DEMO_MODE=true 自动化任务 */
+
+// AutoInquire 自动预约 demo模式下自动预约
+func AutoInquire(job *work.Job) error {
+	log.Debug().Msg("demo模式下自动预约 .........")
+
+	var a aftersales.Aftersale
+	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
+		db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "created").Take(&a)
+		aftersales.OrderStateMachine.Trigger("inquire", &a, db.DB, "auto inquire aftersale with id: "+fmt.Sprintf("%d", a.ID))
+		a.Remark = "客户很急"
+		db.DB.Save(&a)
+	}
+
+	return nil
+}
+
+// AutoSchedule 自动派单 demo模式下自动派单
+func AutoSchedule(job *work.Job) error {
+	log.Debug().Msg("demo模式下自动派单 .........")
+
+	var a aftersales.Aftersale
+	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
+		db.DB.Model(aftersales.Aftersale{}).Where("state = ? or state = ?", "inquired", "overdue").Order("random()").Take(&a)
+		aftersales.OrderStateMachine.Trigger("schedule", &a, db.DB, "auto inquire aftersale with id: "+fmt.Sprintf("%d", a.ID))
+		var w users.User
+		db.DB.Model(users.User{}).Where("role = ?", "workman").Order("random()").First(&w)
+		a.UserID = w.ID
+		db.DB.Save(&a)
+	}
+
+	return nil
+}
+
+// AutoProcess 自动派单 demo模式下自动接单
+func AutoProcess(job *work.Job) error {
+	log.Debug().Msg("demo模式下自动接单 .........")
+
+	var a aftersales.Aftersale
+	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
+		db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "scheduled").Order("random()").Take(&a)
+		a.State = "processing"
+		db.DB.Save(&a)
+	}
+	return nil
+}
+
+// AutoFinish 自动派单 demo模式下自动完成
+func AutoFinish(job *work.Job) error {
+	log.Debug().Msg("demo模式下自动完成 .........")
+
+	var a aftersales.Aftersale
+	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
+		db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "processing").Order("random()").Take(&a)
+		a.State = "processed"
+		db.DB.Save(&a)
+	}
+	return nil
+}
+
+// AutoAudit 自动派单 demo模式下自动审批
+func AutoAudit(job *work.Job) error {
+	log.Debug().Msg("demo模式下自动审批 .........")
+
+	var a aftersales.Aftersale
+	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
+		db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "processed").Order("random()").Take(&a)
+		a.State = "audited"
+		db.DB.Save(&a)
+	}
+	return nil
 }

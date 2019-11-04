@@ -66,7 +66,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	activity.Register(aftersale)
 
 	settlement := Admin.AddResource(&aftersales.Settlement{}, &admin.Config{Menu: []string{"Settlement Management"}, Priority: 2})
-	settlement.IndexAttrs("-CreatedBy", "-UpdatedBy", "ID", "Workman", "Amount", "Direction", "Aftersale", "State", "CreatedAt")
+	settlement.IndexAttrs("ID", "Workman", "Amount", "Direction", "Aftersale", "State", "CreatedAt")
 	settlement.Meta(&admin.Meta{
 		Name:       "Direction",
 		Type:       "select_one",
@@ -129,7 +129,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	// }})
 
 	balance := Admin.AddResource(&aftersales.Balance{}, &admin.Config{Menu: []string{"Settlement Management"}, Priority: 1})
-	balance.IndexAttrs("-ID", "-CreatedAt", "-CreatedBy", "-UpdatedBy", "User", "FrozenAmount", "FreeAmount", "TotalAmount", "WithdrawAmount", "UpdatedAt")
+	balance.IndexAttrs("User", "FrozenAmount", "FreeAmount", "TotalAmount", "WithdrawAmount", "UpdatedAt")
 	balance.Meta(&admin.Meta{Name: "WithdrawAmount", Type: "float32", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
 		m := record.(*aftersales.Balance)
 		if m.WithdrawAmount < 0 {

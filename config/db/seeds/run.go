@@ -127,6 +127,9 @@ func Run() {
 
 	fmt.Println("Create service_types .....")
 	CreateServiceTypes()
+
+	fmt.Println("Create workman .....")
+	CreateWorkman()
 	// createRecords()
 }
 
@@ -229,7 +232,8 @@ func CreateAftersales() {
 			ServiceContent: faker.Lorem().String(),
 			Source:         sources[rand.Intn(3)],
 			Brand:          brands[rand.Intn(7)],
-			Fee:            1,
+			Fee:            50,
+			// Fee:            float32(rand.Intn(101)),
 		}
 
 		afs = append(afs, a)
@@ -238,6 +242,29 @@ func CreateAftersales() {
 	for _, s := range afs {
 		if err := DraftDB.Create(&s).Error; err != nil {
 			log.Fatalf("create aftersale (%v) failure, got err %v", s, err)
+		}
+	}
+}
+
+func CreateWorkman() {
+	a := users.User{
+		Name:        "段访",
+		MobilePhone: "15618903080",
+		Role:        "workman",
+	}
+	b := users.User{
+		Name:        "朱大平",
+		MobilePhone: "18970278113",
+		Role:        "workman",
+	}
+
+	var names []users.User
+	names = append(names, a)
+	names = append(names, b)
+
+	for i := 0; i < len(names); i++ {
+		if err := DraftDB.Create(&names[i]).Error; err != nil {
+			log.Fatalf("create workman (%v) failure, got err %v", a, err)
 		}
 	}
 }

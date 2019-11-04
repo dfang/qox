@@ -51,7 +51,7 @@ func (item *Aftersale) BeforeCreate(scope *gorm.Scope) error {
 
 // BeforeSave 验证费用
 func (item *Aftersale) BeforeSave(scope *gorm.Scope) error {
-	if item.Fee <= 0 {
+	if item.Fee < 0 {
 		return fmt.Errorf("费用不能小于或这等于0")
 	}
 

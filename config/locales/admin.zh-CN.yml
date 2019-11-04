@@ -103,6 +103,7 @@ zh-CN:
       plural: 结算明细表
     attributes:
       User: 师傅
+      Workman: 师傅
       Amount: 金额
       Direction: 收支
       Aftersale: 售后单

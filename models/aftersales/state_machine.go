@@ -251,6 +251,10 @@ func enqueueScheduleJob(value interface{}, tx *gorm.DB) error {
 	fmt.Println("mobile_phone is > ", mobilePhone)
 	fmt.Println("openid is > ", wp.Openid)
 
+	if wp.Openid == "" {
+		return fmt.Errorf("openid 不能为空，否则无法发送模板消息")
+	}
+
 	// 填充模板
 	m := ModelForSchedule{
 		OpenID: wp.Openid,
@@ -287,6 +291,10 @@ func enqueueAuditJob(value interface{}, tx *gorm.DB) error {
 	fmt.Println("user_id is > ", item.UserID)
 	fmt.Println("mobile_phone is > ", mobilePhone)
 	fmt.Println("openid is > ", wp.Openid)
+
+	if wp.Openid == "" {
+		return fmt.Errorf("openid 不能为空，否则无法发送模板消息")
+	}
 
 	// 填充模板
 	m := ModelForAudit{

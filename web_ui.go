@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"strconv"
 	"time"
+
+	"github.com/dfang/qor-demo/config/db"
 
 	"github.com/gocraft/work/webui"
 	"github.com/gomodule/redigo/redis"
@@ -23,15 +23,17 @@ func startWorkWebUI() {
 
 	// redisDatabase = flag.String("database", "0", "redis database")
 
-	database, err := strconv.Atoi("0")
-	if err != nil {
-		fmt.Printf("Error: %v is not a valid database value", 0)
-		return
-	}
+	// database, err := strconv.Atoi("0")
+	// if err != nil {
+	// 	fmt.Printf("Error: %v is not a valid database value", 0)
+	// 	return
+	// }
 
 	// pool := newPool(*redisHostPort, database)
-	pool := newPool("redis:6379", database)
-	server := webui.NewServer("qor", pool, ":5040")
+	// pool := newPool("redis:6379", database)
+
+	// server := webui.NewServer("qor", pool, ":5040")
+	server := webui.NewServer("qor", db.RedisPool, ":5040")
 	server.Start()
 
 	// c := make(chan os.Signal, 1)
