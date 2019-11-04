@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/dfang/qor-demo/config"
@@ -55,6 +56,7 @@ func startWorkerPool() {
 	pool.Job("freeze_audited_aftersales", FreezeAftersales)
 	pool.Job("unfreeze_aftersales", UnfreezeAftersales)
 	pool.Job("update_balances", UpdateBalances)
+	pool.Job("update_balance", UpdateBalance)
 
 	pool.Job("send_wechat_template_msg", SendWechatTemplateMsg)
 
@@ -152,12 +154,25 @@ func UpdateBalances(job *work.Job) error {
 	log.Debug().Msg("update balances ......")
 
 	for _, item := range workmen {
-		balance := aftersales.UpdateBalanceFor(item.ID)
+
+		id := strconv.FormatUint(uint64(item.ID), 10)
+		// balance := aftersales.UpdateBalanceFor(fmt.Sprint(item.ID))
+		balance := aftersales.UpdateBalanceFor(id)
 		db.DB.Save(&balance)
 	}
 
 	log.Debug().Msgf("now is %s", time.Now().Format("2006-01-02 15:04:05"))
 	log.Debug().Msg("update balances done ......")
+	return nil
+}
+
+// UpdateBalance 计算并更新某个师傅的账户额度
+func UpdateBalance(job *work.Job) error {
+	userID := job.ArgString("user_id")
+	balance := aftersales.UpdateBalanceFor(userID)
+	db.DB.Save(&balance)
+	log.Debug().Msg("update balance done ......")
+
 	return nil
 }
 

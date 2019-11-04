@@ -1,7 +1,11 @@
 package aftersales
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/dfang/qor-demo/models/users"
+	"github.com/gocraft/work"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/audited"
 	"github.com/qor/transition"
@@ -68,15 +72,36 @@ func (item *Settlement) BeforeSave(scope *gorm.Scope) error {
 	return nil
 }
 
+// AfterSave AfterSave Callback
+func (item *Settlement) AfterSave(scope *gorm.Scope) error {
+	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
+
+	fmt.Printf("enqueueing update_balance for user id %d .....\n", item.UserID)
+	id := strconv.FormatUint(uint64(item.UserID), 10)
+	j, err := enqueuer.Enqueue("update_balance", work.Q{"user_id": id})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Job ID: %s, Name: %s, EnqueueAt: %d\n", j.ID, j.Name, j.EnqueuedAt)
+
+	return nil
+}
+
 // UpdateBalanceFor 更新账户余额
 // 罚款和奖励都是立即生效的（立即变为free状态的）
-func UpdateBalanceFor(userID uint) Balance {
+func UpdateBalanceFor(userID string) Balance {
 	var results []Result
 	var f1, f2, f3 float32
 
 	// update balance by user_id
 	var balance Balance
-	db.DB.Model(Balance{}).Where("user_id = ?", userID).Assign(Balance{UserID: userID}).FirstOrInit(&balance)
+
+	u64, err := strconv.ParseUint(userID, 10, 32)
+	if err != nil {
+		panic(err)
+	}
+
+	db.DB.Model(Balance{}).Where("user_id = ?", userID).Assign(Balance{UserID: uint(u64)}).FirstOrInit(&balance)
 
 	// select state, sum(amount) as total from settlements where user_id = 1 group by state;
 	db.DB.Table("settlements").Select("state, sum(amount) as total").Group("state").Where("user_id = ?", userID).Scan(&results)
