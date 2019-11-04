@@ -196,6 +196,10 @@ func configureMetas(model *admin.Resource) {
 			return "待上门"
 		case "processed":
 			return "已服务"
+		case "frozen":
+			return "冻结中"
+		// case "completed":
+		// 	return "已解冻"
 		default:
 			// return "N/A"
 			return m.State

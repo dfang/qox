@@ -62,7 +62,7 @@ zh-CN:
         created: 待预约
         inquired: 待指派
         scheduled: 待响应
-        overdue: 已超时待重新指派
+        overdue: 已超时
         processing: 待上门
         processed: 待审核
         audited: 已审核

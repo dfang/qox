@@ -95,7 +95,7 @@ func init() {
 
 	// 重新指派师傅
 	OrderStateMachine.Event("reschedule").To("scheduled").From("scheduled").After(func(value interface{}, tx *gorm.DB) (err error) {
-		err = enqueueSendTemplateMsgJob(value, tx)
+		err = enqueueJob(value, tx, "schedule")
 		if err != nil {
 			panic("oooops")
 		}
@@ -105,7 +105,7 @@ func init() {
 
 	// 重新指派师傅
 	OrderStateMachine.Event("reschedule").To("scheduled").From("overdue").After(func(value interface{}, tx *gorm.DB) (err error) {
-		err = enqueueSendTemplateMsgJob(value, tx)
+		err = enqueueJob(value, tx, "schedule")
 		if err != nil {
 			panic("oooops")
 		}
@@ -181,6 +181,154 @@ func init() {
 	})
 }
 
+func enqueueJob(value interface{}, tx *gorm.DB, jobType string) error {
+	// 首先找出openid 等需要填充到模板消息变量的信息
+	item := value.(*Aftersale)
+	u := users.User{}
+	tx.Where("id = ?", item.UserID).First(&u)
+	mobilePhone := u.MobilePhone
+	wp := users.WechatProfile{}
+	tx.Where("mobile_phone = ?", mobilePhone).First(&wp)
+	fmt.Println("user_id is > ", item.UserID)
+	fmt.Println("mobile_phone is > ", mobilePhone)
+	fmt.Println("openid is > ", wp.Openid)
+
+	if wp.Openid == "" {
+		return fmt.Errorf("openid 不能为空，否则无法发送模板消息")
+	}
+
+	t, _ := TimeIn(time.Now(), "Asia/Shanghai")
+	format := t.Format("2006-01-02 15:04:05")
+
+	switch jobType {
+	case "schedule":
+		enqueueScheduleJob(wp.Openid, item.ID, format)
+		return nil
+	case "audit":
+		enqueueAuditJob(wp.Openid, item.ID, format)
+		return nil
+	case "audit_failed":
+		enqueueAuditFailedJob(wp.Openid, item.ID, format)
+		return nil
+	case "unfreeze":
+		enqueueUnfreezeJob(wp.Openid, item.ID, format)
+		return nil
+	case "take_order":
+		// enqueueTakeOrderJob(wp.Openid, item.ID, format)
+		return nil
+	default:
+		fmt.Println("Unknown job type")
+		return nil
+	}
+}
+
+func enqueueScheduleJob(openid string, id uint, format string) error {
+	// 推送微信模版消息到师傅微信
+	// Make an enqueuer with a particular namespace
+	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
+	// _, err = enqueuer.Enqueue("send_wechat_template_msg", work.Q{"address": "test@example.com", "subject": "hello world", "customer_id": 4})
+
+	// 填充模板
+	m := ModelForSchedule{
+		OpenID: openid,
+		ID:     strconv.FormatUint(uint64(id), 10),
+		URL:    "http://mp.xsjd123.com/",
+		Now:    format,
+	}
+	s := executeTpl(SCHEDULE_TPL, m)
+	// fmt.Println("模板消息插入变量后是: ", s)
+
+	tkn := getToken()
+	// sendTemplateMsg(b)
+	fmt.Println("enqueueing send_wechat_template_msg .....")
+	j, err := enqueuer.Enqueue("send_wechat_template_msg", work.Q{"contents": s, "token": tkn})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Job ID: %s, Name: %s, EnqueueAt: %d\n", j.ID, j.Name, j.EnqueuedAt)
+	return nil
+}
+
+func enqueueAuditJob(openid string, id uint, format string) error {
+	// 推送微信模版消息到师傅微信
+	// Make an enqueuer with a particular namespace
+	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
+
+	// 填充模板
+	m := ModelForAudit{
+		OpenID: openid,
+		ID:     strconv.FormatUint(uint64(id), 10),
+		URL:    "http://mp.xsjd123.com/",
+		Now:    format,
+	}
+	s := executeTpl(AUDIT_OK_TPL, m)
+	// fmt.Println("模板消息插入变量后是: ", s)
+
+	tkn := getToken()
+	// sendTemplateMsg(b)
+	fmt.Println("enqueueing send_wechat_template_msg .....")
+	j, err := enqueuer.Enqueue("send_wechat_template_msg", work.Q{"contents": s, "token": tkn})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Job ID: %s, Name: %s, EnqueueAt: %d\n", j.ID, j.Name, j.EnqueuedAt)
+	return nil
+}
+
+func enqueueUnfreezeJob(openid string, id uint, format string) error {
+	// 推送微信模版消息到师傅微信
+	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
+	// 填充模板
+	m := ModelForAudit{
+		OpenID: openid,
+		ID:     strconv.FormatUint(uint64(id), 10),
+		URL:    "http://mp.xsjd123.com/",
+		Now:    format,
+	}
+	s := executeTpl(UNFREEZE_TPL, m)
+	// fmt.Println("模板消息插入变量后是: ", s)
+
+	tkn := getToken()
+	// sendTemplateMsg(b)
+	fmt.Println("enqueueing send_wechat_template_msg .....")
+	j, err := enqueuer.Enqueue("send_wechat_template_msg", work.Q{"contents": s, "token": tkn})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Job ID: %s, Name: %s, EnqueueAt: %d\n", j.ID, j.Name, j.EnqueuedAt)
+	return nil
+}
+
+func enqueueAuditFailedJob(openid string, id uint, format string) error {
+	// 推送微信模版消息到师傅微信
+	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
+	// 填充模板
+	m := ModelForAudit{
+		OpenID: openid,
+		ID:     strconv.FormatUint(uint64(id), 10),
+		URL:    "http://mp.xsjd123.com/",
+		Now:    format,
+	}
+	s := executeTpl(AUDIT_FAILED_TPL, m)
+	// fmt.Println("模板消息插入变量后是: ", s)
+
+	tkn := getToken()
+	// sendTemplateMsg(b)
+	fmt.Println("enqueueing send_wechat_template_msg .....")
+	j, err := enqueuer.Enqueue("send_wechat_template_msg", work.Q{"contents": s, "token": tkn})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Job ID: %s, Name: %s, EnqueueAt: %d\n", j.ID, j.Name, j.EnqueuedAt)
+	return nil
+}
+
+func enqueueTakeOrderJob(value interface{}, tx *gorm.DB) error {
+	fmt.Println("师傅接单了， 给用户发通知(模板消息或短信")
+	// TODO: 发送通知
+	return nil
+}
+
 // 从中控服务器获取access_token
 func getToken() string {
 	var tkn Token
@@ -211,223 +359,14 @@ func executeTpl(tpl string, model interface{}) string {
 	return tmplBytes.String()
 }
 
-func enqueueJob(vaule interface{}, tx *gorm.DB, jobType string) error {
-	switch jobType {
-	case "schedule":
-		enqueueScheduleJob(vaule, tx)
-		return nil
-	case "audit":
-		enqueueAuditJob(vaule, tx)
-		return nil
-	case "audit_failed":
-		enqueueAuditFailedJob(vaule, tx)
-		return nil
-	case "unfreeze":
-		enqueueUnfreezeJob(vaule, tx)
-		return nil
-	case "take_order":
-		enqueueTakeOrderJob(vaule, tx)
-		return nil
-	default:
-		fmt.Println("Unknown job type")
-		return nil
+// TimeIn returns the time in UTC if the name is "" or "UTC".
+// It returns the local time if the name is "Local".
+// Otherwise, the name is taken to be a location name in
+// the IANA Time Zone database, such as "Africa/Lagos".
+func TimeIn(t time.Time, name string) (time.Time, error) {
+	loc, err := time.LoadLocation(name)
+	if err == nil {
+		t = t.In(loc)
 	}
-}
-
-func enqueueScheduleJob(value interface{}, tx *gorm.DB) error {
-	// 推送微信模版消息到师傅微信
-	// Make an enqueuer with a particular namespace
-	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
-	// _, err = enqueuer.Enqueue("send_wechat_template_msg", work.Q{"address": "test@example.com", "subject": "hello world", "customer_id": 4})
-
-	// 首先找出openid 等需要填充到模板消息变量的信息
-	item := value.(*Aftersale)
-	u := users.User{}
-	tx.Where("id = ?", item.UserID).First(&u)
-	mobilePhone := u.MobilePhone
-	wp := users.WechatProfile{}
-	tx.Where("mobile_phone = ?", mobilePhone).First(&wp)
-	fmt.Println("user_id is > ", item.UserID)
-	fmt.Println("mobile_phone is > ", mobilePhone)
-	fmt.Println("openid is > ", wp.Openid)
-
-	if wp.Openid == "" {
-		return fmt.Errorf("openid 不能为空，否则无法发送模板消息")
-	}
-
-	// 填充模板
-	m := ModelForSchedule{
-		OpenID: wp.Openid,
-		ID:     strconv.FormatUint(uint64(item.ID), 10),
-		URL:    "http://mp.xsjd123.com/",
-		Now:    time.Now().Format("2006-01-02 15:04"),
-	}
-	s := executeTpl(SCHEDULE_TPL, m)
-	// fmt.Println("模板消息插入变量后是: ", s)
-
-	tkn := getToken()
-	// sendTemplateMsg(b)
-	fmt.Println("enqueueing send_wechat_template_msg .....")
-	j, err := enqueuer.Enqueue("send_wechat_template_msg", work.Q{"contents": s, "token": tkn})
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Job ID: %s, Name: %s, EnqueueAt: %d\n", j.ID, j.Name, j.EnqueuedAt)
-	return nil
-}
-
-func enqueueAuditJob(value interface{}, tx *gorm.DB) error {
-	// 推送微信模版消息到师傅微信
-	// Make an enqueuer with a particular namespace
-	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
-
-	// 首先找出openid 等需要填充到模板消息变量的信息
-	item := value.(*Aftersale)
-	u := users.User{}
-	tx.Where("id = ?", item.UserID).First(&u)
-	mobilePhone := u.MobilePhone
-	wp := users.WechatProfile{}
-	tx.Where("mobile_phone = ?", mobilePhone).First(&wp)
-	fmt.Println("user_id is > ", item.UserID)
-	fmt.Println("mobile_phone is > ", mobilePhone)
-	fmt.Println("openid is > ", wp.Openid)
-
-	if wp.Openid == "" {
-		return fmt.Errorf("openid 不能为空，否则无法发送模板消息")
-	}
-
-	// 填充模板
-	m := ModelForAudit{
-		OpenID: wp.Openid,
-		ID:     strconv.FormatUint(uint64(item.ID), 10),
-		URL:    "http://mp.xsjd123.com/",
-		Now:    time.Now().Format("2006-01-02 15:04"),
-	}
-	s := executeTpl(AUDIT_OK_TPL, m)
-	// fmt.Println("模板消息插入变量后是: ", s)
-
-	tkn := getToken()
-	// sendTemplateMsg(b)
-	fmt.Println("enqueueing send_wechat_template_msg .....")
-	j, err := enqueuer.Enqueue("send_wechat_template_msg", work.Q{"contents": s, "token": tkn})
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Job ID: %s, Name: %s, EnqueueAt: %d\n", j.ID, j.Name, j.EnqueuedAt)
-	return nil
-}
-
-func enqueueUnfreezeJob(value interface{}, tx *gorm.DB) error {
-	// 推送微信模版消息到师傅微信
-	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
-
-	// 首先找出openid 等需要填充到模板消息变量的信息
-	item := value.(*Aftersale)
-	u := users.User{}
-	tx.Where("id = ?", item.UserID).First(&u)
-	mobilePhone := u.MobilePhone
-	wp := users.WechatProfile{}
-	tx.Where("mobile_phone = ?", mobilePhone).First(&wp)
-	fmt.Println("user_id is > ", item.UserID)
-	fmt.Println("mobile_phone is > ", mobilePhone)
-	fmt.Println("openid is > ", wp.Openid)
-
-	// 填充模板
-	m := ModelForAudit{
-		OpenID: wp.Openid,
-		ID:     strconv.FormatUint(uint64(item.ID), 10),
-		URL:    "http://mp.xsjd123.com/",
-		Now:    time.Now().Format("2006-01-02 15:04"),
-	}
-	s := executeTpl(UNFREEZE_TPL, m)
-	// fmt.Println("模板消息插入变量后是: ", s)
-
-	tkn := getToken()
-	// sendTemplateMsg(b)
-	fmt.Println("enqueueing send_wechat_template_msg .....")
-	j, err := enqueuer.Enqueue("send_wechat_template_msg", work.Q{"contents": s, "token": tkn})
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Job ID: %s, Name: %s, EnqueueAt: %d\n", j.ID, j.Name, j.EnqueuedAt)
-	return nil
-}
-
-func enqueueAuditFailedJob(value interface{}, tx *gorm.DB) error {
-	// 推送微信模版消息到师傅微信
-	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
-	// 首先找出openid 等需要填充到模板消息变量的信息
-	item := value.(*Aftersale)
-	u := users.User{}
-	tx.Where("id = ?", item.UserID).First(&u)
-	mobilePhone := u.MobilePhone
-	wp := users.WechatProfile{}
-	tx.Where("mobile_phone = ?", mobilePhone).First(&wp)
-	fmt.Println("user_id is > ", item.UserID)
-	fmt.Println("mobile_phone is > ", mobilePhone)
-	fmt.Println("openid is > ", wp.Openid)
-
-	// 填充模板
-	m := ModelForAudit{
-		OpenID: wp.Openid,
-		ID:     strconv.FormatUint(uint64(item.ID), 10),
-		URL:    "http://mp.xsjd123.com/",
-		Now:    time.Now().Format("2006-01-02 15:04"),
-	}
-	s := executeTpl(AUDIT_FAILED_TPL, m)
-	// fmt.Println("模板消息插入变量后是: ", s)
-
-	tkn := getToken()
-	// sendTemplateMsg(b)
-	fmt.Println("enqueueing send_wechat_template_msg .....")
-	j, err := enqueuer.Enqueue("send_wechat_template_msg", work.Q{"contents": s, "token": tkn})
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Job ID: %s, Name: %s, EnqueueAt: %d\n", j.ID, j.Name, j.EnqueuedAt)
-	return nil
-}
-
-func enqueueTakeOrderJob(value interface{}, tx *gorm.DB) error {
-	fmt.Println("师傅接单了， 给用户发通知(模板消息或短信")
-	// TODO: 发送通知
-	return nil
-}
-
-func enqueueSendTemplateMsgJob(value interface{}, tx *gorm.DB) error {
-	// 推送微信模版消息到师傅微信
-	// Make an enqueuer with a particular namespace
-	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
-	// _, err = enqueuer.Enqueue("send_wechat_template_msg", work.Q{"address": "test@example.com", "subject": "hello world", "customer_id": 4})
-
-	// 首先找出openid 等需要填充到模板消息变量的信息
-	item := value.(*Aftersale)
-	u := users.User{}
-	tx.Where("id = ?", item.UserID).First(&u)
-	mobilePhone := u.MobilePhone
-	wp := users.WechatProfile{}
-	tx.Where("mobile_phone = ?", mobilePhone).First(&wp)
-	fmt.Println("user_id is > ", item.UserID)
-	fmt.Println("mobile_phone is > ", mobilePhone)
-	fmt.Println("openid is > ", wp.Openid)
-
-	// 填充模板
-	m := ModelForSchedule{
-		OpenID: wp.Openid,
-		ID:     strconv.FormatUint(uint64(item.ID), 10),
-		URL:    "http://mp.xsjd123.com/",
-		Now:    time.Now().Format("2006-01-02 15:04"),
-	}
-	s := executeTpl(SCHEDULE_TPL, m)
-	// fmt.Println("模板消息插入变量后是: ", s)
-
-	tkn := getToken()
-	// sendTemplateMsg(b)
-	fmt.Println("enqueueing send_wechat_template_msg .....")
-	j, err := enqueuer.Enqueue("send_wechat_template_msg", work.Q{"contents": s, "token": tkn})
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Job ID: %s, Name: %s, EnqueueAt: %d\n", j.ID, j.Name, j.EnqueuedAt)
-	return nil
+	return t, err
 }
