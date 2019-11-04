@@ -249,12 +249,15 @@ type TemplateMsgResp struct {
 func AutoInquire(job *work.Job) error {
 	log.Debug().Msg("demo模式下自动预约 .........")
 
-	var a aftersales.Aftersale
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
-		db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "created").Take(&a)
-		aftersales.OrderStateMachine.Trigger("inquire", &a, db.DB, "auto inquire aftersale with id: "+fmt.Sprintf("%d", a.ID))
-		a.Remark = "客户很急"
-		db.DB.Save(&a)
+		var a aftersales.Aftersale
+		db.DB.Where("state = ?", "created").Order("random()").First(&a)
+
+		if a.ID > 0 {
+			aftersales.OrderStateMachine.Trigger("inquire", &a, db.DB, "auto inquire aftersale with id: "+fmt.Sprintf("%d", a.ID))
+			a.Remark = "客户很急"
+			db.DB.Save(&a)
+		}
 	}
 
 	return nil
@@ -264,14 +267,17 @@ func AutoInquire(job *work.Job) error {
 func AutoSchedule(job *work.Job) error {
 	log.Debug().Msg("demo模式下自动派单 .........")
 
-	var a aftersales.Aftersale
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
-		db.DB.Model(aftersales.Aftersale{}).Where("state = ? or state = ?", "inquired", "overdue").Order("random()").Take(&a)
-		aftersales.OrderStateMachine.Trigger("schedule", &a, db.DB, "auto inquire aftersale with id: "+fmt.Sprintf("%d", a.ID))
+		var a aftersales.Aftersale
 		var w users.User
 		db.DB.Model(users.User{}).Where("role = ?", "workman").Order("random()").First(&w)
-		a.UserID = w.ID
-		db.DB.Save(&a)
+		db.DB.Where("state = ? or state = ?", "inquired", "overdue").Order("random()").First(&a)
+
+		if a.ID > 0 && w.ID > 0 {
+			a.UserID = w.ID
+			aftersales.OrderStateMachine.Trigger("schedule", &a, db.DB, "auto inquire aftersale with id: "+fmt.Sprintf("%d", a.ID))
+			db.DB.Save(&a)
+		}
 	}
 
 	return nil
@@ -281,11 +287,13 @@ func AutoSchedule(job *work.Job) error {
 func AutoProcess(job *work.Job) error {
 	log.Debug().Msg("demo模式下自动接单 .........")
 
-	var a aftersales.Aftersale
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
-		db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "scheduled").Order("random()").Take(&a)
-		a.State = "processing"
-		db.DB.Save(&a)
+		var a aftersales.Aftersale
+		db.DB.Where("state = ?", "scheduled").Order("random()").First(&a)
+		if a.ID > 0 {
+			a.State = "processing"
+			db.DB.Save(&a)
+		}
 	}
 	return nil
 }
@@ -294,11 +302,13 @@ func AutoProcess(job *work.Job) error {
 func AutoFinish(job *work.Job) error {
 	log.Debug().Msg("demo模式下自动完成 .........")
 
-	var a aftersales.Aftersale
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
-		db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "processing").Order("random()").Take(&a)
-		a.State = "processed"
-		db.DB.Save(&a)
+		var a aftersales.Aftersale
+		db.DB.Where("state = ?", "processing").Order("random()").First(&a)
+		if a.ID > 0 {
+			a.State = "processed"
+			db.DB.Save(&a)
+		}
 	}
 	return nil
 }
@@ -307,11 +317,14 @@ func AutoFinish(job *work.Job) error {
 func AutoAudit(job *work.Job) error {
 	log.Debug().Msg("demo模式下自动审批 .........")
 
-	var a aftersales.Aftersale
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
-		db.DB.Model(aftersales.Aftersale{}).Where("state = ?", "processed").Order("random()").Take(&a)
-		a.State = "audited"
-		db.DB.Save(&a)
+		var a aftersales.Aftersale
+		db.DB.Where("state = ?", "processed").Order("random()").First(&a)
+		if a.ID > 0 {
+			aftersales.OrderStateMachine.Trigger("audit", &a, db.DB, "auto audit aftersale with id: "+fmt.Sprintf("%d", a.ID))
+			db.DB.Save(&a)
+		}
 	}
+
 	return nil
 }

@@ -59,12 +59,12 @@ zh-CN:
       "Filter By Date": 根据创建时间快速筛选
       "Filter By Workman": 根据师傅快速筛选
       "Filter By State":
-        created: 已接收待预约客户
-        inquired: 已预约待指派
-        scheduled: 已指派待响应
+        created: 待预约
+        inquired: 待指派
+        scheduled: 待响应
         overdue: 已超时待重新指派
-        processing: 待上门服务
-        processed: 已完成服务待审核
+        processing: 待上门
+        processed: 待审核
         audited: 已审核
         audit_failed: 审核失败
         frozen: 已冻结

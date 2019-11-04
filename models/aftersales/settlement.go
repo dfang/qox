@@ -67,6 +67,10 @@ func (item *Settlement) BeforeSave(scope *gorm.Scope) error {
 	// 检查是否可提现
 	if item.Direction == "提现" {
 		// Amount <= Balance.FreeAmount
+		balance := UpdateBalanceFor(fmt.Sprint(item.UserID))
+		if item.Amount >= balance.FreeAmount {
+			return fmt.Errorf("提现不能超过可提现额度, 提现失败!")
+		}
 	}
 
 	return nil
