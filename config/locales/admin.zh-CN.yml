@@ -112,6 +112,8 @@ zh-CN:
     scopes:
       "Filter By Date": "按日期"
       "Filter By Workman": "按师傅筛选"
+      "Filter By Direction": "按类型"
+
   balances:
     name:
       plural: 结算统计

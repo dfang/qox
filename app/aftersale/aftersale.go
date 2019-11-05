@@ -594,6 +594,19 @@ func configureSettlements(settlement *admin.Resource) {
 		})
 	}
 
+	for _, item := range []string{"收入", "提现", "奖励", "罚款"} {
+		var item = item
+		settlement.Scope(&admin.Scope{
+			Name:  item,
+			Label: item,
+			Group: "Filter By Direction",
+			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+				// 两种写法都可以
+				return db.Where("direction = ?", item)
+			},
+		})
+	}
+
 	settlement.SaveHandler = func(result interface{}, context *qor.Context) error {
 		if context.GetDB().NewScope(result).PrimaryKeyZero() {
 			return context.GetDB().Save(result).Error
