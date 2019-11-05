@@ -42,9 +42,9 @@ func startWorkerPool() {
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
 		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_inquire")
 		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_schedule")
-		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_process")
-		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_finish")
-		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_audit")
+		pool.PeriodicallyEnqueue("0 */2 * * * *", "auto_process")
+		pool.PeriodicallyEnqueue("0 */2 * * * * *", "auto_finish")
+		pool.PeriodicallyEnqueue("0 */1 * * * *", "auto_audit")
 		pool.PeriodicallyEnqueue("0 */5 * * * *", "auto_withdraw")
 		pool.PeriodicallyEnqueue("0 */6 * * * *", "auto_award")
 		pool.PeriodicallyEnqueue("0 */7 * * * *", "auto_fine")

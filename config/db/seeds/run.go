@@ -283,6 +283,28 @@ func CreateWorkman() {
 			log.Fatalf("create workman (%v) failure, got err %v", a, err)
 		}
 	}
+
+	wp1 := users.WechatProfile{
+		Openid:      "oLROJs729qr09CqFLFx03eGAAHU8",
+		Unionid:     "opDDlslN3CL8zeH8AuW_LW_pNBoM",
+		Nickname:    "Fang",
+		MobilePhone: "15618903080",
+	}
+
+	if err := DraftDB.Create(&wp1).Error; err != nil {
+		log.Fatalf("create wechat profiles (%v) failure, got err %v", a, err)
+	}
+
+	wp2 := users.WechatProfile{
+		Openid:      "oLROJs4Zr8rn-Azsbs7_7fr2MLdU",
+		Unionid:     "opDDlstLHxfJU3budoZjto1WDR3Y",
+		Nickname:    "修水京东18070421816朱大平",
+		MobilePhone: "18970278113",
+	}
+
+	if err := DraftDB.Create(&wp2).Error; err != nil {
+		log.Fatalf("create wechat profiles (%v) failure, got err %v", a, err)
+	}
 }
 
 func importUsers() {
