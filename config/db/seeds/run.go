@@ -125,7 +125,7 @@ func Run() {
 	fmt.Println("Create brands .....")
 	CreateBrands()
 
-	fmt.Println("Create service_types .....")
+	fmt.Println("Create serviceTypes .....")
 	CreateServiceTypes()
 
 	fmt.Println("Create workman .....")
@@ -153,7 +153,7 @@ func CreateSources() {
 }
 
 func CreateServiceTypes() {
-	service_types := []string{
+	serviceTypes := []string{
 		"安装调试服务",
 		"售后维修服务",
 		"清洗养护服务",
@@ -161,9 +161,9 @@ func CreateServiceTypes() {
 	}
 
 	// var afs []settings.ServiceType
-	for i := 0; i < len(service_types); i++ {
+	for i := 0; i < len(serviceTypes); i++ {
 		a := settings.ServiceType{
-			Name: service_types[i],
+			Name: serviceTypes[i],
 		}
 
 		if err := DraftDB.Create(&a).Error; err != nil {
@@ -195,7 +195,7 @@ func CreateBrands() {
 }
 
 func CreateAftersales() {
-	service_types := []string{
+	serviceTypes := []string{
 		"安装调试服务",
 		"售后维修服务",
 	}
@@ -219,6 +219,22 @@ func CreateAftersales() {
 		"康佳",
 	}
 
+	serviceContents := []string{
+		"电视安装",
+		"电视维修",
+		"冰箱维修",
+		"冰箱安装",
+		"空调安装",
+		"空调维修",
+		"洗衣机安装",
+		"洗衣机维修",
+		"油烟机维修",
+	}
+
+	fees := []int{
+		50, 60, 80, 100, 120, 150, 180, 200,
+	}
+
 	rand.Seed(time.Now().UnixNano())
 
 	var afs []aftersales.Aftersale
@@ -228,11 +244,11 @@ func CreateAftersales() {
 			CustomerPhone:   faker.PhoneNumber().CellPhone(),
 			CustomerAddress: faker.Address().StreetAddress(),
 
-			ServiceType:    service_types[rand.Intn(1)],
-			ServiceContent: faker.Lorem().String(),
-			Source:         sources[rand.Intn(3)],
-			Brand:          brands[rand.Intn(7)],
-			Fee:            50,
+			ServiceType:    serviceTypes[rand.Intn(len(serviceTypes)-1)],
+			ServiceContent: serviceContents[rand.Intn(len(serviceContents)-1)],
+			Source:         sources[rand.Intn(len(sources)-1)],
+			Brand:          brands[rand.Intn(len(brands)-1)],
+			Fee:            float32(fees[rand.Intn(len(fees)-1)]),
 			// Fee:            float32(rand.Intn(101)),
 		}
 
