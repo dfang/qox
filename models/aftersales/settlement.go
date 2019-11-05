@@ -128,7 +128,7 @@ func UpdateBalanceFor(userID string) *Balance {
 	fmt.Println("balance is ....")
 	fmt.Println(balance)
 
-	// select state, sum(amount) as total from settlements where user_id = 1 group by state;
+	// select state, direction, sum(amount) as total from settlements where user_id = 1 group by state, direction;
 	db.DB.Table("settlements").Select("state, direction, sum(amount) as total").Group("state, direction").Where("user_id = ?", userID).Scan(&results)
 	for _, i := range results {
 		// fmt.Println(i.State)

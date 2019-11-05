@@ -11,6 +11,7 @@ import (
 
 	"github.com/dfang/qor-demo/config"
 	"github.com/dfang/qor-demo/config/db"
+	"github.com/dfang/qor-demo/config/db/seeds"
 	"github.com/dfang/qor-demo/models/aftersales"
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/gocraft/work"
@@ -47,6 +48,7 @@ func startWorkerPool() {
 		pool.PeriodicallyEnqueue("0 */5 * * * *", "auto_withdraw")
 		pool.PeriodicallyEnqueue("0 */6 * * * *", "auto_award")
 		pool.PeriodicallyEnqueue("0 */7 * * * *", "auto_fine")
+		pool.PeriodicallyEnqueue("0 */20 * * * *", "auto_fine")
 
 		pool.Job("auto_inquire", AutoInquire)
 		pool.Job("auto_schedule", AutoSchedule)
@@ -56,6 +58,8 @@ func startWorkerPool() {
 		pool.Job("auto_withdraw", AutoWithdraw)
 		pool.Job("auto_award", AutoAward)
 		pool.Job("auto_fine", AutoFine)
+		pool.Job("auto_generate_aftersales", AutoGenerateAftersales)
+
 	}
 
 	pool.Job("expire_aftersales", ExpireAftersales)
@@ -398,6 +402,15 @@ func AutoFine(job *work.Job) error {
 				fmt.Println("罚款失败！！！！")
 			}
 		}
+	}
+	return nil
+}
+
+// AutoGenerateAftersales demo模式下自动创建服务单
+func AutoGenerateAftersales(job *work.Job) error {
+	log.Debug().Msg("demo模式下自动创建服务单 .........")
+	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
+		seeds.CreateAftersales()
 	}
 	return nil
 }
