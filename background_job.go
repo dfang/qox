@@ -45,6 +45,8 @@ func startWorkerPool() {
 		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_finish")
 		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_audit")
 		pool.PeriodicallyEnqueue("0 */5 * * * *", "auto_withdraw")
+		pool.PeriodicallyEnqueue("0 */6 * * * *", "auto_award")
+		pool.PeriodicallyEnqueue("0 */7 * * * *", "auto_fine")
 
 		pool.Job("auto_inquire", AutoInquire)
 		pool.Job("auto_schedule", AutoSchedule)
@@ -52,6 +54,8 @@ func startWorkerPool() {
 		pool.Job("auto_finish", AutoFinish)
 		pool.Job("auto_audit", AutoAudit)
 		pool.Job("auto_withdraw", AutoWithdraw)
+		pool.Job("auto_award", AutoAward)
+		pool.Job("auto_fine", AutoFine)
 	}
 
 	pool.Job("expire_aftersales", ExpireAftersales)
@@ -247,7 +251,7 @@ type TemplateMsgResp struct {
 
 /* DEMO_MODE=true 自动化任务 */
 
-// AutoInquire 自动预约 demo模式下自动预约
+// AutoInquire demo模式下自动预约
 func AutoInquire(job *work.Job) error {
 	log.Debug().Msg("demo模式下自动预约 .........")
 
@@ -265,7 +269,7 @@ func AutoInquire(job *work.Job) error {
 	return nil
 }
 
-// AutoSchedule 自动派单 demo模式下自动派单
+// AutoSchedule demo模式下自动派单
 func AutoSchedule(job *work.Job) error {
 	log.Debug().Msg("demo模式下自动派单 .........")
 
@@ -285,7 +289,7 @@ func AutoSchedule(job *work.Job) error {
 	return nil
 }
 
-// AutoProcess 自动派单 demo模式下自动接单
+// AutoProcess demo模式下自动接单
 func AutoProcess(job *work.Job) error {
 	log.Debug().Msg("demo模式下自动接单 .........")
 
@@ -300,7 +304,7 @@ func AutoProcess(job *work.Job) error {
 	return nil
 }
 
-// AutoFinish 自动派单 demo模式下自动完成
+// AutoFinish demo模式下自动完成
 func AutoFinish(job *work.Job) error {
 	log.Debug().Msg("demo模式下自动完成 .........")
 
@@ -315,7 +319,7 @@ func AutoFinish(job *work.Job) error {
 	return nil
 }
 
-// AutoAudit 自动派单 demo模式下自动审批
+// AutoAudit demo模式下自动审批
 func AutoAudit(job *work.Job) error {
 	log.Debug().Msg("demo模式下自动审批 .........")
 
@@ -331,7 +335,7 @@ func AutoAudit(job *work.Job) error {
 	return nil
 }
 
-// AutoWithdraw 自动派单 demo模式下自动提现
+// AutoWithdraw demo模式下自动提现
 func AutoWithdraw(job *work.Job) error {
 	log.Debug().Msg("demo模式下自动提现 .........")
 
@@ -348,6 +352,50 @@ func AutoWithdraw(job *work.Job) error {
 
 			if err := db.DB.Save(&s); err != nil {
 				fmt.Println("提现失败！！！！")
+			}
+		}
+	}
+	return nil
+}
+
+// AutoAward demo模式下自动增加奖金
+func AutoAward(job *work.Job) error {
+	log.Debug().Msg("demo模式下自动增加奖金 .........")
+	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
+		var w users.User
+		db.DB.Model(users.User{}).Where("role = ?", "workman").Order("random()").First(&w)
+
+		if w.ID > 0 {
+			s := aftersales.Settlement{
+				Direction: "奖励",
+				Amount:    20,
+				UserID:    w.ID,
+			}
+
+			if err := db.DB.Save(&s); err != nil {
+				fmt.Println("奖励失败！！！！")
+			}
+		}
+	}
+	return nil
+}
+
+// AutoFine demo模式下自动罚款
+func AutoFine(job *work.Job) error {
+	log.Debug().Msg("demo模式下自动罚款 .........")
+	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
+		var w users.User
+		db.DB.Model(users.User{}).Where("role = ?", "workman").Order("random()").First(&w)
+
+		if w.ID > 0 {
+			s := aftersales.Settlement{
+				Direction: "罚款",
+				Amount:    -15,
+				UserID:    w.ID,
+			}
+
+			if err := db.DB.Save(&s); err != nil {
+				fmt.Println("罚款失败！！！！")
 			}
 		}
 	}
