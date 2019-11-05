@@ -48,7 +48,7 @@ func startWorkerPool() {
 		pool.PeriodicallyEnqueue("0 */5 * * * *", "auto_withdraw")
 		pool.PeriodicallyEnqueue("0 */6 * * * *", "auto_award")
 		pool.PeriodicallyEnqueue("0 */7 * * * *", "auto_fine")
-		pool.PeriodicallyEnqueue("0 */20 * * * *", "auto_fine")
+		pool.PeriodicallyEnqueue("0 */20 * * * *", "auto_generate_aftersales")
 
 		pool.Job("auto_inquire", AutoInquire)
 		pool.Job("auto_schedule", AutoSchedule)
