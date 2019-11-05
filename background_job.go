@@ -285,7 +285,11 @@ func AutoSchedule(job *work.Job) error {
 
 		if a.ID > 0 && w.ID > 0 {
 			a.UserID = w.ID
-			aftersales.OrderStateMachine.Trigger("schedule", &a, db.DB, "auto inquire aftersale with id: "+fmt.Sprintf("%d", a.ID))
+			if a.State == "inquired" {
+				aftersales.OrderStateMachine.Trigger("schedule", &a, db.DB, "auto schedule aftersale with id: "+fmt.Sprintf("%d", a.ID))
+			} else {
+				aftersales.OrderStateMachine.Trigger("reschedule", &a, db.DB, "auto reschedule aftersale with id: "+fmt.Sprintf("%d", a.ID))
+			}
 			db.DB.Save(&a)
 		}
 	}
