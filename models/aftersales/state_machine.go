@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"text/template"
 	"time"
@@ -194,7 +195,10 @@ func enqueueJob(value interface{}, tx *gorm.DB, jobType string) error {
 	fmt.Println("openid is > ", wp.Openid)
 
 	if wp.Openid == "" {
-		return fmt.Errorf("openid 不能为空，否则无法发送模板消息")
+		if os.Getenv("QOR_ENV") == "production" {
+			return fmt.Errorf("openid 不能为空，否则无法发送模板消息")
+		}
+		return nil
 	}
 
 	t, _ := TimeIn(time.Now(), "Asia/Shanghai")

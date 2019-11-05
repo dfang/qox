@@ -1,6 +1,8 @@
 package aftersales
 
 import (
+	"fmt"
+
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/jinzhu/gorm"
 )
@@ -18,6 +20,12 @@ type Balance struct {
 	// 总可提现金额
 	FreeAmount float32
 
+	// 奖励金
+	AwardAmount float32
+
+	// 罚款
+	FineAmount float32
+
 	// 历史总收入
 	TotalAmount float32
 
@@ -25,4 +33,11 @@ type Balance struct {
 	WithdrawAmount float32
 
 	// transition.Transition
+}
+
+func (item *Balance) BeforeSave(scope *gorm.Scope) error {
+	if item.UserID <= 0 {
+		return fmt.Errorf("balance user_id 不能为空")
+	}
+	return nil
 }

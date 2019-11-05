@@ -44,12 +44,14 @@ func startWorkerPool() {
 		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_process")
 		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_finish")
 		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_audit")
+		pool.PeriodicallyEnqueue("0 */5 * * * *", "auto_withdraw")
 
 		pool.Job("auto_inquire", AutoInquire)
 		pool.Job("auto_schedule", AutoSchedule)
 		pool.Job("auto_process", AutoProcess)
 		pool.Job("auto_finish", AutoFinish)
 		pool.Job("auto_audit", AutoAudit)
+		pool.Job("auto_withdraw", AutoWithdraw)
 	}
 
 	pool.Job("expire_aftersales", ExpireAftersales)
@@ -154,11 +156,11 @@ func UpdateBalances(job *work.Job) error {
 	log.Debug().Msg("update balances ......")
 
 	for _, item := range workmen {
-
 		id := strconv.FormatUint(uint64(item.ID), 10)
 		// balance := aftersales.UpdateBalanceFor(fmt.Sprint(item.ID))
-		balance := aftersales.UpdateBalanceFor(id)
-		db.DB.Save(&balance)
+		aftersales.UpdateBalanceFor(id)
+		// balance := aftersales.UpdateBalanceFor(id)
+		// db.DB.Save(&balance)
 	}
 
 	log.Debug().Msgf("now is %s", time.Now().Format("2006-01-02 15:04:05"))
@@ -326,5 +328,28 @@ func AutoAudit(job *work.Job) error {
 		}
 	}
 
+	return nil
+}
+
+// AutoWithdraw 自动派单 demo模式下自动提现
+func AutoWithdraw(job *work.Job) error {
+	log.Debug().Msg("demo模式下自动提现 .........")
+
+	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
+		var w users.User
+		db.DB.Model(users.User{}).Where("role = ?", "workman").Order("random()").First(&w)
+
+		if w.ID > 0 {
+			s := aftersales.Settlement{
+				Direction: "提现",
+				Amount:    -5,
+				UserID:    w.ID,
+			}
+
+			if err := db.DB.Save(&s); err != nil {
+				fmt.Println("提现失败！！！！")
+			}
+		}
+	}
 	return nil
 }

@@ -121,6 +121,8 @@ zh-CN:
       Free Amount: 剩余可提现金额
       Total Amount: 历史总收入
       Withdraw Amount: 历史提现总金额
+      Award Amount: 奖励金总数
+      Fine Amount: 罚款总数
       UpdatedAt: 最后更新于
     scopes:
       "Filter By Date": "按日期"

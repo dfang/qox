@@ -2,6 +2,7 @@ package aftersales
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 
 	"github.com/dfang/qor-demo/models/users"
@@ -44,18 +45,17 @@ func (item *Settlement) BeforeCreate(scope *gorm.Scope) error {
 
 // BeforeSave BeforeSave Callback
 func (item *Settlement) BeforeSave(scope *gorm.Scope) error {
-	if item.Direction == "提现" {
-		if item.Amount > 0 {
-			item.Amount = -item.Amount
-			item.State = "withdrawed"
-		}
-	}
+	fmt.Println("before save ...")
+	fmt.Println(item)
+	fmt.Println(item.User)
+	fmt.Println(item.UserID) // 0, 取不到值得, 不对
+	fmt.Println(item.User.ID)
 
 	if item.Direction == "罚款" {
 		if item.Amount > 0 {
 			item.Amount = -item.Amount
-			item.State = "free"
 		}
+		item.State = "free"
 	}
 
 	if item.Direction == "奖励" {
@@ -66,11 +66,28 @@ func (item *Settlement) BeforeSave(scope *gorm.Scope) error {
 
 	// 检查是否可提现
 	if item.Direction == "提现" {
-		// Amount <= Balance.FreeAmount
-		balance := UpdateBalanceFor(fmt.Sprint(item.UserID))
-		if item.Amount >= balance.FreeAmount {
-			return fmt.Errorf("提现不能超过可提现额度, 提现失败!")
+		// s, err := strconv.ParseUint(fmt.Sprint(item.Amount), 10, 64)
+		// if err != nil {
+		// 	panic(err)
+		// }
+		// amount := float32(s)
+
+		balance := UpdateBalanceFor(fmt.Sprint(item.User.ID))
+
+		fmt.Println(*balance)
+
+		fmt.Println("剩余可提现额度是", balance.FreeAmount)
+		fmt.Println("尝试提现", item.Amount)
+
+		if math.Abs(float64(item.Amount)) >= float64(balance.FreeAmount) {
+			return fmt.Errorf("提现不能超过可提现额度, 提现失败")
 		}
+
+		if item.Amount > 0 {
+			item.Amount = -item.Amount
+		}
+
+		item.State = "withdrawed"
 	}
 
 	return nil
@@ -79,9 +96,8 @@ func (item *Settlement) BeforeSave(scope *gorm.Scope) error {
 // AfterSave AfterSave Callback
 func (item *Settlement) AfterSave(scope *gorm.Scope) error {
 	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
-
 	fmt.Printf("enqueueing update_balance for user id %d .....\n", item.UserID)
-	id := strconv.FormatUint(uint64(item.UserID), 10)
+	id := strconv.FormatUint(uint64(item.User.ID), 10)
 	j, err := enqueuer.Enqueue("update_balance", work.Q{"user_id": id})
 	if err != nil {
 		return err
@@ -93,11 +109,13 @@ func (item *Settlement) AfterSave(scope *gorm.Scope) error {
 
 // UpdateBalanceFor 更新账户余额
 // 罚款和奖励都是立即生效的（立即变为free状态的）
-func UpdateBalanceFor(userID string) Balance {
+// update balance by user_id
+func UpdateBalanceFor(userID string) *Balance {
 	var results []Result
-	var f1, f2, f3 float32
+	// var f1, f2, f3 float32
 
-	// update balance by user_id
+	var awards, fines, incomeFrozen, incomeFree, withdraw float32
+
 	var balance Balance
 
 	u64, err := strconv.ParseUint(userID, 10, 32)
@@ -107,33 +125,52 @@ func UpdateBalanceFor(userID string) Balance {
 
 	db.DB.Model(Balance{}).Where("user_id = ?", userID).Assign(Balance{UserID: uint(u64)}).FirstOrInit(&balance)
 
+	fmt.Println("balance is ....")
+	fmt.Println(balance)
+
 	// select state, sum(amount) as total from settlements where user_id = 1 group by state;
-	db.DB.Table("settlements").Select("state, sum(amount) as total").Group("state").Where("user_id = ?", userID).Scan(&results)
+	db.DB.Table("settlements").Select("state, direction, sum(amount) as total").Group("state, direction").Where("user_id = ?", userID).Scan(&results)
 	for _, i := range results {
 		// fmt.Println(i.State)
 		// fmt.Println(i.Total)
-		if i.State == "frozen" {
-			f1 = i.Total
+
+		if i.Direction == "收入" && i.State == "frozen" {
+			incomeFrozen = i.Total
 		}
 
-		if i.State == "free" {
-			f2 = i.Total
+		if i.Direction == "收入" && i.State == "free" {
+			incomeFree = i.Total
+		}
+
+		if i.Direction == "奖励" {
+			awards = i.Total
+		}
+
+		if i.Direction == "罚款" {
+			fines = i.Total
 		}
 
 		if i.State == "withdrawed" {
-			f3 = i.Total
+			withdraw = i.Total
 		}
+
 	}
 
-	balance.FrozenAmount = f1
-	balance.FreeAmount = f2 + f3
-	balance.WithdrawAmount = f3
-	balance.TotalAmount = f2 + f1
+	balance.TotalAmount = incomeFrozen + incomeFree
+	balance.WithdrawAmount = withdraw
+	balance.FineAmount = fines
+	balance.AwardAmount = awards
 
-	return balance
+	balance.FrozenAmount = incomeFrozen
+	balance.FreeAmount = incomeFrozen + incomeFree + awards + (fines + withdraw)
+
+	db.DB.Save(&balance)
+	return &balance
 }
 
+// Result 临时结果表
 type Result struct {
-	State string
-	Total float32
+	State     string
+	Direction string
+	Total     float32
 }

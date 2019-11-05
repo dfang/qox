@@ -198,11 +198,13 @@ $(document).ready(function () {
 
   if ($('.qor-settlements').length > 0) {
     // $(document).off("click.qor.openUrl", ".qor-table-container tr[data-url]")
-
     // $(document).off("click.qor.openUrl", "[data-url]")
 
     // hide search button
     $('.qor-search__label').hide()
+
+    // hide qor-actions dropdown
+    $('.qor-table__actions').hide()
   }
 
   if ($('.qor-brands, .qor-servcie_types, .qor-wechat_profiles').length > 0) {

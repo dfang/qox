@@ -38,7 +38,7 @@ type Config struct {
 
 var sources []settings.Source
 var brands []settings.Brand
-var service_types []settings.ServiceType
+var serviceTypes []settings.ServiceType
 var workmen []users.User
 
 // ConfigureApplication configure application
@@ -51,134 +51,44 @@ func (app App) ConfigureApplication(application *application.Application) {
 func (App) ConfigureAdmin(Admin *admin.Admin) {
 
 	db.DB.Select("name, id").Find(&brands)
-	db.DB.Select("name, id").Find(&service_types)
+	db.DB.Select("name, id").Find(&serviceTypes)
 	db.DB.Select("name, id").Find(&sources)
 	db.DB.Select("name, id").Where("role = ?", "workman").Find(&workmen)
 
 	aftersale := Admin.AddResource(&aftersales.Aftersale{}, &admin.Config{Menu: []string{"Aftersale Management"}, Priority: 1})
-	aftersale.Meta(&admin.Meta{Name: "User", Type: "aftersale_user_field"})
 
 	Admin.AddResource(&settings.Source{}, &admin.Config{Name: "Source", Menu: []string{"Aftersale Management"}, Priority: 2})
 	Admin.AddResource(&settings.Brand{}, &admin.Config{Name: "Brand", Menu: []string{"Aftersale Management"}, Priority: 3})
 	Admin.AddResource(&settings.ServiceType{}, &admin.Config{Name: "ServiceType", Menu: []string{"Aftersale Management"}, Priority: 4})
+
 	manufacturer := Admin.AddResource(&aftersales.Manufacturer{}, &admin.Config{Menu: []string{"Aftersale Management"}, Priority: 5})
+	settlement := Admin.AddResource(&aftersales.Settlement{}, &admin.Config{Menu: []string{"Settlement Management"}, Priority: 2})
+	balance := Admin.AddResource(&aftersales.Balance{}, &admin.Config{Menu: []string{"Settlement Management"}, Priority: 1})
+
+	configureMetasForAftersales(aftersale)
+	configureActionsForAftersales(Admin, aftersale)
+	configureScopesForAftersales(aftersale)
+
+	configureManufacturers(manufacturer)
+	configureSettlements(settlement)
+	configureBalances(balance)
 
 	activity.Register(aftersale)
-
-	settlement := Admin.AddResource(&aftersales.Settlement{}, &admin.Config{Menu: []string{"Settlement Management"}, Priority: 2})
-	settlement.IndexAttrs("ID", "Workman", "Amount", "Direction", "Aftersale", "State", "CreatedAt")
-	settlement.Meta(&admin.Meta{
-		Name:       "Direction",
-		Type:       "select_one",
-		Collection: []string{"收入", "提现", "罚款", "奖励"},
-	})
-	// 虚拟field， 仅为在列表页正确显示师傅姓名和链接，又不影响form里的下拉框
-	settlement.Meta(&admin.Meta{
-		Name: "Workman",
-		Type: "settlement_user_field",
-		Valuer: func(record interface{}, context *qor.Context) interface{} {
-			if p, ok := record.(*aftersales.Settlement); ok {
-				// fmt.Println("ok")
-				var user users.User
-				context.GetDB().Model(users.User{}).Where("id = ?", p.UserID).Find(&user)
-				// fmt.Println(p)
-				// fmt.Println(p.User)
-				return user
-			}
-
-			return record
-		},
-	})
-
-	settlement.Meta(&admin.Meta{
-		Name: "User",
-		Type: "select_one",
-		Collection: func(_ interface{}, context *admin.Context) (options [][]string) {
-			var users []users.User
-			context.GetDB().Where("role = ?", "workman").Find(&users)
-
-			for _, n := range users {
-				idStr := fmt.Sprintf("%d", n.ID)
-				var option = []string{idStr, n.Name}
-				options = append(options, option)
-			}
-
-			return options
-		},
-	})
-	settlement.Meta(&admin.Meta{Name: "State", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
-		m := record.(*aftersales.Settlement)
-		switch m.State {
-		case "frozen":
-			return "冻结中"
-		case "free":
-			return "已解冻"
-		case "withdrawed":
-			return "已提现"
-		default:
-			// return "N/A"
-			return m.State
-		}
-	}})
-	// settlement.Meta(&admin.Meta{Name: "Amount", Type: "float32", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
-	// 	m := record.(*aftersales.Settlement)
-	// 	if m.Amount < 0 {
-	// 		return (-m.Amount)
-	// 	}
-	// 	return m.Amount
-	// }})
-
-	balance := Admin.AddResource(&aftersales.Balance{}, &admin.Config{Menu: []string{"Settlement Management"}, Priority: 1})
-	balance.IndexAttrs("User", "FrozenAmount", "FreeAmount", "TotalAmount", "WithdrawAmount", "UpdatedAt")
-	balance.Meta(&admin.Meta{Name: "WithdrawAmount", Type: "float32", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
-		m := record.(*aftersales.Balance)
-		if m.WithdrawAmount < 0 {
-			return (-m.WithdrawAmount)
-		}
-		return m.WithdrawAmount
-	}})
-	balance.Meta(&admin.Meta{Name: "User", Type: "balance_user_field", Label: "师傅"})
-
-	manufacturer.Meta(&admin.Meta{Name: "URL", Type: "manufacturer_url_field", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
-		m := record.(*aftersales.Manufacturer)
-		return m
-	}})
-	manufacturer.Action(&admin.Action{
-		Name: "打开厂家后台网站",
-		URL: func(record interface{}, context *admin.Context) string {
-			if item, ok := record.(*aftersales.Manufacturer); ok {
-				return fmt.Sprintf("%s", item.URL)
-			}
-			return "#"
-		},
-		URLOpenType: "_blank",
-		Modes:       []string{"menu_item", "edit", "show"},
-	})
-
-	configureMetas(aftersale)
-	configureActions(Admin, aftersale)
-	configureScopes(aftersale)
-
-	configureScopesForSettlements(settlement)
-	configureScopesForBalances(balance)
 
 	// aftersale.UseTheme("grid")
 	// aftersale.UseTheme("publish2")
 	aftersale.UseTheme("fancy")
-
-	// aftersale.FindManyHandler = func(results interface{}, context *qor.Context) error {
-	// 	db             = context.GetDB()
-	// 	scope          = db.NewScope(record)
-
-	// 	// find records and decode them to results
-	// 	return nil
-	// }
 }
 
-func configureMetas(model *admin.Resource) {
+func configureMetasForAftersales(model *admin.Resource) {
 	// model.EditAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
 	// model.NewAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
 	model.IndexAttrs("ID", "CustomerName", "CustomerPhone", "CustomerAddress", "Source", "Brand", "ServiceType", "Fee", "User", "State", "UpdatedAt")
+	model.Meta(&admin.Meta{Name: "User", Type: "aftersale_user_field"})
+	model.Meta(&admin.Meta{Name: "UpdatedAt", Type: "datetime", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		m := record.(*aftersales.Aftersale)
+		return m.UpdatedAt.Local().Format("2006-01-02 15:04:05")
+	}})
 	model.Meta(&admin.Meta{Name: "State", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
 		m := record.(*aftersales.Aftersale)
 		switch m.State {
@@ -241,7 +151,7 @@ func configureMetas(model *admin.Resource) {
 		Type: "select_one",
 		// Collection: []string{"安装", "维修", "清洗"},
 		Collection: func(value interface{}, context *qor.Context) (options [][]string) {
-			for _, m := range service_types {
+			for _, m := range serviceTypes {
 				idStr := fmt.Sprintf("%s", m.Name)
 				var option = []string{idStr, m.Name}
 				options = append(options, option)
@@ -297,7 +207,7 @@ func configureMetas(model *admin.Resource) {
 		}})
 }
 
-func configureScopes(model *admin.Resource) {
+func configureScopesForAftersales(model *admin.Resource) {
 	// filter by order state
 	for _, item := range aftersales.STATES {
 		var item = item // 这句必须有否则会报错，永远都是最后一个值
@@ -318,7 +228,7 @@ func configureScopes(model *admin.Resource) {
 	}
 
 	// filter by order type
-	for _, item := range service_types {
+	for _, item := range serviceTypes {
 		var item = item // 这句必须有否则会报错，永远都是最后一个值
 		model.Scope(&admin.Scope{
 			Name:  item.Name,
@@ -434,7 +344,7 @@ func configureScopes(model *admin.Resource) {
 	})
 }
 
-func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
+func configureActionsForAftersales(Admin *admin.Admin, aftersale *admin.Resource) {
 	// 预约客户
 	type reserveActionArgument struct {
 		Remark string
@@ -669,10 +579,11 @@ func configureActions(Admin *admin.Admin, aftersale *admin.Resource) {
 	})
 }
 
-func configureScopesForSettlements(model *admin.Resource) {
+func configureSettlements(settlement *admin.Resource) {
+	// scopes
 	for _, item := range workmen {
 		var item = item
-		model.Scope(&admin.Scope{
+		settlement.Scope(&admin.Scope{
 			Name:  item.Name,
 			Label: item.Name,
 			Group: "Filter By Workman",
@@ -682,12 +593,144 @@ func configureScopesForSettlements(model *admin.Resource) {
 			},
 		})
 	}
+
+	settlement.SaveHandler = func(result interface{}, context *qor.Context) error {
+		if context.GetDB().NewScope(result).PrimaryKeyZero() {
+			return context.GetDB().Save(result).Error
+		}
+		return nil
+	}
+
+	settlement.IndexAttrs("ID", "Workman", "Amount", "Direction", "Aftersale", "State", "UpdatedAt")
+	// settlement.ShowAttrs("ID", "User", "Amount", "Direction", "Aftersale", "State", "CreatedAt", "UpdatedAt", "CreatedBy", "UpdatedBy")
+	settlement.NewAttrs("User", "Direction", "Amount", "Aftersale")
+	settlement.Meta(&admin.Meta{
+		Name:       "Direction",
+		Type:       "select_one",
+		Collection: []string{"收入", "提现", "罚款", "奖励"},
+	})
+	// 虚拟field， 仅为在列表页正确显示师傅姓名和链接，又不影响form里的下拉框
+	settlement.Meta(&admin.Meta{
+		Name: "Workman",
+		Type: "settlement_user_field",
+		Valuer: func(record interface{}, context *qor.Context) interface{} {
+			if p, ok := record.(*aftersales.Settlement); ok {
+				// fmt.Println("ok")
+				var user users.User
+				context.GetDB().Model(users.User{}).Where("id = ?", p.UserID).Find(&user)
+				// fmt.Println(p)
+				// fmt.Println(p.User)
+				return user
+			}
+
+			return record
+		},
+	})
+	settlement.Meta(&admin.Meta{
+		Name: "User",
+		Type: "select_one",
+		Config: &admin.SelectOneConfig{
+			Collection: func(_ interface{}, context *admin.Context) (options [][]string) {
+				var users []users.User
+				context.GetDB().Where("role = ?", "workman").Find(&users)
+
+				for _, n := range users {
+					idStr := fmt.Sprintf("%d", n.ID)
+					var option = []string{idStr, n.Name}
+					options = append(options, option)
+				}
+
+				return options
+			},
+			AllowBlank: false,
+		},
+	})
+	settlement.Meta(&admin.Meta{
+		Name: "Aftersale",
+		Type: "select_one",
+		Config: &admin.SelectOneConfig{
+			Collection: func(_ interface{}, context *admin.Context) (options [][]string) {
+				var items []aftersales.Aftersale
+				context.GetDB().Find(&items)
+
+				for _, n := range items {
+					idStr := fmt.Sprintf("%d", n.ID)
+					var option = []string{idStr, fmt.Sprintf("#%d: %s", n.ID, n.ServiceContent)}
+					options = append(options, option)
+				}
+
+				return options
+			},
+			AllowBlank: true,
+		},
+	})
+	settlement.Meta(&admin.Meta{Name: "State", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		m := record.(*aftersales.Settlement)
+		switch m.State {
+		case "frozen":
+			return "冻结中"
+		case "free":
+			return "已解冻"
+		case "withdrawed":
+			return "已提现"
+		default:
+			// return "N/A"
+			return m.State
+		}
+	}})
+	// settlement.Meta(&admin.Meta{Name: "Amount", Type: "float32", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+	// 	m := record.(*aftersales.Settlement)
+	// 	if m.Amount < 0 {
+	// 		return (-m.Amount)
+	// 	}
+	// 	return m.Amount
+	// }})
+
+	settlement.Meta(&admin.Meta{Name: "CreatedAt", Type: "readonly"})
+	settlement.Meta(&admin.Meta{Name: "CreatedBy", Type: "readonly"})
+	settlement.Meta(&admin.Meta{Name: "UpdatedBy", Type: "readonly"})
+	settlement.Meta(&admin.Meta{Name: "UpdatedAt", Type: "datetime", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		m := record.(*aftersales.Settlement)
+		return m.UpdatedAt.Local().Format("2006-01-02 15:04:05")
+	}})
 }
 
-func configureScopesForBalances(model *admin.Resource) {
+func configureManufacturers(manufacturer *admin.Resource) {
+	manufacturer.Meta(&admin.Meta{Name: "URL", Type: "manufacturer_url_field", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		m := record.(*aftersales.Manufacturer)
+		return m
+	}})
+	manufacturer.Action(&admin.Action{
+		Name: "打开厂家后台网站",
+		URL: func(record interface{}, context *admin.Context) string {
+			if item, ok := record.(*aftersales.Manufacturer); ok {
+				return fmt.Sprintf("%s", item.URL)
+			}
+			return "#"
+		},
+		URLOpenType: "_blank",
+		Modes:       []string{"menu_item", "edit", "show"},
+	})
+}
+
+func configureBalances(balance *admin.Resource) {
+	balance.IndexAttrs("User", "FrozenAmount", "FreeAmount", "TotalAmount", "WithdrawAmount", "AwardAmount", "FineAmount", "UpdatedAt")
+	balance.Meta(&admin.Meta{Name: "WithdrawAmount", Type: "float32", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		m := record.(*aftersales.Balance)
+		if m.WithdrawAmount < 0 {
+			return (-m.WithdrawAmount)
+		}
+		return m.WithdrawAmount
+	}})
+	balance.Meta(&admin.Meta{Name: "User", Type: "balance_user_field", Label: "师傅"})
+	balance.Meta(&admin.Meta{Name: "UpdatedAt", Type: "datetime", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		m := record.(*aftersales.Balance)
+		return m.UpdatedAt.Local().Format("2006-01-02 15:04:05")
+	}})
+	// scopes
 	for _, item := range workmen {
 		var item = item
-		model.Scope(&admin.Scope{
+		balance.Scope(&admin.Scope{
 			Name:  item.Name,
 			Label: item.Name,
 			Group: "Filter By Workman",
