@@ -82,8 +82,8 @@ var Config = struct {
 		FreezeAuditedAftersales string `env:"FREEZE_AUDITED_AFTERSALES"`
 		UnfreezeAftersales      string `env:"UNFREEZE_AFTERSALES"`
 		UpdateBalances          string `env:"UPDATE_BALANCES"`
-
-		AutoInquire            string
+		// DEMO_MODE = true 才用得到
+		AutoInquire            string `env:"AutoInquire"`
 		AutoSchedule           string
 		AutoProcess            string
 		AutoFinish             string
@@ -157,6 +157,7 @@ func Initialize() {
 	}
 
 	log.Debug().Msg("Cron settings: ")
+	log.Debug().Msgf("Cron settings: %+v", Config.Cron)
 	log.Debug().Msgf("ExpireAftersales: %s", Config.Cron.ExpireAftersales)
 	log.Debug().Msgf("FreezeAuditedAftersales: %s", Config.Cron.FreezeAuditedAftersales)
 	log.Debug().Msgf("UnfreezeAftersales: %s", Config.Cron.UnfreezeAftersales)

@@ -35,6 +35,7 @@ func startWorkerPool() {
 	pool.Middleware(Log)
 
 	cronCfg := config.Config.Cron
+	fmt.Println(cronCfg)
 
 	pool.PeriodicallyEnqueue(cronCfg.ExpireAftersales, "expire_aftersales")
 	pool.PeriodicallyEnqueue(cronCfg.FreezeAuditedAftersales, "freeze_audited_aftersales")
