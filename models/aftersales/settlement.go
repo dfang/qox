@@ -51,6 +51,15 @@ func (item *Settlement) BeforeSave(scope *gorm.Scope) error {
 	fmt.Println(item.UserID) // 0, 取不到值得, 不对
 	fmt.Println(item.User.ID)
 
+	// 表单提交来的 item.User.ID 有值
+	// AutoWithdraw 来的只有item.UserID 有值
+	var userID uint
+	if item.UserID != 0 {
+		userID = item.UserID
+	} else {
+		userID = item.User.ID
+	}
+
 	if item.Direction == "罚款" {
 		if item.Amount > 0 {
 			item.Amount = -item.Amount
@@ -65,14 +74,14 @@ func (item *Settlement) BeforeSave(scope *gorm.Scope) error {
 	}
 
 	// 检查是否可提现
-	if item.Direction == "提现" {
+	if item.Direction == "提现" && userID > 0 {
 		// s, err := strconv.ParseUint(fmt.Sprint(item.Amount), 10, 64)
 		// if err != nil {
 		// 	panic(err)
 		// }
 		// amount := float32(s)
 
-		balance := UpdateBalanceFor(fmt.Sprint(item.User.ID))
+		balance := UpdateBalanceFor(fmt.Sprint(userID))
 
 		fmt.Println(*balance)
 
