@@ -142,6 +142,19 @@ func configureMetasForAftersales(model *admin.Resource) {
 		"CreatedAt",
 		"UpdatedAt",
 	)
+	model.ShowAttrs(
+		"CustomerName",
+		"CustomerPhone",
+		"CustomerAddress",
+		"Source",
+		"Brand",
+		"ServiceType",
+		"Fee",
+		"ServiceContent",
+		"ReservedServiceTime",
+		"CreatedAt",
+		"UpdatedAt",
+	)
 
 	model.Meta(&admin.Meta{Name: "CreatedAt", Type: "readonly"})
 	model.Meta(&admin.Meta{Name: "UpdatedAt", Type: "readonly"})
@@ -661,6 +674,13 @@ func configureSettlements(settlement *admin.Resource) {
 	settlement.Meta(&admin.Meta{
 		Name: "Aftersale",
 		Type: "select_one",
+		// FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		// 	m := record.(*aftersales.Settlement)
+		// 	if m.Direction == "收入" {
+		// 		return "<a href=\"#\">Aftersale #{m.ID}</a>"
+		// 	}
+		// 	return ""
+		// },
 		Config: &admin.SelectOneConfig{
 			Collection: func(_ interface{}, context *admin.Context) (options [][]string) {
 				var items []aftersales.Aftersale
