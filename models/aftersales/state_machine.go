@@ -236,7 +236,7 @@ func enqueueScheduleJob(openid string, id uint, format string) error {
 	m := ModelForSchedule{
 		OpenID: openid,
 		ID:     strconv.FormatUint(uint64(id), 10),
-		URL:    "http://mp.xsjd123.com/",
+		URL:    fmt.Sprintf("http://mp.xsjd123.com/#/pages/detail/index?id=%d", id),
 		Now:    format,
 	}
 	s := executeTpl(SCHEDULE_TPL, m)
@@ -262,7 +262,7 @@ func enqueueAuditJob(openid string, id uint, format string) error {
 	m := ModelForAudit{
 		OpenID: openid,
 		ID:     strconv.FormatUint(uint64(id), 10),
-		URL:    "http://mp.xsjd123.com/",
+		URL:    fmt.Sprintf("http://mp.xsjd123.com/#/pages/detail/index?id=%d", id),
 		Now:    format,
 	}
 	s := executeTpl(AUDIT_OK_TPL, m)
@@ -286,7 +286,7 @@ func enqueueUnfreezeJob(openid string, id uint, format string) error {
 	m := ModelForAudit{
 		OpenID: openid,
 		ID:     strconv.FormatUint(uint64(id), 10),
-		URL:    "http://mp.xsjd123.com/",
+		URL:    fmt.Sprintf("http://mp.xsjd123.com/#/pages/detail/index?id=%d", id),
 		Now:    format,
 	}
 	s := executeTpl(UNFREEZE_TPL, m)
@@ -310,7 +310,7 @@ func enqueueAuditFailedJob(openid string, id uint, format string) error {
 	m := ModelForAudit{
 		OpenID: openid,
 		ID:     strconv.FormatUint(uint64(id), 10),
-		URL:    "http://mp.xsjd123.com/",
+		URL:    fmt.Sprintf("http://mp.xsjd123.com/#/pages/detail/index?id=%d", id),
 		Now:    format,
 	}
 	s := executeTpl(AUDIT_FAILED_TPL, m)

@@ -283,7 +283,7 @@ func AutoSchedule(job *work.Job) error {
 		var a aftersales.Aftersale
 		var w users.User
 		db.DB.Model(users.User{}).Where("role = ?", "workman").Order("random()").First(&w)
-		db.DB.Where("state = ? or state = ?", "inquired", "overdue").Order("random()").First(&a)
+		db.DB.Where("state = ? or state = ?", "overdue", "inquired").Order("random()").First(&a)
 
 		if a.ID > 0 && w.ID > 0 {
 			a.UserID = w.ID
