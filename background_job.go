@@ -34,21 +34,23 @@ func startWorkerPool() {
 	// pool.PeriodicallyEnqueue("30 * * * * *", "update_balances")
 	pool.Middleware(Log)
 
-	pool.PeriodicallyEnqueue(config.Config.Cron.ExpireAftersales, "expire_aftersales")
-	pool.PeriodicallyEnqueue(config.Config.Cron.FreezeAuditedAftersales, "freeze_audited_aftersales")
-	pool.PeriodicallyEnqueue(config.Config.Cron.UnfreezeAftersales, "unfreeze_aftersales")
-	pool.PeriodicallyEnqueue(config.Config.Cron.UpdateBalances, "update_balances")
+	cronCfg := config.Config.Cron
+
+	pool.PeriodicallyEnqueue(cronCfg.ExpireAftersales, "expire_aftersales")
+	pool.PeriodicallyEnqueue(cronCfg.FreezeAuditedAftersales, "freeze_audited_aftersales")
+	pool.PeriodicallyEnqueue(cronCfg.UnfreezeAftersales, "unfreeze_aftersales")
+	pool.PeriodicallyEnqueue(cronCfg.UpdateBalances, "update_balances")
 
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
-		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_inquire")
-		pool.PeriodicallyEnqueue("*/30 * * * * *", "auto_schedule")
-		pool.PeriodicallyEnqueue("0 */2 * * * *", "auto_process")
-		pool.PeriodicallyEnqueue("0 */2 * * * *", "auto_finish")
-		pool.PeriodicallyEnqueue("0 */1 * * * *", "auto_audit")
-		pool.PeriodicallyEnqueue("0 */5 * * * *", "auto_withdraw")
-		pool.PeriodicallyEnqueue("0 */6 * * * *", "auto_award")
-		pool.PeriodicallyEnqueue("0 */7 * * * *", "auto_fine")
-		pool.PeriodicallyEnqueue("0 */20 * * * *", "auto_generate_aftersales")
+		pool.PeriodicallyEnqueue(cronCfg.AutoInquire, "auto_inquire")
+		pool.PeriodicallyEnqueue(cronCfg.AutoSchedule, "auto_schedule")
+		pool.PeriodicallyEnqueue(cronCfg.AutoProcess, "auto_process")
+		pool.PeriodicallyEnqueue(cronCfg.AutoFinish, "auto_finish")
+		pool.PeriodicallyEnqueue(cronCfg.AutoAudit, "auto_audit")
+		pool.PeriodicallyEnqueue(cronCfg.AutoWithdraw, "auto_withdraw")
+		pool.PeriodicallyEnqueue(cronCfg.AutoAward, "auto_award")
+		pool.PeriodicallyEnqueue(cronCfg.AutoFine, "auto_fine")
+		pool.PeriodicallyEnqueue(cronCfg.AutoGenerateAftersales, "auto_generate_aftersales")
 
 		pool.Job("auto_inquire", AutoInquire)
 		pool.Job("auto_schedule", AutoSchedule)
@@ -253,7 +255,7 @@ type TemplateMsgResp struct {
 	MsgID   int64  `json:"msgid"`
 }
 
-/* DEMO_MODE=true 自动化任务 */
+/* DEMO_MODE=true 下自动化任务 */
 
 // AutoInquire demo模式下自动预约
 func AutoInquire(job *work.Job) error {

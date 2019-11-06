@@ -16,3 +16,13 @@ cron:
   freezeauditedaftersales: "*/30 * * * * *"
   unfreezeaftersales: "*/30 * * * * *"
   updatebalances: "*/30 * * * * *"
+
+  autoinquire: "*/30 * * * * *"
+  autoschedule: "0 */5 * * * *"
+  autoprocess: "0 */2 * * * *"
+  autofinish: "0 */2 * * * *"
+  autoaudit: "0 */1 * * * *"
+  autowithdraw: "0 */5 * * * *"
+  autoaward: "0 */6 * * * *"
+  autofine: "0 */7 * * * *"
+  autogenerateaftersales: "0 */30 * * * *"

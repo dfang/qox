@@ -82,6 +82,16 @@ var Config = struct {
 		FreezeAuditedAftersales string `env:"FREEZE_AUDITED_AFTERSALES"`
 		UnfreezeAftersales      string `env:"UNFREEZE_AFTERSALES"`
 		UpdateBalances          string `env:"UPDATE_BALANCES"`
+
+		AutoInquire            string
+		AutoSchedule           string
+		AutoProcess            string
+		AutoFinish             string
+		AutoAudit              string
+		AutoWithdraw           string
+		AutoAward              string
+		AutoFine               string
+		AutoGenerateAftersales string
 	}
 
 	SMTP         SMTPConfig
