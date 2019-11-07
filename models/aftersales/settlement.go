@@ -83,8 +83,6 @@ func (item *Settlement) BeforeSave(scope *gorm.Scope) error {
 
 		balance := UpdateBalanceFor(fmt.Sprint(userID))
 
-		fmt.Println(*balance)
-
 		fmt.Println("剩余可提现额度是", balance.FreeAmount)
 		fmt.Println("尝试提现", item.Amount)
 
@@ -106,7 +104,7 @@ func (item *Settlement) BeforeSave(scope *gorm.Scope) error {
 func (item *Settlement) AfterSave(scope *gorm.Scope) error {
 	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
 	fmt.Printf("enqueueing update_balance for user id %d .....\n", item.UserID)
-	id := strconv.FormatUint(uint64(item.User.ID), 10)
+	id := strconv.FormatUint(uint64(item.UserID), 10)
 	j, err := enqueuer.Enqueue("update_balance", work.Q{"user_id": id})
 	if err != nil {
 		return err
@@ -124,18 +122,13 @@ func UpdateBalanceFor(userID string) *Balance {
 	// var f1, f2, f3 float32
 
 	var awards, fines, incomeFrozen, incomeFree, withdraw float32
-
 	var balance Balance
-
 	u64, err := strconv.ParseUint(userID, 10, 32)
 	if err != nil {
 		panic(err)
 	}
 
 	db.DB.Model(Balance{}).Where("user_id = ?", userID).Assign(Balance{UserID: uint(u64)}).FirstOrInit(&balance)
-
-	fmt.Println("balance is ....")
-	fmt.Println(balance)
 
 	// select state, direction, sum(amount) as total from settlements where user_id = 1 group by state, direction;
 	db.DB.Table("settlements").Select("state, direction, sum(amount) as total").Group("state, direction").Where("user_id = ?", userID).Scan(&results)
