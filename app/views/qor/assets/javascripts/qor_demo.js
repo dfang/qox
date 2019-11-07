@@ -249,16 +249,21 @@ $(document).ready(function () {
     window.location.href = "/admin/balances"
   });
 
+  Mousetrap.bind('g r', function () {
+    window.location.href = "/admin/reports"
+  });
+
+
   // New action
   Mousetrap.bind('n', function () {
     $('.qor-button--new').click()
   });
 
-  Mousetrap.bind('s', function () {
+  Mousetrap.bind('\\', function () {
     toggleDrawer()
   });
 
-  Mousetrap.bind('d', function () {
+  Mousetrap.bind('s', function () {
     toggleDrawer()
   });
 

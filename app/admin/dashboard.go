@@ -2,6 +2,7 @@ package admin
 
 import (
 	"encoding/json"
+	"net/http"
 	"strings"
 
 	"github.com/dfang/qor-demo/config/db"
@@ -107,5 +108,10 @@ func SetupDashboard(Admin *admin.Admin) {
 	// Admin.AddMenu(&admin.Menu{Name: "Today", Link: "/admin/today", Ancestors: []string{"Reports"}})
 
 	// Admin.GetRouter().Get("/reports", ReportsDataHandler)
+	Admin.GetRouter().Get("/reports", ReportsHandler)
 	initFuncMap(Admin)
+}
+
+func ReportsHandler(context *admin.Context) {
+	http.Redirect(context.Writer, context.Request, "/admin/reports/by_brands", http.StatusFound)
 }
