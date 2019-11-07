@@ -1,0 +1,40 @@
+{{$context := .}}
+{{$resource := .Resource}}
+
+{{if len .Result}}
+  {{$metas := toAftersaleReportBySource .Result}}
+
+  <table class="mdl-data-table mdl-js-data-table qor-table qor-js-table">
+    <thead>
+      <tr>
+        <th class="mdl-data-table__cell--non-numeric">时间</th>
+        <th class="mdl-data-table__cell--non-numeric">来源</th>
+        <th class="mdl-data-table__cell--non-numeric">完成量(单)</th>
+        <th class="mdl-data-table__cell--non-numeric">总费用(元)</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{range $index, $meta := $metas}}
+          <tr>
+              <td class="mdl-data-table__cell--non-numeric">
+                <div class="qor-table__content">{{ $meta.Time }}</div>
+              </td>
+              <td class="mdl-data-table__cell--non-numeric">
+                <div class="qor-table__content">{{ $meta.Source }}</div>
+              </td>
+
+              <td class="mdl-data-table__cell--non-numeric">
+                <div class="qor-table__content">{{ $meta.Count }}</div>
+              </td>
+
+              <td class="mdl-data-table__cell--non-numeric">
+                <div class="qor-table__content">{{ $meta.Sum }}</div>
+              </td>
+          </tr>
+      {{end}}
+    </tbody>
+  </table>
+{{else}}
+  <h2 class="qor-page__tips">{{t (printf "%v.tables.no_items" $resource.ToParam) (printf "No %v to show." (lower (plural $resource.Name)))}}</h2>
+{{end}}

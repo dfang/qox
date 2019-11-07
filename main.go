@@ -29,6 +29,8 @@ import (
 	"github.com/dfang/qor-demo/app/orders"
 	"github.com/dfang/qor-demo/app/pages"
 	"github.com/dfang/qor-demo/app/products"
+
+	"github.com/dfang/qor-demo/app/reports"
 	"github.com/dfang/qor-demo/app/stores"
 	"github.com/dfang/qor-demo/config"
 	"github.com/dfang/qor-demo/config/auth"
@@ -265,6 +267,8 @@ func setupMiddlewaresAndRoutes() {
 	Application.Use(orders.NewWithDefault())
 	Application.Use(pages.NewWithDefault())
 	Application.Use(stores.NewWithDefault())
+
+	Application.Use(reports.NewWithDefault())
 
 	// Application.Use(enterprise.New(&enterprise.Config{}))
 

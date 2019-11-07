@@ -1,0 +1,22 @@
+<div class="qor-page__body">
+  {{render "shared/flashes"}}
+  {{render "shared/errors"}}
+
+  <!-- if have table please add qor-section__table className -->
+  <div class="qor-section reports qor-section__table">
+
+    <div class="mdl-grid reports-daterange" style="float: right">
+      <button class="mdl-button year-reports" onClick="javascript:function x(){window.location.href='/admin/reports/by_sources?type=year'}; x()" > {{t "按年"}} </button>
+      <button class="mdl-button year-reports" onClick="javascript:function x(){window.location.href='/admin/reports/by_sources?type=month'}; x()" > {{t "按月"}} </button>
+      <button class="mdl-button year-reports" onClick="javascript:function x(){window.location.href='/admin/reports/by_sources?type=day'}; x()" > {{t "按日"}} </button>
+    </div>
+
+    <div class="qor-section__header">
+      <h4 class="qor-section-title">{{t "按时间统计各来源"}}</h4>
+    </div>
+    <div class="qor-section__body qor-table-container">
+      {{render_by_sources .}}
+    </div>
+  </div>
+
+</div>
