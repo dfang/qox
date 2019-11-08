@@ -45,11 +45,11 @@ func (item *Settlement) BeforeCreate(scope *gorm.Scope) error {
 
 // BeforeSave BeforeSave Callback
 func (item *Settlement) BeforeSave(scope *gorm.Scope) error {
-	fmt.Println("before save ...")
-	fmt.Println(item)
-	fmt.Println(item.User)
-	fmt.Println(item.UserID) // 0, 取不到值得, 不对
-	fmt.Println(item.User.ID)
+	// fmt.Println("before save ...")
+	// fmt.Println(item)
+	// fmt.Println(item.User)
+	// fmt.Println(item.UserID) // 0, 取不到值得, 不对
+	// fmt.Println(item.User.ID)
 
 	// 表单提交来的 item.User.ID 有值
 	// AutoWithdraw 来的只有item.UserID 有值
