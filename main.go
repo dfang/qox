@@ -44,6 +44,7 @@ import (
 	"github.com/qor/publish2"
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
+	"github.com/rs/cors"
 
 	// https://github.com/qor/qor-example/issues/129
 	"github.com/dfang/qor-demo/config/db/migrations"
@@ -226,6 +227,9 @@ func setupMiddlewaresAndRoutes() {
 	Router.Use(middleware.Logger)
 	Router.Use(middleware.Recoverer)
 
+	// Use default options
+	Router.Use(cors.Default().Handler)
+
 	Router.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			var (
@@ -300,7 +304,6 @@ func setupMiddlewaresAndRoutes() {
 	workDir, _ := os.Getwd()
 	filesDir := filepath.Join(workDir, "public")
 	FileServer(Router, "/", http.Dir(filesDir))
-
 }
 
 // DumpHTTPRequest for debugging

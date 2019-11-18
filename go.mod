@@ -78,6 +78,7 @@ require (
 	github.com/qor/wildcard_router v0.0.0-20171031035524-56710e5bb5a4 // indirect
 	github.com/qor/worker v0.0.0-20190805090529-35a245417f70
 	github.com/robfig/cron v1.2.0 // indirect
+	github.com/rs/cors v1.7.0
 	github.com/rs/zerolog v1.16.0
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 // indirect
