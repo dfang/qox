@@ -628,7 +628,7 @@ func configureSettlements(settlement *admin.Resource) {
 	}
 
 	settlement.IndexAttrs("ID", "Workman", "Amount", "Direction", "Aftersale", "State", "UpdatedAt")
-	// settlement.ShowAttrs("ID", "User", "Amount", "Direction", "Aftersale", "State", "CreatedAt", "UpdatedAt", "CreatedBy", "UpdatedBy")
+	settlement.ShowAttrs("ID", "User", "Amount", "Direction", "Aftersale", "State", "CreatedAt", "UpdatedAt", "CreatedBy", "UpdatedBy")
 	settlement.NewAttrs("User", "Direction", "Amount", "Aftersale")
 	settlement.Meta(&admin.Meta{
 		Name:       "Direction",
