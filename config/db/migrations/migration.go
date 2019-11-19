@@ -25,6 +25,7 @@ import (
 // Migrate Run Migration
 func Migrate() {
 	AutoMigrate(&aftersales.Aftersale{})
+	AutoMigrate(&aftersales.AftersaleImage{})
 	AutoMigrate(&aftersales.Manufacturer{})
 	AutoMigrate(&aftersales.Settlement{})
 	AutoMigrate(&aftersales.Balance{})

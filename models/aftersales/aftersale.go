@@ -3,11 +3,11 @@ package aftersales
 import (
 	"fmt"
 
+	"github.com/dfang/qor-demo/models/users"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/audited"
+	"github.com/qor/media/oss"
 	"github.com/qor/transition"
-
-	"github.com/dfang/qor-demo/models/users"
 )
 
 // Aftersale 售后管理
@@ -39,6 +39,10 @@ type Aftersale struct {
 	UserID uint
 	User   users.User
 
+	Images []AftersaleImage
+
+	AftersaleItems []AftersaleItem
+
 	transition.Transition
 	audited.AuditedModel
 }
@@ -65,3 +69,10 @@ func (item *Aftersale) BeforeSave(scope *gorm.Scope) error {
 // 服务类型 安装 清洗 维修
 // 服务内容
 // 备注
+
+type AftersaleImage struct {
+	gorm.Model
+	Aftersale   Aftersale
+	AftersaleID uint
+	Image       oss.OSS `sql:"size:4294967295;" media_library:"url:/backend/{{class}}/{{primary_key}}/{{column}}.{{extension}};path:./private"`
+}

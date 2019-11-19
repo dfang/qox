@@ -208,7 +208,13 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	// user.UseTheme("grid")
 
 	// Add  submenu
-	Admin.AddResource(&users.WechatProfile{}, &admin.Config{Name: "WechatProfile", Menu: []string{"User Management"}, Priority: 9})
+	wp := Admin.AddResource(&users.WechatProfile{}, &admin.Config{Name: "WechatProfile", Menu: []string{"User Management"}, Priority: 9})
+	wp.Meta(&admin.Meta{Name: "Avatar", Type: "wechat_avatar_field", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+		m := record.(*users.WechatProfile)
+		return m
+	}})
+	wp.NewAttrs("-Avatar")
+	wp.IndexAttrs("ID", "Nickname", "Avatar", "MobilePhone", "Openid", "Unionid", "Sex", "City", "Province", "Country", "Role")
 
 	setupMan := Admin.AddResource(&users.User{}, &admin.Config{Name: "Workman", Menu: []string{"User Management"}, Priority: 1})
 	setupMan.IndexAttrs("ID", "Name", "MobilePhone", "Gender", "Role")

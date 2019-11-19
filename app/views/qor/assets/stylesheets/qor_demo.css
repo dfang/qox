@@ -90,3 +90,15 @@
   width: 100%;
 }
 /* end */
+
+
+
+.qor-wechat_profiles .qor-table__content {
+  max-height: none !important;
+}
+.qor-wechat_profiles .qor-table img {
+  height: 64px !important;
+  width: 64px !important;
+  max-width: none !important;
+  max-height: none !important;
+}

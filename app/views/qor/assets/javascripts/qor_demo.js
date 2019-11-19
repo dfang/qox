@@ -209,7 +209,7 @@ $(document).ready(function () {
 
   if ($('.qor-brands, .qor-servcie_types, .qor-wechat_profiles').length > 0) {
     // disable click to open url
-    $(document).off("click.qor.openUrl", "[data-url]")
+    // $(document).off("click.qor.openUrl", "[data-url]")
   }
 });
 

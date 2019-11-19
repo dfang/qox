@@ -183,6 +183,10 @@ github.com/prometheus/common v0.2.0/go.mod h1:TNfzLD0ON7rHzMJeJkieUDPYmFC7Snx/y8
 github.com/prometheus/procfs v0.0.0-20181005140218-185b4288413d/go.mod h1:c3At6R/oaqEKCNdg8wHV1ftS6bRYblBhIjjI8uT2IGk=
 github.com/prometheus/procfs v0.0.0-20190117184657-bf6a532e95b1 h1:/K3IL0Z1quvmJ7X0A1AwNEK7CRkVK3YwfOU/QAL4WGg=
 github.com/prometheus/procfs v0.0.0-20190117184657-bf6a532e95b1/go.mod h1:c3At6R/oaqEKCNdg8wHV1ftS6bRYblBhIjjI8uT2IGk=
+github.com/qiniu/api.v7 v7.2.5+incompatible h1:6KKaGt7MbFzVGSniwzv7qsM/Qv0or4SkRJfmak8LqZE=
+github.com/qiniu/api.v7 v7.2.5+incompatible/go.mod h1:V8/EzlTgLN6q0s0CJmg/I81ytsvldSF22F7h6MI02+c=
+github.com/qiniu/x v7.0.8+incompatible h1:P4LASsfwJY7SoZ13dwqBwGhZh7HKU8cdFVCUkmz0gZ8=
+github.com/qiniu/x v7.0.8+incompatible/go.mod h1:KpRKWYG/GaidPQVpoQ2Cvuvtts3gYnoo2PftgdmAiU4=
 github.com/qor/action_bar v0.0.0-20190314070413-136e5e2c5b8c h1:tH4cZbUQnYl96Z9LBtcTSSjeZYJyK34CcjC0xGOTJ4g=
 github.com/qor/action_bar v0.0.0-20190314070413-136e5e2c5b8c/go.mod h1:R3YfRk2jIBUj7T2/ZayTp5TYr4CDL3UFwZ0qM8P/3kk=
 github.com/qor/activity v0.0.0-20190717092745-b7d0527b3572 h1:VtURdMRvB3M2zJhnyhxRrBXi9phU6Wgi4n6piuYvH7s=
@@ -217,6 +221,8 @@ github.com/qor/mailer v0.0.0-20180329083248-0555e49f99ac h1:dONvA5yiZ6LXQ9pEgepL
 github.com/qor/mailer v0.0.0-20180329083248-0555e49f99ac/go.mod h1:83J4znr9Zj5OF4XPQzh+HFGPwUfXrYPCixwSc+QXTYM=
 github.com/qor/media v0.0.0-20190830035427-8c0c3e14880b h1:TYv8QZsBSE4MnSv/rtHtBuwT0Qhw4Zd6sXIjkye9sY8=
 github.com/qor/media v0.0.0-20190830035427-8c0c3e14880b/go.mod h1:hzx9cTt5MpROMVIhwNhRJETc7e3a1J4bLNYflkcQ1wk=
+github.com/qor/media_library v0.0.0-20171016091834-7c6ac542ddcc h1:F9tIGaZ4KhNx4t0R4BaCYB25hHmGaooUmZcwqd9y5zA=
+github.com/qor/media_library v0.0.0-20171016091834-7c6ac542ddcc/go.mod h1:NtpQ+QQLe6qKWSxhK+uzlrcM6OK/ut8wE6CCZzmCh/Y=
 github.com/qor/middlewares v0.0.0-20170822143614-781378b69454 h1:+WCc1IigwWpWBxMFsmLUsIF230TakGHstDajd8aKDAc=
 github.com/qor/middlewares v0.0.0-20170822143614-781378b69454/go.mod h1:PejEyg3hS+Toh5m0AKRv2jK5br8qIoHLqmHrpg0WJYg=
 github.com/qor/notification v0.0.0-20181014061619-c4c002490b78 h1:XYgu511isuQ7VuezI8ybpQY1UT/RWa3iUqITllLynZI=
@@ -367,5 +373,7 @@ gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 honnef.co/go/tools v0.0.0-20180728063816-88497007e858/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 honnef.co/go/tools v0.0.0-20190102054323-c2f93a96b099/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 honnef.co/go/tools v0.0.0-20190106161140-3f1c8253044a/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
+qiniupkg.com/x v7.0.8+incompatible h1:Ek0ZVi5IyaWUAFkJbPRiqlh34xDM4uoKw7KqdpankvU=
+qiniupkg.com/x v7.0.8+incompatible/go.mod h1:6sLxR5IZ03vMaRAQAY/5MvzofeoBIjO4XE0Njv6V1ms=
 syreclabs.com/go/faker v1.2.0 h1:fy5UfSu5bOFrVpBk8I1jSgPdOLMJxM7ulKFvkh673ow=
 syreclabs.com/go/faker v1.2.0/go.mod h1:NAXInmkPsC2xuO5MKZFe80PUXX5LU8cFdJIHGs+nSBE=

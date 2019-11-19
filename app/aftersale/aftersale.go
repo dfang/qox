@@ -15,6 +15,7 @@ import (
 	"github.com/qor/admin"
 	"github.com/qor/application"
 	"github.com/qor/qor"
+	"github.com/qor/render"
 )
 
 // New new home app
@@ -45,6 +46,8 @@ var workmen []users.User
 func (app App) ConfigureApplication(application *application.Application) {
 	// 售后后台
 	app.ConfigureAdmin(application.Admin)
+	controller := &Controller{View: render.New(&render.Config{AssetFileSystem: application.AssetFS.NameSpace("aftersale")}, "app/aftersale/views")}
+	application.Router.Post("/admin/upload", controller.Upload)
 }
 
 // ConfigureAdmin configure admin interface
@@ -116,6 +119,7 @@ func configureMetasForAftersales(model *admin.Resource) {
 		}
 	}})
 
+	model.Meta(&admin.Meta{Name: "Fee", Type: "readonly"})
 	// Structure the new form to make it tidy and clean with `Section`
 	model.NewAttrs(
 		"CustomerName",
@@ -127,6 +131,8 @@ func configureMetasForAftersales(model *admin.Resource) {
 		"Fee",
 		"ServiceContent",
 		"ReservedServiceTime",
+		"AftersaleItems",
+		"Images",
 	)
 
 	model.EditAttrs(
@@ -139,6 +145,7 @@ func configureMetasForAftersales(model *admin.Resource) {
 		"Fee",
 		"ServiceContent",
 		"ReservedServiceTime",
+		"Images",
 		"CreatedAt",
 		"UpdatedAt",
 	)
@@ -152,6 +159,7 @@ func configureMetasForAftersales(model *admin.Resource) {
 		"Fee",
 		"ServiceContent",
 		"ReservedServiceTime",
+		"Images",
 		"CreatedAt",
 		"UpdatedAt",
 	)

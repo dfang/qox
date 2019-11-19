@@ -223,6 +223,10 @@ zh-CN:
       Feedback: 有无问题要反馈
       Exception Handling: "异常处理结果"
 
+  qor_activity:
+    form:
+      tab_title: "动态"
+
   qor_admin:
     layout:
       title: "控制台"
@@ -292,6 +296,11 @@ zh-CN:
       select_many_hint_button: " 完成 "
       submit: " 提交 "
 
+      show:
+        title: "{{$1}}详情"
+
+
+
     pagination:
       first: " 首页 "
       next: " 下一页 "
@@ -312,6 +321,9 @@ zh-CN:
     slideout:
       close_warning:
         "You have unsaved changes on this slideout. If you close this slideout, you will lose all unsaved changes. Are you sure you want to close the slideout?": 关闭有可能会丢失未保存的修改, 请确认?
+
+
+
 
 
   products:
