@@ -96,11 +96,6 @@ function addClassToBody() {
 $(document).ready(function () {
   addClassToBody()
 
-  // 订单列表页 禁止slideout 打开订单详情
-  if ($('.qor-orders .qor-table-container table').length > 0) {
-    $(document).off("click.qor.openUrl", "[data-url]")
-  }
-
   $("#startDate").val(moment().subtract(10, 'days').format('YYYY-MM-DD'));
   $("#endDate").val(moment().format('YYYY-MM-DD'));
   $(".j-update-record").click(function () {
@@ -165,7 +160,6 @@ $(document).ready(function () {
   });
 
   // $('#startDate').on('onOk', function () {
-  //   console.log("fuck")
   // })
 
   $('.qor-datepicker').find('.qor-datepicker__save').on('click', function (e) {
@@ -173,13 +167,21 @@ $(document).ready(function () {
   });
 
   // document.getElementById('startDate').addEventListener('onOk', function () {
-  //   console.log("fuck")
   // });
 
   // document.getElementById('endDate').addEventListener('onOk', function () {
   //   this.value = x.time.toString();
   // });
 
+  // 订单列表页 禁止slideout 打开订单详情
+  // if ($('.qor-orders .qor-table-container table').length > 0) {
+  //   $(document).off("click.qor.openUrl", "[data-url]")
+  // }
+
+  if ($('.qor-order_follow_ups').length > 0) {
+    var order_no = getQueryStringValue("order_no")
+    $("[name='QorResource.OrderNo']").val(order_no)
+  }
 
   if ($('.qor-balances').length > 0) {
     // hide big new button
@@ -241,6 +243,10 @@ $(document).ready(function () {
     window.location.href = "/admin/aftersales"
   });
 
+  Mousetrap.bind('g o', function () {
+    window.location.href = "/admin/orders"
+  });
+
   Mousetrap.bind('g s', function () {
     window.location.href = "/admin/settlements"
   });
@@ -252,7 +258,6 @@ $(document).ready(function () {
   Mousetrap.bind('g r', function () {
     window.location.href = "/admin/reports"
   });
-
 
   // New action
   Mousetrap.bind('n', function () {
@@ -321,3 +326,7 @@ function getCookie(name) {
   }
   return null;
 }
+
+function getQueryStringValue(key) {
+  return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
+}  

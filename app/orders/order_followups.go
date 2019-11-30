@@ -10,8 +10,60 @@ func (App) ConfigureOrderFollowUpsAdmin(Admin *admin.Admin) {
 	// Admin.AddMenu(&admin.Menu{Name: "Order Management", Priority: 1})
 
 	// Add Order
-	order_followup := Admin.AddResource(&orders.OrderFollowUp{}, &admin.Config{Menu: []string{"Order Management"}})
-	configureVisibleFieldsForOrderFollowUps(order_followup)
+	followup := Admin.AddResource(&orders.OrderFollowUp{}, &admin.Config{Menu: []string{"Order Management"}})
+	configureVisibleFieldsForOrderFollowUps(followup)
+	followup.IndexAttrs("-CreatedBy", "-UpdatedBy", "-State")
+
+	followup.Action(&admin.Action{
+		Name:        "导出",
+		URLOpenType: "slideout",
+		URL: func(record interface{}, context *admin.Context) string {
+			return "/admin/workers/new?job=Export_FollowUps"
+		},
+		Modes: []string{"collection"},
+	})
+
+	followup.Meta(&admin.Meta{
+		Name:       "SatisfactionOfTimeliness",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
+
+	followup.Meta(&admin.Meta{
+		Name:       "SatisfactionOfServices",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
+
+	followup.Meta(&admin.Meta{
+		Name:       "InspectTheGoods",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
+
+	followup.Meta(&admin.Meta{
+		Name:       "RequestFeedback",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
+
+	followup.Meta(&admin.Meta{
+		Name:       "LeaveContactInfomation",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
+
+	followup.Meta(&admin.Meta{
+		Name:       "IntroduceWarrantyExtension",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
+
+	followup.Meta(&admin.Meta{
+		Name:       "PositionProperly",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
 }
 
 func configureVisibleFieldsForOrderFollowUps(item *admin.Resource) {

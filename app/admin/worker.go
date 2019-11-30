@@ -137,6 +137,7 @@ func SetupWorker(Admin *admin.Admin) {
 		Name:  "Export Orders",
 		Group: "Orders Management",
 		Handler: func(arg interface{}, qorJob worker.QorJobInterface) error {
+			fmt.Println("fuck")
 			qorJob.AddLog("Exporting orders...")
 			// context := &qor.Context{DB: db.DB}
 
@@ -180,6 +181,48 @@ func SetupWorker(Admin *admin.Admin) {
 
 			defer rows.Close()
 
+			// context.Writer.Header().Set("Content-type", "text/csv")
+			// context.Writer.Header().Set("Content-Disposition", "attachment; filename=\"report.csv\"")
+			sqltocsv.Write(f, rows)
+
+			// err = sqltocsv.WriteFile(fileName, rows)
+			// if err != nil {
+			// 	panic(err)
+			// }
+
+			qorJob.SetProgressText(fmt.Sprintf("<a href='%v'>Download exported orders</a>", fileName))
+			return nil
+		},
+	})
+
+	Worker.RegisterJob(&worker.Job{
+		Name:  "Export_FollowUps",
+		Group: "Orders Management",
+		Handler: func(arg interface{}, qorJob worker.QorJobInterface) error {
+			qorJob.AddLog("导出订单回访记录...")
+			// context := &qor.Context{DB: db.DB}
+			// 导出csv文件 中文乱码问题
+			// https://forum.golangbridge.org/t/how-to-write-csv-file-with-bom-utf8/9434
+			// https://www.zhihu.com/question/21869078
+			// https://blog.csdn.net/wodatoucai/article/details/46970347
+			// https://pathbox.github.io/2017/01/20/csv-operation-in-GO/
+			// https://stackoverflow.com/questions/21371673/reading-files-with-a-bom-in-go
+			// fileName := fmt.Sprintf("/downloads/orders/%v.csv", time.Now().UnixNano())
+			fileName := fmt.Sprintf("/downloads/orders/%v.csv", time.Now().AddDate(0, 0, -1).Format("20060102"))
+			bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
+			f, err := os.Create(filepath.Join("public", fileName))
+			defer f.Close()
+			f.Write(bomUtf8)
+			if err != nil {
+				panic(err)
+			}
+
+			// rows, err := db.DB.DB().Query("SELECT * FROM order_follow_ups where DATE(created_at) = DATE(timestamp 'yesterday');")
+			rows, err := db.DB.DB().Query("SELECT order_follow_ups.order_no AS 订单号, order_items.item_name ,orders.customer_address AS 客户地址, orders.customer_phone AS 客户电话, satisfaction_of_timeliness AS 对时效是否满意, satisfaction_of_services AS  对服务是否满意, inspect_the_goods AS 是否开箱验货, request_feedback AS  是否邀评, leave_contact_infomation AS 是否留下联系方式, introduce_warranty_extension AS 是否有介绍延保, position_properly AS 是否把商品放到指定位置, feedback AS 有无问题反馈, exception_handling AS 异常处理结果 FROM order_follow_ups INNER JOIN orders ON orders.order_no = order_follow_ups.order_no INNER JOIN order_items ON orders.order_no = order_items.order_no;")
+			if err != nil {
+			}
+
+			defer rows.Close()
 			// context.Writer.Header().Set("Content-type", "text/csv")
 			// context.Writer.Header().Set("Content-Disposition", "attachment; filename=\"report.csv\"")
 			sqltocsv.Write(f, rows)

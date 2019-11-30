@@ -595,7 +595,6 @@ func configureActions(Admin *admin.Admin, order *admin.Resource) {
 			// } else {
 			// 	return errors.New("invalid man to deliver")
 			// }
-
 			tx.Commit()
 			return nil
 		},
@@ -711,7 +710,6 @@ func configureActions(Admin *admin.Admin, order *admin.Resource) {
 		},
 		Modes: []string{"menu_item", "edit", "show"},
 	})
-
 }
 
 // 废弃订单

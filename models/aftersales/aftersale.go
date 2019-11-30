@@ -41,7 +41,7 @@ type Aftersale struct {
 
 	Images []AftersaleImage
 
-	AftersaleItems []AftersaleItem
+	// AftersaleItems []AftersaleItem
 
 	transition.Transition
 	audited.AuditedModel
