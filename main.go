@@ -252,7 +252,7 @@ func setupMiddlewaresAndRoutes() {
 		})
 	})
 
-	if os.Getenv("DEBUG") != "false" {
+	if os.Getenv("DEBUG") == "true" {
 		Router.Use(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 				DumpHTTPRequest(req)
