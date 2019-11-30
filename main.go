@@ -60,7 +60,7 @@ var (
 )
 
 func main() {
-	cmdLine := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 	compileTemplate := cmdLine.Bool("compile-templates", false, "Compile Templates")
 	isDebug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
 	debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
