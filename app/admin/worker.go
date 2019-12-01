@@ -218,7 +218,7 @@ func SetupWorker(Admin *admin.Admin) {
 			}
 
 			// rows, err := db.DB.DB().Query("SELECT * FROM order_follow_ups where DATE(created_at) = DATE(timestamp 'yesterday');")
-			rows, err := db.DB.DB().Query("SELECT order_follow_ups.order_no AS 订单号, order_items.item_name AS 产品信息,orders.customer_address AS 客户地址, orders.customer_phone AS 客户电话, satisfaction_of_timeliness AS 对时效是否满意, satisfaction_of_services AS  对服务是否满意, inspect_the_goods AS 是否开箱验货, request_feedback AS  是否邀评, leave_contact_infomation AS 是否留下联系方式, introduce_warranty_extension AS 是否有介绍延保, position_properly AS 是否把商品放到指定位置, feedback AS 有无问题反馈, exception_handling AS 异常处理结果 FROM order_follow_ups INNER JOIN orders ON orders.order_no = order_follow_ups.order_no INNER JOIN order_items ON orders.order_no = order_items.order_no;")
+			rows, err := db.DB.DB().Query("SELECT order_follow_ups.order_no AS 订单号, order_items.item_name AS 产品信息,orders.customer_address AS 客户地址, orders.customer_phone AS 客户电话, satisfaction_of_timeliness AS 对时效是否满意, satisfaction_of_services AS  对服务是否满意, inspect_the_goods AS 是否开箱验货, request_feedback AS  是否邀评, leave_contact_infomation AS 是否留下联系方式, introduce_warranty_extension AS 是否有介绍延保, position_properly AS 是否把商品放到指定位置, feedback AS 有无问题反馈, exception_handling AS 异常处理结果,  order_follow_ups.created_at AS 创建时间 FROM order_follow_ups INNER JOIN orders ON orders.order_no = order_follow_ups.order_no INNER JOIN order_items ON orders.order_no = order_items.order_no;")
 			if err != nil {
 			}
 
@@ -232,7 +232,7 @@ func SetupWorker(Admin *admin.Admin) {
 			// 	panic(err)
 			// }
 
-			qorJob.SetProgressText(fmt.Sprintf("<a href='%v'>Download exported orders</a>", fileName))
+			qorJob.SetProgressText(fmt.Sprintf("<a href='%v'>下载导出的订单回访记录</a>", fileName))
 			return nil
 		},
 	})
