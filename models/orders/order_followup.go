@@ -26,7 +26,7 @@ type OrderFollowUp struct {
 	transition.Transition
 
 	// OrderID uint
-	OrderNo string `json:"order_no"`
+	OrderNo string `gorm:"unique;not null" json:"order_no"`
 
 	// 对配送时效是否满意
 	SatisfactionOfTimeliness string `json:"satisfaction_of_timeliness"`
