@@ -66,8 +66,10 @@ func (App) ConfigureOrderFollowUpsAdmin(Admin *admin.Admin) {
 }
 
 func configureVisibleFieldsForOrderFollowUps(item *admin.Resource) {
-	item.IndexAttrs("-CreatedBy", "-UpdatedBy", "-State")
-	item.ShowAttrs("-CreatedBy", "-UpdatedBy")
-	item.NewAttrs("-CreatedBy", "-UpdatedBy")
-	item.EditAttrs("-CreatedBy", "-UpdatedBy")
+	// item.IndexAttrs("-CreatedBy", "-UpdatedBy", "-State")
+	item.IndexAttrs("OrderNo", "SatisfactionOfTimeliness", "SatisfactionOfServices", "InspectTheGoods", "RequestFeedback", "LeaveContactInfomation", "IntroduceWarrantyExtension", "PositionProperly", "CreatedAt")
+
+	item.ShowAttrs("-CreatedBy", "-UpdatedBy", "-State")
+	item.NewAttrs("-CreatedBy", "-UpdatedBy", "-State")
+	item.EditAttrs("-CreatedBy", "-UpdatedBy", "-State")
 }
