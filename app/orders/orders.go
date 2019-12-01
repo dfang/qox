@@ -185,9 +185,12 @@ func configureVisibleFields(order *admin.Resource) {
 	// 	return ""
 	// }})
 
-	order.IndexAttrs("ID", "source", "order_no", "state", "order_type", "customer_name", "customer_address", "customer_phone", "receivables",
-		"is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id",
-		"shipping_fee", "setup_fee", "pickup_fee", "created_at", "updated_at")
+	// order.IndexAttrs("ID", "source", "order_no", "state", "order_type", "customer_name", "customer_address", "customer_phone", "receivables",
+	// 	"is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id",
+	//   "shipping_fee", "setup_fee", "pickup_fee", "created_at", "updated_at")
+
+	order.IndexAttrs("ID", "source", "order_no", "customer_name", "customer_address", "customer_phone", "receivables",
+		"is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "created_at", "updated_at")
 
 	a1 := []string{"-CreatedBy", "-UpdatedBy", "-User", "-DeliveryMethod", "-PaymentMethod", "-TrackingNumber", "-ShippedAt", "-ReturnedAt", "-CancelledAt", "-ShippingAddress", "-BillingAddress", "-IsDeliveryAndSetup"}
 	a2 := []string{"-DiscountValue", "-AbandonedReason", "-PaymentLog", "-PaymentAmount", "-PaymentTotal", "-AmazonOrderReferenceID", "-AmazonAddressAccessToken"}

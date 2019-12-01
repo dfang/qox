@@ -12,7 +12,6 @@ func (App) ConfigureOrderFollowUpsAdmin(Admin *admin.Admin) {
 	// Add Order
 	followup := Admin.AddResource(&orders.OrderFollowUp{}, &admin.Config{Menu: []string{"Order Management"}})
 	configureVisibleFieldsForOrderFollowUps(followup)
-	followup.IndexAttrs("-CreatedBy", "-UpdatedBy", "-State")
 
 	followup.Action(&admin.Action{
 		Name:        "导出",
@@ -67,6 +66,8 @@ func (App) ConfigureOrderFollowUpsAdmin(Admin *admin.Admin) {
 }
 
 func configureVisibleFieldsForOrderFollowUps(item *admin.Resource) {
+	item.IndexAttrs("-CreatedBy", "-UpdatedBy", "-State")
 	item.ShowAttrs("-CreatedBy", "-UpdatedBy")
 	item.NewAttrs("-CreatedBy", "-UpdatedBy")
+	item.EditAttrs("-CreatedBy", "-UpdatedBy")
 }
