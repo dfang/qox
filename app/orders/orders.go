@@ -419,14 +419,15 @@ func configureScopes(order *admin.Resource) {
 func configureActions(Admin *admin.Admin, order *admin.Resource) {
 	// 查看
 	order.Action(&admin.Action{
-		Name: "View",
+		Name: "查看详情",
 		URL: func(record interface{}, context *admin.Context) string {
 			if order, ok := record.(*orders.Order); ok {
 				return fmt.Sprintf("/admin/orders/%v", order.ID)
 			}
 			return "#"
 		},
-		Modes: []string{"menu_item", "edit", "show"},
+		URLOpenType: "_blank",
+		Modes:       []string{"menu_item", "edit", "show"},
 	})
 
 	// define actions for Order
@@ -440,6 +441,29 @@ func configureActions(Admin *admin.Admin, order *admin.Resource) {
 
 	type setupActionArgument struct {
 		ManToSetup string
+	}
+
+	type createFollowUpActionArgument struct {
+		// OrderID uint
+		OrderNo string
+		// 对配送时效是否满意
+		SatisfactionOfTimeliness string
+		// 对服务态度是否满意
+		SatisfactionOfServices string
+		// 是否有开箱验货
+		InspectTheGoods string
+		// 师傅是否邀评
+		RequestFeedback string
+		// 是否有留下联系方式 方便后期有问题联系
+		LeaveContactInfomation string
+		// 师傅是否有介绍延保
+		IntroduceWarrantyExtension string
+		// 是否有把商品放到指定位置
+		PositionProperly string
+		// 有无问题要反馈
+		Feedback string
+		// 异常处理结果
+		ExceptionHandling string
 	}
 
 	type processingActionArgument struct {
@@ -501,60 +525,6 @@ func configureActions(Admin *admin.Admin, order *admin.Resource) {
 		Resource: processingActionResource,
 		Modes:    []string{"show", "menu_item"},
 	})
-	// order.Action(&admin.Action{
-	// 	Name: "Processing",
-	// 	Handler: func(argument *admin.ActionArgument) error {
-	// 		for _, order := range argument.FindSelectedRecords() {
-	// 			db := argument.Context.GetDB()
-	// 			if err := orders.OrderState.Trigger("process", order.(*orders.Order), db); err != nil {
-	// 				return err
-	// 			}
-	// 			db.Save(order)
-	// 		}
-	// 		return nil
-	// 	},
-	// 	Visible: func(record interface{}, context *admin.Context) bool {
-	// 		if order, ok := record.(*orders.Order); ok {
-	// 			return order.State == "pending"
-	// 		}
-	// 		return false
-	// 	},
-	// 	Modes: []string{"show", "menu_item"},
-	// })
-
-	// order.Action(&admin.Action{
-	// 	Name: "Ship",
-	// 	Handler: func(argument *admin.ActionArgument) error {
-	// 		var (
-	// 			tx                     = argument.Context.GetDB().Begin()
-	// 			trackingNumberArgument = argument.Argument.(*trackingNumberArgument)
-	// 		)
-	// 		if trackingNumberArgument.TrackingNumber != "" {
-	// 			for _, record := range argument.FindSelectedRecords() {
-	// 				order := record.(*orders.Order)
-	// 				order.TrackingNumber = &trackingNumberArgument.TrackingNumber
-	// 				orders.OrderState.Trigger("ship", order, tx, "tracking number "+trackingNumberArgument.TrackingNumber)
-	// 				if err := tx.Save(order).Error; err != nil {
-	// 					tx.Rollback()
-	// 					return err
-	// 				}
-	// 			}
-	// 		} else {
-	// 			return errors.New("invalid shipment number")
-	// 		}
-
-	// 		tx.Commit()
-	// 		return nil
-	// 	},
-	// 	Visible: func(record interface{}, context *admin.Context) bool {
-	// 		if order, ok := record.(*orders.Order); ok {
-	// 			return order.State == "processing"
-	// 		}
-	// 		return false
-	// 	},
-	// 	Resource: Admin.NewResource(&trackingNumberArgument{}),
-	// 	Modes:    []string{"show", "menu_item"},
-	// })
 
 	deliveryActionArgumentResource := Admin.NewResource(&deliveryActionArgument{})
 	deliveryActionArgumentResource.Meta(&admin.Meta{
@@ -668,75 +638,108 @@ func configureActions(Admin *admin.Admin, order *admin.Resource) {
 		Modes:    []string{"show", "menu_item"},
 	})
 
+	// order.Action(&admin.Action{
+	// 	Name: "创建回访记录",
+	// 	URL: func(record interface{}, context *admin.Context) string {
+	// 		if order, ok := record.(*orders.Order); ok {
+	// 			return fmt.Sprintf("/admin/order_follow_ups/new?order_id=%v&order_no=%v", order.ID, order.OrderNo)
+	// 		}
+	// 		return "#"
+	// 	},
+	// 	Modes: []string{"menu_item", "edit", "show"},
+	// })
+
+	followUpResource := Admin.NewResource(&createFollowUpActionArgument{})
+	followUpResource.Meta(&admin.Meta{
+		Name:       "SatisfactionOfTimeliness",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
+
+	followUpResource.Meta(&admin.Meta{
+		Name:       "SatisfactionOfServices",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
+
+	followUpResource.Meta(&admin.Meta{
+		Name:       "InspectTheGoods",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
+
+	followUpResource.Meta(&admin.Meta{
+		Name:       "RequestFeedback",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
+
+	followUpResource.Meta(&admin.Meta{
+		Name:       "LeaveContactInfomation",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
+
+	followUpResource.Meta(&admin.Meta{
+		Name:       "IntroduceWarrantyExtension",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
+
+	followUpResource.Meta(&admin.Meta{
+		Name:       "PositionProperly",
+		Type:       "select_one",
+		Collection: []string{"是", "否"},
+	})
 	order.Action(&admin.Action{
-		Name: "Cancel",
+		Name: "创建回访",
 		Handler: func(argument *admin.ActionArgument) error {
-			for _, order := range argument.FindSelectedRecords() {
-				db := argument.Context.GetDB()
-				order := order.(*orders.Order)
-				if err := orders.OrderState.Trigger("cancel", order, db); err != nil {
+			var (
+				tx  = argument.Context.GetDB().Begin()
+				arg = argument.Argument.(*createFollowUpActionArgument)
+			)
+
+			// var order orders.Order
+			// tx.Model(orders.Order{}).Where("id = ?", argument.PrimaryValues[0]).Find(&order)
+			// fmt.Println(argument.Context)
+			// fmt.Println(argument.PrimaryValues)
+			var followUp orders.OrderFollowUp
+			// if order.OrderNo != "" {
+			for _, record := range argument.FindSelectedRecords() {
+				item := record.(*orders.Order)
+				// fmt.Println(item)
+				// fmt.Println(arg)
+				followUp.OrderNo = item.OrderNo
+				followUp.SatisfactionOfTimeliness = arg.SatisfactionOfTimeliness
+				followUp.SatisfactionOfServices = arg.SatisfactionOfServices
+				followUp.InspectTheGoods = arg.InspectTheGoods
+				followUp.RequestFeedback = arg.RequestFeedback
+				followUp.LeaveContactInfomation = arg.LeaveContactInfomation
+				followUp.IntroduceWarrantyExtension = arg.IntroduceWarrantyExtension
+				followUp.PositionProperly = arg.PositionProperly
+				followUp.Feedback = arg.Feedback
+				followUp.ExceptionHandling = arg.ExceptionHandling
+				if err := tx.Save(&followUp).Error; err != nil {
+					tx.Rollback()
 					return err
 				}
-				db.Save(order)
 			}
+			// } else {
+			// 	return errors.New("create follow up failed")
+			// }
+			tx.Commit()
 			return nil
 		},
 		Visible: func(record interface{}, context *admin.Context) bool {
-			if order, ok := record.(*orders.Order); ok {
-				for _, state := range []string{"draft", "pending", "processing", "shipped"} {
-					if order.State == state {
-						return true
-					}
-				}
-			}
-			return false
+			// if order, ok := record.(*orders.Order); ok {
+			// 	return order.State == "processing"
+			// }
+			// return false
+			return true
 		},
-		Modes: []string{"show", "menu_item"},
-	})
-	// order.Action(&admin.Action{
-	// 	Name: "Cancel",
-	// 	Handler: func(argument *admin.ActionArgument) error {
-	// 		for _, order := range argument.FindSelectedRecords() {
-	// 			db := argument.Context.GetDB()
-	// 			order := order.(*orders.Order)
-	// 			if err := orders.OrderState.Trigger("cancel", order, db); err != nil {
-	// 				return err
-	// 			}
-	// 			db.Save(order)
-	// 		}
-	// 		return nil
-	// 	},
-	// 	Visible: func(record interface{}, context *admin.Context) bool {
-	// 		if order, ok := record.(*orders.Order); ok {
-	// 			for _, state := range []string{"draft", "pending", "processing", "shipped"} {
-	// 				if order.State == state {
-	// 					return true
-	// 				}
-	// 			}
-	// 		}
-	// 		return false
-	// 	},
-	// 	Modes: []string{"show", "menu_item"},
-	// })
-
-	order.Action(&admin.Action{
-		Name:        "Export",
-		URLOpenType: "slideout",
-		URL: func(record interface{}, context *admin.Context) string {
-			return "/admin/workers/new?job=Export Orders"
-		},
-		Modes: []string{"collection"},
-	})
-
-	order.Action(&admin.Action{
-		Name: "创建回访记录",
-		URL: func(record interface{}, context *admin.Context) string {
-			if order, ok := record.(*orders.Order); ok {
-				return fmt.Sprintf("/admin/order_follow_ups/new?order_id=%v&order_no=%v", order.ID, order.OrderNo)
-			}
-			return "#"
-		},
-		Modes: []string{"menu_item", "edit", "show"},
+		// Resource: Admin.NewResource(&setupActionArgument{}),
+		Resource: followUpResource,
+		Modes:    []string{"show", "menu_item"},
 	})
 }
 

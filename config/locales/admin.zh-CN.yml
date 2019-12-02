@@ -223,6 +223,21 @@ zh-CN:
       Feedback: 有无问题要反馈
       Exception Handling: "异常处理结果"
 
+  create_follow_up_action_arguments:
+    attributes:
+      Order No: "订单编号"
+      Satisfaction Of Timeliness: "对时效是否满意"
+      Satisfaction Of Services:  "对服务态度是否满意"
+      Inspect The Goods: "是否有开箱验货"
+      Request Feedback: "是否邀评"
+      Leave Contact Infomation: "是否有留下联系方式"
+      Introduce Warranty Extension: "是否有介绍延保"
+      Position Properly: "是否有把商品放到指定位置"
+      Feedback: 有无问题要反馈
+      Exception Handling: "异常处理结果"
+
+
+
   qor_activity:
     form:
       tab_title: "动态"
