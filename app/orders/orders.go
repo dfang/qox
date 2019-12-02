@@ -480,65 +480,65 @@ func configureActions(Admin *admin.Admin, order *admin.Resource) {
 		ExceptionHandling string
 	}
 
-	type processingActionArgument struct {
-		ShippingFee float32
-		SetupFee    float32
-		PickupFee   float32
-		OrderType   string
-	}
-	processingActionResource := Admin.NewResource(&processingActionArgument{})
-	processingActionResource.Meta(&admin.Meta{
-		Name: "ShippingFee",
-		Type: "float",
-	})
-	processingActionResource.Meta(&admin.Meta{
-		Name: "SetupFee",
-		Type: "float",
-	})
-	processingActionResource.Meta(&admin.Meta{
-		Name: "PickupFee",
-		Type: "float",
-	})
-	processingActionResource.Meta(&admin.Meta{
-		Name:       "OrderType",
-		Type:       "select_one",
-		Collection: []string{"配送", "安装", "配送一体", "维修", "清洗"},
-	})
-	order.Action(&admin.Action{
-		Name: "Processing",
-		Handler: func(argument *admin.ActionArgument) error {
-			db := argument.Context.GetDB()
-			var (
-				tx  = argument.Context.GetDB().Begin()
-				arg = argument.Argument.(*processingActionArgument)
-			)
-			for _, record := range argument.FindSelectedRecords() {
-				order := record.(*orders.Order)
-				order.ShippingFee = arg.ShippingFee
-				order.SetupFee = arg.SetupFee
-				order.PickupFee = arg.PickupFee
-				order.OrderType = arg.OrderType
-				if err := orders.OrderState.Trigger("process", order, db); err != nil {
-					return err
-				}
-				if err := tx.Save(order).Error; err != nil {
-					tx.Rollback()
-					return err
-				}
-				tx.Commit()
-				return nil
-			}
-			return nil
-		},
-		Visible: func(record interface{}, context *admin.Context) bool {
-			if order, ok := record.(*orders.Order); ok {
-				return order.State == "pending"
-			}
-			return false
-		},
-		Resource: processingActionResource,
-		Modes:    []string{"show", "menu_item"},
-	})
+	// type processingActionArgument struct {
+	// 	ShippingFee float32
+	// 	SetupFee    float32
+	// 	PickupFee   float32
+	// 	OrderType   string
+	// }
+	// processingActionResource := Admin.NewResource(&processingActionArgument{})
+	// processingActionResource.Meta(&admin.Meta{
+	// 	Name: "ShippingFee",
+	// 	Type: "float",
+	// })
+	// processingActionResource.Meta(&admin.Meta{
+	// 	Name: "SetupFee",
+	// 	Type: "float",
+	// })
+	// processingActionResource.Meta(&admin.Meta{
+	// 	Name: "PickupFee",
+	// 	Type: "float",
+	// })
+	// processingActionResource.Meta(&admin.Meta{
+	// 	Name:       "OrderType",
+	// 	Type:       "select_one",
+	// 	Collection: []string{"配送", "安装", "配送一体", "维修", "清洗"},
+	// })
+	// order.Action(&admin.Action{
+	// 	Name: "Processing",
+	// 	Handler: func(argument *admin.ActionArgument) error {
+	// 		db := argument.Context.GetDB()
+	// 		var (
+	// 			tx  = argument.Context.GetDB().Begin()
+	// 			arg = argument.Argument.(*processingActionArgument)
+	// 		)
+	// 		for _, record := range argument.FindSelectedRecords() {
+	// 			order := record.(*orders.Order)
+	// 			order.ShippingFee = arg.ShippingFee
+	// 			order.SetupFee = arg.SetupFee
+	// 			order.PickupFee = arg.PickupFee
+	// 			order.OrderType = arg.OrderType
+	// 			if err := orders.OrderState.Trigger("process", order, db); err != nil {
+	// 				return err
+	// 			}
+	// 			if err := tx.Save(order).Error; err != nil {
+	// 				tx.Rollback()
+	// 				return err
+	// 			}
+	// 			tx.Commit()
+	// 			return nil
+	// 		}
+	// 		return nil
+	// 	},
+	// 	Visible: func(record interface{}, context *admin.Context) bool {
+	// 		if order, ok := record.(*orders.Order); ok {
+	// 			return order.State == "pending"
+	// 		}
+	// 		return false
+	// 	},
+	// 	Resource: processingActionResource,
+	// 	Modes:    []string{"show", "menu_item"},
+	// })
 
 	deliveryActionArgumentResource := Admin.NewResource(&deliveryActionArgument{})
 	deliveryActionArgumentResource.Meta(&admin.Meta{
