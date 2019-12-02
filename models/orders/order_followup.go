@@ -25,7 +25,7 @@ type OrderFollowUp struct {
 	audited.AuditedModel
 	transition.Transition
 
-	// OrderID uint
+	OrderID uint
 	OrderNo string `gorm:"unique;not null" json:"order_no"`
 
 	// 对配送时效是否满意

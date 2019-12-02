@@ -723,6 +723,7 @@ func configureActions(Admin *admin.Admin, order *admin.Resource) {
 				item := record.(*orders.Order)
 				// fmt.Println(item)
 				// fmt.Println(arg)
+				followUp.OrderID = item.ID
 				followUp.OrderNo = item.OrderNo
 				followUp.SatisfactionOfTimeliness = arg.SatisfactionOfTimeliness
 				followUp.SatisfactionOfServices = arg.SatisfactionOfServices
