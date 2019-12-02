@@ -693,6 +693,31 @@ func configureActions(Admin *admin.Admin, order *admin.Resource) {
 		},
 		Modes: []string{"show", "menu_item"},
 	})
+	// order.Action(&admin.Action{
+	// 	Name: "Cancel",
+	// 	Handler: func(argument *admin.ActionArgument) error {
+	// 		for _, order := range argument.FindSelectedRecords() {
+	// 			db := argument.Context.GetDB()
+	// 			order := order.(*orders.Order)
+	// 			if err := orders.OrderState.Trigger("cancel", order, db); err != nil {
+	// 				return err
+	// 			}
+	// 			db.Save(order)
+	// 		}
+	// 		return nil
+	// 	},
+	// 	Visible: func(record interface{}, context *admin.Context) bool {
+	// 		if order, ok := record.(*orders.Order); ok {
+	// 			for _, state := range []string{"draft", "pending", "processing", "shipped"} {
+	// 				if order.State == state {
+	// 					return true
+	// 				}
+	// 			}
+	// 		}
+	// 		return false
+	// 	},
+	// 	Modes: []string{"show", "menu_item"},
+	// })
 
 	order.Action(&admin.Action{
 		Name:        "Export",
