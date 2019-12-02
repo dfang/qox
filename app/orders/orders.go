@@ -321,6 +321,20 @@ func configureScopes(order *admin.Resource) {
 		},
 	})
 	order.Scope(&admin.Scope{
+		Name:  "The Day Before Yesterday",
+		Label: "The Day Before Yesterday",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			now.WeekStartDay = time.Monday
+			// select order_no, customer_name, item_name::varchar(20), quantity, created_at
+			// from orders_view
+			// where created_at between now() - interval '2 day' and  now() - interval '1 day';
+			// return db.Where("created_at between now() - interval '2 day' and  now() - interval '1 day'")
+			return db.Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -2)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -2))
+		},
+	})
+
+	order.Scope(&admin.Scope{
 		Name:  "ThisWeek",
 		Label: "This Week",
 		Group: "Filter By Date",
@@ -445,7 +459,7 @@ func configureActions(Admin *admin.Admin, order *admin.Resource) {
 
 	type createFollowUpActionArgument struct {
 		// OrderID uint
-		OrderNo string
+		// OrderNo string
 		// 对配送时效是否满意
 		SatisfactionOfTimeliness string
 		// 对服务态度是否满意
