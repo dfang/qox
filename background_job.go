@@ -435,7 +435,7 @@ func ExportMobilePhones(job *work.Job) error {
 	if err != nil {
 		panic(err)
 	}
-	rows, err := db.DB.DB().Query("select customer_phone from orders where DATE(created_at) = DATE(timestamp 'yesterday');")
+	rows, err := db.DB.DB().Query("select distinct customer_phone from orders where DATE(created_at) = DATE(timestamp 'yesterday');")
 	if err != nil {
 		panic(err)
 	}
