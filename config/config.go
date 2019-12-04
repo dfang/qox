@@ -82,6 +82,7 @@ var Config = struct {
 		FreezeAuditedAftersales string `env:"FREEZE_AUDITED_AFTERSALES"`
 		UnfreezeAftersales      string `env:"UNFREEZE_AFTERSALES"`
 		UpdateBalances          string `env:"UPDATE_BALANCES"`
+		AutoExportMobilePhones  string `env:"AUTO_EXPORT_MOBILE_PHONES"`
 		// DEMO_MODE = true 才用得到
 		AutoInquire            string `env:"AutoInquire"`
 		AutoSchedule           string

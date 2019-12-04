@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/dfang/qor-demo/models/aftersales"
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/gocraft/work"
+	"github.com/joho/sqltocsv"
 
 	"github.com/rs/zerolog/log"
 )
@@ -41,6 +43,7 @@ func startWorkerPool() {
 	pool.PeriodicallyEnqueue(cronCfg.FreezeAuditedAftersales, "freeze_audited_aftersales")
 	pool.PeriodicallyEnqueue(cronCfg.UnfreezeAftersales, "unfreeze_aftersales")
 	pool.PeriodicallyEnqueue(cronCfg.UpdateBalances, "update_balances")
+	pool.PeriodicallyEnqueue(cronCfg.AutoExportMobilePhones, "export_mobile_phones")
 
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
 		pool.PeriodicallyEnqueue(cronCfg.AutoInquire, "auto_inquire")
@@ -62,7 +65,6 @@ func startWorkerPool() {
 		pool.Job("auto_award", AutoAward)
 		pool.Job("auto_fine", AutoFine)
 		pool.Job("auto_generate_aftersales", AutoGenerateAftersales)
-
 	}
 
 	pool.Job("expire_aftersales", ExpireAftersales)
@@ -72,6 +74,7 @@ func startWorkerPool() {
 	pool.Job("update_balance", UpdateBalance)
 
 	pool.Job("send_wechat_template_msg", SendWechatTemplateMsg)
+	pool.Job("export_mobile_phones", ExportMobilePhones)
 
 	// Start processing jobs
 	pool.Start()
@@ -419,5 +422,26 @@ func AutoGenerateAftersales(job *work.Job) error {
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
 		seeds.CreateAftersales()
 	}
+	return nil
+}
+
+// ExportMobilePhones 定时导出昨日电话号码
+func ExportMobilePhones(job *work.Job) error {
+	fileName := fmt.Sprintf("/downloads/orders/%v.phones.csv", time.Now().AddDate(0, 0, -1).Format("20060102"))
+	// bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
+	f, err := os.Create(filepath.Join("public", fileName))
+	defer f.Close()
+	// f.Write(bomUtf8)
+	if err != nil {
+		panic(err)
+	}
+	rows, err := db.DB.DB().Query("select customer_phone from orders where DATE(created_at) = DATE(timestamp 'yesterday');")
+	if err != nil {
+		panic(err)
+	}
+
+	defer rows.Close()
+
+	sqltocsv.Write(f, rows)
 	return nil
 }

@@ -26,3 +26,4 @@ cron:
   autoaward: "0 */6 * * * *"
   autofine: "0 */7 * * * *"
   autogenerateaftersales: "0 */30 * * * *"
+  autoexportmobilephones: "0 0 1 * * *"
