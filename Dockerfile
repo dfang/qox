@@ -3,6 +3,11 @@ FROM golang:1.12.5 as build-step
 # FROM golang:1.12.5-alpine3.9 as build-step
 # RUN apk add --update --no-cache build-base ca-certificates git
 
+# fatal: unable to access 'https://go.googlesource.com/sys/'
+# maybe outage
+# https://github.com/golang/go/issues/32395
+ENV GOPROXY=https://proxy.golang.org
+
 RUN mkdir /go-app
 WORKDIR /go-app
 COPY go.mod .
