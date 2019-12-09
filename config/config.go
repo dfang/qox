@@ -78,12 +78,13 @@ var Config = struct {
 	}
 
 	Cron struct {
-		ExpireAftersales        string `env:"EXPIRE_AFTERSALES"`
-		FreezeAuditedAftersales string `env:"FREEZE_AUDITED_AFTERSALES"`
-		UnfreezeAftersales      string `env:"UNFREEZE_AFTERSALES"`
-		UpdateBalances          string `env:"UPDATE_BALANCES"`
-		AutoExportMobilePhones  string `env:"AUTO_EXPORT_MOBILE_PHONES"`
-		AutoExportOrderDetails  string `env:"AUTO_EXPORT_ORDER_DETAILS"`
+		ExpireAftersales         string `env:"EXPIRE_AFTERSALES"`
+		FreezeAuditedAftersales  string `env:"FREEZE_AUDITED_AFTERSALES"`
+		UnfreezeAftersales       string `env:"UNFREEZE_AFTERSALES"`
+		UpdateBalances           string `env:"UPDATE_BALANCES"`
+		AutoExportMobilePhones   string `env:"AUTO_EXPORT_MOBILE_PHONES"`
+		AutoExportOrderDetails   string `env:"AUTO_EXPORT_ORDER_DETAILS"`
+		AutoExportOrderFollowUps string `env:"AUTO_EXPORT_ORDER_FOLLOWUPS"`
 		// DEMO_MODE = true 才用得到
 		AutoInquire            string `env:"AutoInquire"`
 		AutoSchedule           string

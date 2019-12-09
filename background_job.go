@@ -45,6 +45,7 @@ func startWorkerPool() {
 	pool.PeriodicallyEnqueue(cronCfg.UpdateBalances, "update_balances")
 	pool.PeriodicallyEnqueue(cronCfg.AutoExportMobilePhones, "export_mobile_phones")
 	pool.PeriodicallyEnqueue(cronCfg.AutoExportOrderDetails, "export_order_details")
+	pool.PeriodicallyEnqueue(cronCfg.AutoExportOrderFollowUps, "export_order_followups")
 
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
 		pool.PeriodicallyEnqueue(cronCfg.AutoInquire, "auto_inquire")
@@ -77,6 +78,7 @@ func startWorkerPool() {
 	pool.Job("send_wechat_template_msg", SendWechatTemplateMsg)
 	pool.Job("export_mobile_phones", ExportMobilePhones)
 	pool.Job("export_order_details", ExportOrderDetails)
+	pool.Job("export_order_followups", ExportOrderFollowUps)
 
 	// Start processing jobs
 	pool.Start()
@@ -429,22 +431,30 @@ func AutoGenerateAftersales(job *work.Job) error {
 
 // ExportMobilePhones 定时导出昨日电话号码
 func ExportMobilePhones(job *work.Job) error {
-	fileName := fmt.Sprintf("/downloads/orders/%v.phones.csv", time.Now().AddDate(0, 0, -1).Format("20060102"))
-	// bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
-	f, err := os.Create(filepath.Join("public", fileName))
-	defer f.Close()
-	// f.Write(bomUtf8)
-	if err != nil {
-		panic(err)
-	}
-	rows, err := db.DB.DB().Query(`select distinct customer_phone from orders where DATE(created_at) = DATE(timestamp 'yesterday');`)
-	if err != nil {
-		panic(err)
+	for i := -7; i < 0; i++ {
+		fileName := fmt.Sprintf("public/downloads/电话号码/%v.phones.csv", time.Now().AddDate(0, 0, i).Format("20060102"))
+		fmt.Println(filepath.Dir(fileName))
+		err := os.MkdirAll(filepath.Dir(fileName), 0777)
+		if err != nil {
+			fmt.Printf("mkdirall err : %v\n", err)
+		}
+		// bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
+		f, err := os.Create(fileName)
+		defer f.Close()
+		// f.Write(bomUtf8)
+		if err != nil {
+			panic(err)
+		}
+		rows, err := db.DB.DB().Query(`select distinct customer_phone from orders where DATE(created_at) = DATE(timestamp 'yesterday');`)
+		if err != nil {
+			panic(err)
+		}
+
+		defer rows.Close()
+
+		sqltocsv.Write(f, rows)
 	}
 
-	defer rows.Close()
-
-	sqltocsv.Write(f, rows)
 	return nil
 }
 
@@ -456,9 +466,13 @@ func ExportOrderDetails(job *work.Job) error {
 		m := n.AddDate(0, 0, i)
 		fmt.Println(m)
 
-		fileName := fmt.Sprintf("/downloads/orders/%v.orders.csv", m.Format("20060102"))
+		fileName := fmt.Sprintf("public/downloads/订单/%v.orders.csv", m.Format("20060102"))
+		err := os.MkdirAll(filepath.Dir(fileName), 0777)
+		if err != nil {
+			fmt.Printf("mkdirall err : %v\n", err)
+		}
 		bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
-		f, err := os.Create(filepath.Join("public", fileName))
+		f, err := os.Create(fileName)
 		defer f.Close()
 		f.Write(bomUtf8)
 		if err != nil {
@@ -471,6 +485,48 @@ func ExportOrderDetails(job *work.Job) error {
     ON orders.order_no = order_items.order_no
     WHERE to_char(orders.created_at, 'YYYY-MM-DD') = $1
     ORDER BY orders.created_at`, m.Format("2006-01-02"))
+
+		if err != nil {
+			panic(err)
+		}
+
+		defer rows.Close()
+
+		sqltocsv.Write(f, rows)
+	}
+
+	return nil
+}
+
+// ExportOrderFollowUps 定时导出订单回访
+func ExportOrderFollowUps(job *work.Job) error {
+	for i := -7; i < 0; i++ {
+		n := time.Now()
+		m := n.AddDate(0, 0, i)
+		fmt.Println(m)
+
+		fileName := fmt.Sprintf("public/downloads/订单回访/%v.order_followups.csv", m.Format("20060102"))
+		err := os.MkdirAll(filepath.Dir(fileName), 0777)
+		if err != nil {
+			fmt.Printf("mkdirall err : %v\n", err)
+		}
+
+		bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
+		f, err := os.Create(fileName)
+		defer f.Close()
+		f.Write(bomUtf8)
+		if err != nil {
+			panic(err)
+		}
+		rows, err := db.DB.DB().Query(`
+      SELECT order_follow_ups.order_no AS 订单号, order_items.item_name AS 产品信息, orders.customer_address AS 客户地址, orders.customer_phone AS 客户电话, satisfaction_of_timeliness AS 对时效是否满意, satisfaction_of_services AS  对服务是否满意, inspect_the_goods AS 是否开箱验货, request_feedback AS  是否邀评, leave_contact_infomation AS 是否留下联系方式, introduce_warranty_extension AS 是否有介绍延保, position_properly AS 是否把商品放到指定位置, feedback AS 有无问题反馈, exception_handling AS 异常处理结果,  order_follow_ups.created_at AS 创建时间 
+      FROM order_follow_ups INNER JOIN orders 
+      ON orders.order_no = order_follow_ups.order_no 
+      INNER JOIN order_items 
+      ON orders.order_no = order_items.order_no
+      WHERE to_char(order_follow_ups.created_at, 'YYYY-MM-DD') = $1
+      ORDER BY order_follow_ups.created_at`,
+			m.Format("2006-01-02"))
 
 		if err != nil {
 			panic(err)
