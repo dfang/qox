@@ -18,7 +18,6 @@ require (
 	github.com/gocraft/web v0.0.0-20190207150652-9707327fb69b // indirect
 	github.com/gocraft/work v0.5.1
 	github.com/gomodule/redigo v2.0.0+incompatible
-	github.com/google/uuid v1.1.1
 	github.com/gorilla/schema v1.1.0
 	github.com/gorilla/sessions v1.2.0 // indirect
 	github.com/gosimple/slug v1.8.0 // indirect
@@ -33,7 +32,7 @@ require (
 	github.com/joho/sqltocsv v0.0.0-20190824231449-5650f27fd5b6
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/lib/pq v1.2.0
+	github.com/lib/pq v1.2.0 // indirect
 	github.com/manveru/gobdd v0.0.0-20131210092515-f1a17fdd710b // indirect
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mattn/go-isatty v0.0.10 // indirect
@@ -59,7 +58,6 @@ require (
 	github.com/qor/location v0.0.0-20181014061834-8c618bfef8ed
 	github.com/qor/mailer v0.0.0-20180329083248-0555e49f99ac
 	github.com/qor/media v0.0.0-20190830035427-8c0c3e14880b
-	github.com/qor/media_library v0.0.0-20171016091834-7c6ac542ddcc
 	github.com/qor/notification v0.0.0-20181014061619-c4c002490b78
 	github.com/qor/oss v0.0.0-20190603071501-90a5bbaee07c
 	github.com/qor/page_builder v0.0.0-20190619064344-2e4b0d81d42d

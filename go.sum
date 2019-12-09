@@ -81,7 +81,6 @@ github.com/google/go-github v17.0.0+incompatible/go.mod h1:zLgOLi98H3fifZn+44m+u
 github.com/google/go-querystring v1.0.0/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
 github.com/google/martian v2.1.0+incompatible/go.mod h1:9I4somxYTbIHy5NJKHRl3wXiIaQGbYVAs8BPL6v8lEs=
 github.com/google/pprof v0.0.0-20181206194817-3ea8567a2e57/go.mod h1:zfwlbNMJ+OItoe0UupaVj+oy1omPYYDuagoSzA8v9mc=
-github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/googleapis/gax-go/v2 v2.0.4/go.mod h1:0Wqv26UfaUD9n4G6kQubkQ+KchISgw+vpHVxEJEs9eg=
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
 github.com/gorilla/context v1.1.1 h1:AWwleXJkX/nhcU9bZSnZoi3h/qGYqQAGhq6zZe/aQW8=
@@ -221,8 +220,6 @@ github.com/qor/mailer v0.0.0-20180329083248-0555e49f99ac h1:dONvA5yiZ6LXQ9pEgepL
 github.com/qor/mailer v0.0.0-20180329083248-0555e49f99ac/go.mod h1:83J4znr9Zj5OF4XPQzh+HFGPwUfXrYPCixwSc+QXTYM=
 github.com/qor/media v0.0.0-20190830035427-8c0c3e14880b h1:TYv8QZsBSE4MnSv/rtHtBuwT0Qhw4Zd6sXIjkye9sY8=
 github.com/qor/media v0.0.0-20190830035427-8c0c3e14880b/go.mod h1:hzx9cTt5MpROMVIhwNhRJETc7e3a1J4bLNYflkcQ1wk=
-github.com/qor/media_library v0.0.0-20171016091834-7c6ac542ddcc h1:F9tIGaZ4KhNx4t0R4BaCYB25hHmGaooUmZcwqd9y5zA=
-github.com/qor/media_library v0.0.0-20171016091834-7c6ac542ddcc/go.mod h1:NtpQ+QQLe6qKWSxhK+uzlrcM6OK/ut8wE6CCZzmCh/Y=
 github.com/qor/middlewares v0.0.0-20170822143614-781378b69454 h1:+WCc1IigwWpWBxMFsmLUsIF230TakGHstDajd8aKDAc=
 github.com/qor/middlewares v0.0.0-20170822143614-781378b69454/go.mod h1:PejEyg3hS+Toh5m0AKRv2jK5br8qIoHLqmHrpg0WJYg=
 github.com/qor/notification v0.0.0-20181014061619-c4c002490b78 h1:XYgu511isuQ7VuezI8ybpQY1UT/RWa3iUqITllLynZI=
