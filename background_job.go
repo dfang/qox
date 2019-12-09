@@ -44,6 +44,7 @@ func startWorkerPool() {
 	pool.PeriodicallyEnqueue(cronCfg.UnfreezeAftersales, "unfreeze_aftersales")
 	pool.PeriodicallyEnqueue(cronCfg.UpdateBalances, "update_balances")
 	pool.PeriodicallyEnqueue(cronCfg.AutoExportMobilePhones, "export_mobile_phones")
+	pool.PeriodicallyEnqueue(cronCfg.AutoExportOrderDetails, "export_order_details")
 
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
 		pool.PeriodicallyEnqueue(cronCfg.AutoInquire, "auto_inquire")
@@ -75,6 +76,7 @@ func startWorkerPool() {
 
 	pool.Job("send_wechat_template_msg", SendWechatTemplateMsg)
 	pool.Job("export_mobile_phones", ExportMobilePhones)
+	pool.Job("export_order_details", ExportOrderDetails)
 
 	// Start processing jobs
 	pool.Start()
@@ -435,7 +437,7 @@ func ExportMobilePhones(job *work.Job) error {
 	if err != nil {
 		panic(err)
 	}
-	rows, err := db.DB.DB().Query("select distinct customer_phone from orders where DATE(created_at) = DATE(timestamp 'yesterday');")
+	rows, err := db.DB.DB().Query(`select distinct customer_phone from orders where DATE(created_at) = DATE(timestamp 'yesterday');`)
 	if err != nil {
 		panic(err)
 	}
@@ -443,5 +445,41 @@ func ExportMobilePhones(job *work.Job) error {
 	defer rows.Close()
 
 	sqltocsv.Write(f, rows)
+	return nil
+}
+
+// ExportOrderDetails 定时导出订单详情
+func ExportOrderDetails(job *work.Job) error {
+
+	for i := -3; i <= 0; i++ {
+		n := time.Now()
+		m := n.AddDate(0, i, 0)
+		fmt.Println(m)
+
+		fileName := fmt.Sprintf("/downloads/orders/%v.orders.csv", m.Format("200601"))
+		bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
+		f, err := os.Create(filepath.Join("public", fileName))
+		defer f.Close()
+		f.Write(bomUtf8)
+		if err != nil {
+			panic(err)
+		}
+		rows, err := db.DB.DB().Query(`
+    SELECT date(orders.created_at) AS 预约日, orders.order_no AS 订单号, customer_name AS 客户姓名, customer_phone AS 客户手机, customer_address AS 客户地址, order_items.item_name AS 商品, order_items.quantity AS 数量 
+    FROM orders
+    INNER JOIN order_items
+    ON orders.order_no = order_items.order_no
+    WHERE to_char(orders.created_at, 'YYYY-MM') = $1
+    ORDER BY orders.created_at`, m.Format("2006-01"))
+
+		if err != nil {
+			panic(err)
+		}
+
+		defer rows.Close()
+
+		sqltocsv.Write(f, rows)
+	}
+
 	return nil
 }
