@@ -12,7 +12,7 @@
   -->
 
   <div class="qor-section reports">
-    <h5>统计</h5>
+    <h5 class="qor-section-title">物流统计</h5>
     
     <!-- 
     <div class="qor-section__header">
@@ -21,7 +21,21 @@
     -->
 
     <div class="mdl-grid">
-      {{ render_today . }}
+      {{ render_today_orders . }}
+    </div>
+  </div>
+
+  <div class="qor-section reports">
+    <h5 class="qor-section-title">售后统计</h5>
+    
+    <!-- 
+    <div class="qor-section__header">
+      <h4 class="qor-section-title">{{t "Reports"}}</h4>
+    </div> 
+    -->
+
+    <div class="mdl-grid">
+      {{ render_today_aftersales . }}
     </div>
   </div>
 
@@ -63,7 +77,7 @@
   -->
 
   <!-- if have table please add qor-section__table className -->
-  <div class="qor-section qor-section__table qor-theme-slideout">
+  <div class="qor-section qor-section__table qor-theme-slideout mdl-layout--large-screen-only">
     <div class="qor-section__header">
       <h4 class="qor-section-title">最近售后服务单</h4>
     </div>

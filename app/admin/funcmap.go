@@ -2,9 +2,12 @@ package admin
 
 import (
 	"html/template"
+	"time"
 
 	"github.com/dfang/qor-demo/models/aftersales"
+	"github.com/dfang/qor-demo/models/orders"
 
+	"github.com/jinzhu/now"
 	"github.com/qor/admin"
 )
 
@@ -13,7 +16,8 @@ func initFuncMap(Admin *admin.Admin) {
 	// Admin.RegisterFuncMap("render_latest_products", renderLatestProduct)
 	Admin.RegisterFuncMap("render_latest_aftersales", renderLatestAftersales)
 	Admin.RegisterFuncMap("render_latest_orders", renderLatestOrders)
-	Admin.RegisterFuncMap("render_today", renderToday)
+	Admin.RegisterFuncMap("render_today_aftersales", renderTodayAftersales)
+	Admin.RegisterFuncMap("render_today_orders", renderTodayOrders)
 }
 
 func renderLatestOrders(context *admin.Context) template.HTML {
@@ -49,9 +53,9 @@ func renderLatestAftersales(context *admin.Context) template.HTML {
 	return template.HTML("")
 }
 
-func renderToday(context *admin.Context) template.HTML {
+func renderTodayAftersales(context *admin.Context) template.HTML {
 	var afterSaleContext = context.NewResourceContext("Aftersale")
-	t := Today{}
+	t := TodayAfterSalesCount{}
 
 	// var count1 int
 	// var count2 int
@@ -75,12 +79,56 @@ func renderToday(context *admin.Context) template.HTML {
 	// fmt.Println(t.ToReserve)
 	// fmt.Println(t.ToSchedule)
 
-	return afterSaleContext.Render("today", t)
+	return afterSaleContext.Render("today_aftersales", t)
 
 	// return template.HTML("")
 }
 
-type Today struct {
+func renderTodayOrders(context *admin.Context) template.HTML {
+	var ctx = context.NewResourceContext("Order")
+	t := TodayOrdersCount{}
+	// var count1 int
+	// var count2 int
+
+	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", time.Now()).Where("order_no like ?", "Q%").Count(&t.ToPickUpTomorrow)
+	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -1)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -1)).Where("order_no like ?", "Q%").Count(&t.ToPickUpToday)
+
+	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", time.Now()).Count(&t.Reserved)
+	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -1)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -1)).Count(&t.ToDeliver)
+	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -2)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -2)).Count(&t.YesterdayToDeliver)
+
+	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -3)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -3)).Count(&t.TheDayBeforeYesterdayToDeliver)
+
+	t.ToDeclare = "0"
+
+	// fmt.Println(t.ToReserve)
+	// fmt.Println(t.ToSchedule)
+
+	return ctx.Render("today_orders", t)
+
+	// return template.HTML("")
+}
+
+type TodayOrdersCount struct {
+	// 待取件
+	ToPickUpToday string
+
+	ToPickUpTomorrow string
+
+	// 待妥投
+	ToDeliver string
+
+	// 待报单
+	ToDeclare string
+
+	YesterdayToDeliver string
+
+	TheDayBeforeYesterdayToDeliver string
+
+	Reserved string
+}
+
+type TodayAfterSalesCount struct {
 	// 待预约
 	ToReserve string
 

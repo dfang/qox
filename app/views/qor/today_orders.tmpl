@@ -1,0 +1,78 @@
+{{$context := .}}
+{{$resource := .Resource}}
+
+<div class="mdl-cell mdl-cell--6-col">
+  <h4 class="qor-section-title">待办</h4>
+  <ul>
+    <li>
+      今天需取件
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=Yesterday&keyword=q"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToPickUpToday }}</span></a>
+        单
+      </span>
+    </li>
+
+    <li>
+      明天需取件
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=Today&keyword=q"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToPickUpTomorrow }}</span></a>
+        单
+      </span>
+    </li>
+    
+    <li>
+      今天需妥投
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=Yesterday"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToDeliver }} </span></a>
+        单
+      </span>
+    </li>
+
+    <li>
+      今天待报单
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/aftersales?scopes=overdue"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToDeclare }}</span></a>
+        单
+      </span>
+    </li>
+  </ul>
+</div>
+
+<div class="mdl-cell mdl-cell--6-col">
+  <h4 class="qor-section-title">历史数据</h4>
+
+  <ul>
+    <li>
+      今天约了
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=Today"><span style="font-size:20px; float:left; margin-right:3px;">  {{ .Result.Reserved }} </span></a>
+        单
+      </span>
+    </li>
+
+    <li>
+      昨天预约了
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=Yesterday"><span style="font-size:20px; float:left; margin-right:3px;">  {{ .Result.ToDeliver }} </span></a>
+        单
+      </span>
+    </li>
+
+    <li>
+      昨天妥投
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=The%20Day%20Before%20Yesterday"><span style="font-size:20px; float:left; margin-right:3px;">  {{ .Result.YesterdayToDeliver }} </span></a>
+        单
+      </span>
+    </li>
+
+    <li>
+      前天妥投
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=Last3Days"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.TheDayBeforeYesterdayToDeliver }} </span></a>
+        单
+      </span>
+    </li>
+  </ul>
+</div>
+

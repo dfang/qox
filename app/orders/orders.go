@@ -193,7 +193,7 @@ func configureVisibleFields(order *admin.Resource) {
 		"is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "created_at", "updated_at")
 
 	a1 := []string{"-CreatedBy", "-UpdatedBy", "-User", "-DeliveryMethod", "-PaymentMethod", "-TrackingNumber", "-ShippedAt", "-ReturnedAt", "-CancelledAt", "-ShippingAddress", "-BillingAddress", "-IsDeliveryAndSetup"}
-	a2 := []string{"-DiscountValue", "-AbandonedReason", "-PaymentLog", "-PaymentAmount", "-PaymentTotal", "-AmazonOrderReferenceID", "-AmazonAddressAccessToken"}
+	a2 := []string{"-DiscountValue", "-AbandonedReason", "-PaymentLog", "-PaymentAmount", "-PaymentTotal", "-AmazonOrderReferenceID", "-AmazonAddressAccessToken", "-OrderItems.Price"}
 	a3 := append(append([]string{}, a1...), a2...)
 
 	order.NewAttrs(a3, "-CreatedAt", "-UpdatedAt")
@@ -206,11 +206,9 @@ func configureVisibleFields(order *admin.Resource) {
 }
 
 func configureMetas(order *admin.Resource) {
-
 	// orderItemMeta := order.Meta(&admin.Meta{Name: "OrderItems"})
 	// orderItemMeta.Resource.Meta(&admin.Meta{Name: "SizeVariation", Config: &admin.SelectOneConfig{Collection: sizeVariationCollection}})
 	// order.NewAttrs("CustomerName", "CustomerAddress", "CustomerPhone", "Source", "OrderType", "Receivables", "PickupFee", "ShippingFee", "SetupFee")
-
 	order.Meta(&admin.Meta{Name: "ReserverdDeliveryTime", Type: "date"})
 	order.Meta(&admin.Meta{Name: "ReserverdSetupTime", Type: "date"})
 	order.Meta(&admin.Meta{Name: "ReserverdPickupTime", Type: "date"})
@@ -301,7 +299,6 @@ func configureScopes(order *admin.Resource) {
 	order.Scope(&admin.Scope{
 		Name:  "Today",
 		Label: "Today",
-		// Default: true,
 		Group: "Filter By Date",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 			return db.Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", time.Now())
@@ -331,6 +328,15 @@ func configureScopes(order *admin.Resource) {
 			// where created_at between now() - interval '2 day' and  now() - interval '1 day';
 			// return db.Where("created_at between now() - interval '2 day' and  now() - interval '1 day'")
 			return db.Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -2)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -2))
+		},
+	})
+
+	order.Scope(&admin.Scope{
+		Name:  "Last3Days",
+		Label: "三天前",
+		Group: "Filter By Date",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -3)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -3))
 		},
 	})
 
