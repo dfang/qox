@@ -451,12 +451,12 @@ func ExportMobilePhones(job *work.Job) error {
 // ExportOrderDetails 定时导出订单详情
 func ExportOrderDetails(job *work.Job) error {
 
-	for i := -3; i <= 0; i++ {
+	for i := -60; i < 0; i++ {
 		n := time.Now()
-		m := n.AddDate(0, i, 0)
+		m := n.AddDate(0, 0, i)
 		fmt.Println(m)
 
-		fileName := fmt.Sprintf("/downloads/orders/%v.orders.csv", m.Format("200601"))
+		fileName := fmt.Sprintf("/downloads/orders/%v.orders.csv", m.Format("20060102"))
 		bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
 		f, err := os.Create(filepath.Join("public", fileName))
 		defer f.Close()
@@ -465,12 +465,12 @@ func ExportOrderDetails(job *work.Job) error {
 			panic(err)
 		}
 		rows, err := db.DB.DB().Query(`
-    SELECT date(orders.created_at) AS 预约日, orders.order_no AS 订单号, customer_name AS 客户姓名, customer_phone AS 客户手机, customer_address AS 客户地址, order_items.item_name AS 商品, order_items.quantity AS 数量 
+    SELECT to_char(orders.created_at, 'YYYY-MM-DD') AS 预约日, orders.order_no AS 订单号, customer_name AS 客户姓名, customer_phone AS 客户手机, customer_address AS 客户地址, order_items.item_name AS 商品, order_items.quantity AS 数量
     FROM orders
     INNER JOIN order_items
     ON orders.order_no = order_items.order_no
-    WHERE to_char(orders.created_at, 'YYYY-MM') = $1
-    ORDER BY orders.created_at`, m.Format("2006-01"))
+    WHERE to_char(orders.created_at, 'YYYY-MM-DD') = $1
+    ORDER BY orders.created_at`, m.Format("2006-01-02"))
 
 		if err != nil {
 			panic(err)
