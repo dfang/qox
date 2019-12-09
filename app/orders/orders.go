@@ -192,9 +192,23 @@ func configureVisibleFields(order *admin.Resource) {
 	order.IndexAttrs("ID", "source", "order_no", "customer_name", "customer_address", "customer_phone", "receivables",
 		"is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "created_at", "updated_at")
 
+	// orderItems := order.GetAdmin().NewResource(&orders.OrderItem{})
+	// orderItems.IndexAttrs("Price", "Quantity")
+	// orderItems.ShowAttrs("Price", "Quantity")
+
 	a1 := []string{"-CreatedBy", "-UpdatedBy", "-User", "-DeliveryMethod", "-PaymentMethod", "-TrackingNumber", "-ShippedAt", "-ReturnedAt", "-CancelledAt", "-ShippingAddress", "-BillingAddress", "-IsDeliveryAndSetup"}
-	a2 := []string{"-DiscountValue", "-AbandonedReason", "-PaymentLog", "-PaymentAmount", "-PaymentTotal", "-AmazonOrderReferenceID", "-AmazonAddressAccessToken", "-OrderItems.Price"}
+	a2 := []string{"-DiscountValue", "-AbandonedReason", "-PaymentLog", "-PaymentAmount", "-PaymentTotal", "-AmazonOrderReferenceID", "-AmazonAddressAccessToken"}
 	a3 := append(append([]string{}, a1...), a2...)
+
+	order.Meta(&admin.Meta{
+		Name: "OrderItems",
+		Type: "collection_edit",
+	})
+
+	items := order.Meta(&admin.Meta{Name: "OrderItems"}).Resource
+	items.IndexAttrs("OrderNo", "ItemName", "Quantity")
+	items.ShowAttrs("OrderNo", "ItemName", "Quantity")
+	items.EditAttrs("OrderNo", "ItemName", "Quantity")
 
 	order.NewAttrs(a3, "-CreatedAt", "-UpdatedAt")
 
