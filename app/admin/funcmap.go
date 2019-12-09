@@ -12,10 +12,11 @@ func initFuncMap(Admin *admin.Admin) {
 	// Admin.RegisterFuncMap("render_latest_order", renderLatestOrder)
 	// Admin.RegisterFuncMap("render_latest_products", renderLatestProduct)
 	Admin.RegisterFuncMap("render_latest_aftersales", renderLatestAftersales)
+	Admin.RegisterFuncMap("render_latest_orders", renderLatestOrders)
 	Admin.RegisterFuncMap("render_today", renderToday)
 }
 
-func renderLatestOrder(context *admin.Context) template.HTML {
+func renderLatestOrders(context *admin.Context) template.HTML {
 	var orderContext = context.NewResourceContext("Order")
 	orderContext.Searcher.Pagination.PerPage = 5
 	// orderContext.SetDB(orderContext.GetDB().Where("state in (?)", []string{"paid"}))
