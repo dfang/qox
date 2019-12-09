@@ -14,13 +14,44 @@ func initFuncMap(Admin *admin.Admin) {
 	Admin.RegisterFuncMap("render_by_brands", renderByBrands)
 	Admin.RegisterFuncMap("render_by_names", renderByNames)
 
+	Admin.RegisterFuncMap("render_orders", renderOrders)
+
 	// Admin.RegisterFuncMap("render_latest_aftersales", renderLatestAftersales)
 	// Admin.RegisterFuncMap("render_today", renderToday)
 
 	Admin.RegisterFuncMap("toAftersaleReportBySource", toAftersaleReportBySource)
 	Admin.RegisterFuncMap("toAftersaleReportByBrand", toAftersaleReportByBrand)
 	Admin.RegisterFuncMap("toAftersaleReportByName", toAftersaleReportByName)
+	Admin.RegisterFuncMap("toOrdersCount", toOrdersCount)
 
+}
+
+func renderOrders(context *admin.Context) template.HTML {
+	db := context.GetDB()
+	t := context.Request.URL.Query().Get("type")
+	var sqlStr string
+	switch t {
+	case "year":
+		sqlStr = "select to_char(date_trunc('day', orders.created_at), 'YYYY') as time, count(*) as count from orders group by 1 order by time;"
+	case "month":
+		sqlStr = "select to_char(date_trunc('day', orders.created_at), 'YYYY-MM') as time, count(*) as count from orders group by 1 order by time DESC;"
+	case "day":
+		sqlStr = "select to_char(date_trunc('day', orders.created_at), 'YYYY-MM-DD') as time, count(*) as count from orders group by 1 order by time DESC;"
+	default:
+		sqlStr = "select to_char(date_trunc('day', orders.created_at), 'YYYY-MM') as time, count(*) as count from orders group by 1 order by time DESC;"
+	}
+	var ctx = context.NewResourceContext("OrdersCount")
+	var result []OrdersCount
+	db.Raw(sqlStr).Scan(&result)
+
+	fmt.Println("result is .....")
+	fmt.Println(result)
+
+	if len(result) > 0 {
+		return ctx.Render("index/table5", result)
+	}
+
+	return template.HTML("")
 }
 
 func renderBySources(context *admin.Context) template.HTML {
@@ -159,4 +190,12 @@ func toAftersaleReportByName(f interface{}) []AftersaleReportByName {
 		return result
 	}
 	return []AftersaleReportByName{}
+}
+
+func toOrdersCount(f interface{}) []OrdersCount {
+	result, ok := f.([]OrdersCount)
+	if ok {
+		return result
+	}
+	return []OrdersCount{}
 }
