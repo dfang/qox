@@ -60,7 +60,6 @@ type Config struct {
 func (app App) ConfigureApplication(application *application.Application) {
 
 	Admin := application.Admin
-	Admin.AddMenu(&admin.Menu{Name: "Reports Management", Priority: 2})
 
 	// Admin.AddMenu(&admin.Menu{Name: "Today", Link: "/today", Priority: 1})
 	Admin.AddMenu(&admin.Menu{Name: "统计品牌", Link: "/admin/reports/by_brands", Ancestors: []string{"Reports Management"}})
