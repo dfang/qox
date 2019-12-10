@@ -102,3 +102,23 @@
   max-width: none !important;
   max-height: none !important;
 }
+
+@media only screen and (max-width: 736px) and (min-width: 320px) {
+  .qor-section.reports h4 {
+    font-weight: normal;
+    font-size: 20px;
+  }
+
+  .qor-section.reports h5 {
+    font-weight: normal;
+    font-size: 18px;
+  }
+  .qor-section.reports .qor-section-title{
+    margin-left: 10px;
+    margin-bottom: 0px;
+  }
+
+  .qor-section.reports .mdl-grid {
+    padding-top: 0px;
+  }
+}
