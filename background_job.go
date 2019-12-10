@@ -500,7 +500,7 @@ func ExportOrderDetails(job *work.Job) error {
 
 // ExportOrderFollowUps 定时导出订单回访
 func ExportOrderFollowUps(job *work.Job) error {
-	for i := -7; i < 0; i++ {
+	for i := -7; i <= 0; i++ {
 		n := time.Now()
 		m := n.AddDate(0, 0, i)
 		fmt.Println(m)
