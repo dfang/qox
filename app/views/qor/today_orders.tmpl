@@ -11,14 +11,6 @@
         单
       </span>
     </li>
-
-    <li>
-      明天需取件
-      <span style="float: right">
-        <a rel="nofollow" href="/admin/orders?scopes=Today&keyword=q"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToPickUpTomorrow }}</span></a>
-        单
-      </span>
-    </li>
     
     <li>
       今天需妥投
@@ -32,6 +24,22 @@
       今天待报单
       <span style="float: right">
         <a rel="nofollow" href="/admin/aftersales?scopes=overdue"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToDeclare }}</span></a>
+        单
+      </span>
+    </li>
+
+    <li>
+      明天需取件
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=Today&keyword=q"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToPickUpTomorrow }}</span></a>
+        单
+      </span>
+    </li>
+
+    <li>
+      明天需妥投
+      <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=Today"><span style="font-size:20px; float:left; margin-right:3px;">  {{ .Result.Reserved }} </span></a>
         单
       </span>
     </li>
