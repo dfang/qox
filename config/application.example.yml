@@ -12,10 +12,10 @@ twitter:
   clientsecret: "your twitter client secret"
 
 cron:
-  expireaftersales: "*/30 * * * * *"
-  freezeauditedaftersales: "*/30 * * * * *"
-  unfreezeaftersales: "*/30 * * * * *"
-  updatebalances: "*/30 * * * * *"
+  expireaftersales: "* */2 * * * *"
+  freezeauditedaftersales: "* */2 * * * *"
+  unfreezeaftersales: "* */2 * * * *"
+  updatebalances: "* */2 * * * *"
   autoexportmobilephones: "0 0 1 * * *"
   autoexportorderdetails: "0 0 1 * * *"
   autoexportorderfollowups: "0 0 1 * * *"

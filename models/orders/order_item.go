@@ -2,6 +2,9 @@ package orders
 
 import (
 	"fmt"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/models/products"
@@ -12,6 +15,7 @@ import (
 type OrderItem struct {
 	gorm.Model
 	OrderID          uint
+	Order            Order
 	SizeVariationID  uint `cartitem:"SizeVariationID"`
 	SizeVariation    *products.SizeVariation
 	ColorVariationID uint `cartitem:"ColorVariationID"`
@@ -19,12 +23,20 @@ type OrderItem struct {
 	Quantity         uint `cartitem:"Quantity"`
 	Price            float32
 	DiscountRate     uint
-	transition.Transition
 
 	ProductNo string `json:"product_no"`
 	OrderNo   string `json:"order_no"`
 	ItemName  string `json:"product_name"`
 	Install   string `json:"install"`
+
+	Range     int    `json:"range"`
+	Category  string `json:"category"`
+	Dimension string `json:"dimension"`
+
+	// 单件商品的配送费 根据规则推断出来的
+	DeliveryFee float64
+
+	transition.Transition
 }
 
 // IsCart order item's state is cart
@@ -119,4 +131,112 @@ func (item OrderItem) Amount() float32 {
 	// }
 	// return amount
 	return 0
+}
+
+func (item *OrderItem) SetRange(i int64) {
+	item.Range = int(i)
+}
+
+func (item *OrderItem) SetCategory(c string) {
+	item.Category = c
+}
+
+func (item *OrderItem) SetDimension(d string) {
+	item.Dimension = d
+}
+
+func (item *OrderItem) SetDeliveryFee(f float64) {
+	item.DeliveryFee = f
+}
+
+// GetLengthUnit 获取长度单位（x英寸）中的数字
+// 电视机
+func (item *OrderItem) GetLengthUnit() int64 {
+	// match, _ := regexp.MatchString("\d+英寸", item.ItemName)
+	re := regexp.MustCompile(`\d+英寸`)
+	re2 := regexp.MustCompile(`\d+`)
+	// fmt.Printf("%q\n", re.FindString(item.ItemName))
+	if re.FindString(item.ItemName) != "" {
+		d := re2.FindString(re.FindString(item.ItemName))
+		n, err := strconv.ParseInt(d, 10, 64)
+		if err != nil {
+			fmt.Printf("%d of type %T", n, n)
+		}
+		return n
+	}
+	return 0
+}
+
+// GetWeightUnit 获取重量单位（x公斤/kg）中的数字
+// 洗衣机
+func (item *OrderItem) GetWeightUnit() int64 {
+	// match, _ := regexp.MatchString("\d+英寸", item.ItemName)
+	re := regexp.MustCompile(`\d+(?:[(KG)|(公斤)|(kg)]+)`)
+	re2 := regexp.MustCompile(`\d+`)
+	// fmt.Printf("%q\n", re.FindString(item.ItemName))
+	if re.FindString(item.ItemName) != "" {
+		d := re2.FindString(re.FindString(item.ItemName))
+		n, err := strconv.ParseInt(d, 10, 64)
+		if err != nil {
+			fmt.Printf("%d of type %T", n, n)
+		}
+		return n
+	}
+	return 0
+}
+
+// GetVolumeUnit 获取重量单位（x升/L）中的数字
+// 冰箱 冰柜 热水器
+func (item *OrderItem) GetVolumeUnit() int64 {
+	re := regexp.MustCompile(`\d+(?:[(L)|(升)|(l)]+)`)
+	re2 := regexp.MustCompile(`\d+`)
+	// fmt.Printf("%q\n", re.FindString(item.ItemName))
+	if re.FindString(item.ItemName) != "" {
+		d := re2.FindString(re.FindString(item.ItemName))
+		n, err := strconv.ParseInt(d, 10, 64)
+		if err != nil {
+			fmt.Printf("%d of type %T", n, n)
+		}
+		return n
+	}
+	return 0
+}
+
+// GetPowerUnit 获取功率单位（x匹）中的数字
+// 空调
+func (item *OrderItem) GetPowerUnit() int64 {
+	re := regexp.MustCompile(`\d+(?:[(L)|(升)|(l)]+)`)
+	re2 := regexp.MustCompile(`\d+`)
+	// fmt.Printf("%q\n", re.FindString(item.ItemName))
+	if re.FindString(item.ItemName) != "" {
+		d := re2.FindString(re.FindString(item.ItemName))
+		n, err := strconv.ParseInt(d, 10, 64)
+		if err != nil {
+			fmt.Printf("%d of type %T", n, n)
+		}
+		return n
+	}
+	return 0
+}
+
+// GetUnit 获取单位
+func (item *OrderItem) GetUnit() int64 {
+
+	if strings.Contains(item.ItemName, "电视") {
+		return item.GetLengthUnit()
+	}
+
+	return 0
+}
+
+// IsService 是否是增值服务
+func (item *OrderItem) IsService() bool {
+	s1 := item.ItemName
+	s2 := []string{"延保", "服务", "安心享", "延误补贴", "礼包", "只换不修"}
+	for _, s := range s2 {
+		if strings.Contains(s1, s) {
+			return true
+		}
+	}
+	return false
 }

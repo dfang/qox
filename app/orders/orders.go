@@ -6,6 +6,7 @@ import (
 
 	// "net/http"
 
+	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/models/orders"
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/dfang/qor-demo/utils/funcmapmaker"
@@ -69,10 +70,70 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	// Add Order
 	order := Admin.AddResource(&orders.Order{}, &admin.Config{Menu: []string{"Order Management"}})
 
+	oi := Admin.AddResource(&orders.OrderItem{}, &admin.Config{Menu: []string{"Order Management"}})
+	oi.IndexAttrs("Order", "ItemName", "Range", "Category", "Dimension", "DeliveryFee")
+	// oi.IndexAttrs("-SizeVariation", "-ColorVariation", "-Price", "-DiscountRate", "-ProductNo", "-Install")
+	oi.ShowAttrs("-SizeVariation", "-ColorVariation", "-Price", "-DiscountRate", "-ProductNo", "-Install")
+	oi.EditAttrs("-SizeVariation", "-ColorVariation", "-Price", "-DiscountRate", "-ProductNo", "-Install")
+	configureScopesForOrderItems(oi)
+
+	rule := Admin.AddResource(&orders.Rule{}, &admin.Config{Menu: []string{"Order Management"}})
+	rule.IndexAttrs("-Conditions")
+	// rule.Meta(&admin.Meta{Name: "Conditions", Type: "rule_conditions_field", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+	// 	m := record.(*orders.Rule)
+	// 	return m
+	// }})
+	configureScopesForRules(rule)
+
+	Admin.AddResource(&orders.Condition{}, &admin.Config{Menu: []string{"Order Management"}})
+	Admin.AddResource(&orders.Execution{}, &admin.Config{Menu: []string{"Order Management"}})
+	rule.Meta(&admin.Meta{
+		Name:  "Category",
+		Type:  "select_one",
+		Label: "分类",
+		Config: &admin.SelectOneConfig{
+			Collection: []string{"", "电脑", "电视", "冰箱", "空调", "洗衣机"},
+			AllowBlank: true,
+		}})
+	rule.Meta(&admin.Meta{
+		Name:  "Effect",
+		Type:  "select_one",
+		Label: "作用",
+		Config: &admin.SelectOneConfig{
+			Collection: []string{"判断分类", "判断大小", "判断配送范围", "定价"},
+			AllowBlank: false,
+		}})
+
+	condition1 := rule.Meta(&admin.Meta{Name: "Conditions"}).Resource
+	condition1.IndexAttrs("-Rule")
+	condition1.EditAttrs("-Rule")
+	condition1.ShowAttrs("-Rule")
+	condition1.NewAttrs("-Rule")
+	condition1.Meta(&admin.Meta{
+		Name:  "Operator",
+		Type:  "select_one",
+		Label: "操作符",
+		Config: &admin.SelectOneConfig{
+			Collection: []string{">", ">=", "=", "<", "<=", "包含", "不包含"},
+			AllowBlank: false,
+		}})
+
+	execution1 := rule.Meta(&admin.Meta{Name: "Executions"}).Resource
+	execution1.IndexAttrs("-Rule")
+	execution1.EditAttrs("-Rule")
+	execution1.ShowAttrs("-Rule")
+	execution1.NewAttrs("-Rule")
+	execution1.Meta(&admin.Meta{
+		Name:  "Name",
+		Type:  "select_one",
+		Label: "操作",
+		Config: &admin.SelectOneConfig{
+			Collection: []string{"设置配送范围", "设置分类", "设置大小", "设置配送价"},
+			AllowBlank: false,
+		}})
+
 	configureMetas(order)
-
 	configureScopes(order)
-
 	configureActions(Admin, order)
 
 	// Customize visible fields
@@ -809,4 +870,58 @@ func configureAbandonedOrders(Admin *admin.Admin) {
 	abandonedOrder.NewAttrs("-DiscountValue")
 	abandonedOrder.EditAttrs("-DiscountValue")
 	abandonedOrder.ShowAttrs("-DiscountValue")
+}
+
+func configureScopesForOrderItems(model *admin.Resource) {
+	var cats []string
+	db.DB.Model(&orders.OrderItem{}).Pluck("DISTINCT category", &cats)
+	// db.DB.Find(&Client{}).Pluck("DISTINCT phone_number", &phoneNumbers)
+
+	for _, cate := range cats {
+		var state = cate
+		model.Scope(&admin.Scope{
+			Name:  state,
+			Label: state,
+			Group: "Filter By Category",
+			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+				return db.Where("category = ?", state)
+			},
+		})
+	}
+	model.Scope(&admin.Scope{
+		Name:  "空",
+		Label: "无",
+		Group: "Filter By Category",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("category = ?", "")
+		},
+	})
+
+	model.Scope(&admin.Scope{
+		Name:  "NA",
+		Label: "未标运费",
+		Group: "未标运费",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("delivery_fee = ?", 0)
+		},
+	})
+
+}
+
+func configureScopesForRules(model *admin.Resource) {
+	var cats []string
+	db.DB.Model(&orders.Rule{}).Pluck("DISTINCT category", &cats)
+	// db.DB.Find(&Client{}).Pluck("DISTINCT phone_number", &phoneNumbers)
+
+	for _, cate := range cats {
+		var state = cate
+		model.Scope(&admin.Scope{
+			Name:  state,
+			Label: state,
+			Group: "Filter By Category",
+			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+				return db.Where("category = ?", state)
+			},
+		})
+	}
 }

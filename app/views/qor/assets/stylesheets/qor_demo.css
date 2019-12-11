@@ -122,3 +122,7 @@
     padding-top: 0px;
   }
 }
+
+.qor-order_items .qor-table__content{
+  max-width: 100%;
+}

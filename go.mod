@@ -38,6 +38,7 @@ require (
 	github.com/mattn/go-isatty v0.0.10 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.2
 	github.com/mrjones/oauth v0.0.0-20190623134757-126b35219450 // indirect
+	github.com/newm4n/grool v1.0.2
 	github.com/qiniu/api.v7 v7.2.5+incompatible // indirect
 	github.com/qiniu/x v7.0.8+incompatible // indirect
 	github.com/qor/action_bar v0.0.0-20190314070413-136e5e2c5b8c

@@ -39,6 +39,12 @@ func Migrate() {
 	AutoMigrate(&users.WechatProfile{})
 
 	AutoMigrate(&orders.Order{}, &orders.OrderItem{}, &orders.OrderFollowUp{})
+
+	AutoMigrate(&orders.Rule{})
+	AutoMigrate(&orders.Condition{})
+	// AutoMigrate(&orders.Action{})
+	AutoMigrate(&orders.Execution{})
+
 	AutoMigrate(&orders.DeliveryMethod{})
 
 	AutoMigrate(&stores.Store{})

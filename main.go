@@ -68,7 +68,16 @@ func main() {
 	runSeeds := cmdLine.Bool("seeds", false, "Run seeds, never run this on production")
 	ui := cmdLine.Bool("ui", false, "Serves gocraft/work ui")
 	// runSeed := cmdLine.Bool("seed", false, "Run seed")
+	eval := cmdLine.Bool("eval", false, "Evaluate rules")
+
 	cmdLine.Parse(os.Args[1:])
+
+	Compile()
+
+	if *eval {
+		Evaluate()
+		os.Exit(0)
+	}
 
 	fmt.Println("check availables enviroments variables ......")
 	checkAvailableEnvs()
@@ -85,8 +94,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Println("start auto migrations ......")
-	migrations.Migrate()
+	// fmt.Println("start auto migrations ......")
+	// migrations.Migrate()
 
 	if *runSeeds && os.Getenv("QOR_ENV") != "production" {
 		fmt.Println("just run seeds and exit ......")
@@ -107,8 +116,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Println("start workerPool ......")
-	go startWorkerPool()
+	// fmt.Println("start workerPool ......")
+	// if os.Getenv("ENV") == "development" {
+	if false {
+		go startWorkerPool()
+	}
 
 	fmt.Println("start health check ......")
 	go startHealthCheck()

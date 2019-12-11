@@ -214,6 +214,10 @@ zh-CN:
       Order No: "订单编号"
       Item Name: "商品名称"
       Quantity: "数量"
+      Dimension: 尺寸
+      Category: 分类
+      Range: 配送范围
+      Delivery Fee: 配送费
 
   order_follow_ups:
     name:
@@ -267,6 +271,7 @@ zh-CN:
 
       "Order Management": 订单管理
       "Orders": 订单
+      "Order Items": 订单明细
       "Order Follow Ups": 订单回访
 
       "Store Management": 店面管理
@@ -345,13 +350,8 @@ zh-CN:
       close_warning:
         "You have unsaved changes on this slideout. If you close this slideout, you will lose all unsaved changes. Are you sure you want to close the slideout?": 关闭有可能会丢失未保存的修改, 请确认?
 
-
-
-
-
   products:
     name:
       plural: Products
     scopes:
       Gender: 性别
-
