@@ -86,6 +86,7 @@ var Config = struct {
 		AutoExportOrderDetails   string `env:"AUTO_EXPORT_ORDER_DETAILS"`
 		AutoExportOrderFollowUps string `env:"AUTO_EXPORT_ORDER_FOLLOWUPS"`
 		AutoExportOrderFees      string `env:"AUTO_EXPORT_ORDER_FEES"`
+		AutoUpdateOrderItems     string `env:"AUTO_UPDATE_ORDER_ITEMS"`
 
 		// DEMO_MODE = true 才用得到
 		AutoInquire            string `env:"AutoInquire"`
