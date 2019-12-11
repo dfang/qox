@@ -118,9 +118,9 @@ func main() {
 
 	// fmt.Println("start workerPool ......")
 	// if os.Getenv("ENV") == "development" {
-	if false {
-		go startWorkerPool()
-	}
+	// if false {
+	go startWorkerPool()
+	// }
 
 	fmt.Println("start health check ......")
 	go startHealthCheck()

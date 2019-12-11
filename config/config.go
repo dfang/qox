@@ -85,6 +85,8 @@ var Config = struct {
 		AutoExportMobilePhones   string `env:"AUTO_EXPORT_MOBILE_PHONES"`
 		AutoExportOrderDetails   string `env:"AUTO_EXPORT_ORDER_DETAILS"`
 		AutoExportOrderFollowUps string `env:"AUTO_EXPORT_ORDER_FOLLOWUPS"`
+		AutoExportOrderFees      string `env:"AUTO_EXPORT_ORDER_FEES"`
+
 		// DEMO_MODE = true 才用得到
 		AutoInquire            string `env:"AutoInquire"`
 		AutoSchedule           string

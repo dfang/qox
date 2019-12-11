@@ -46,6 +46,7 @@ func startWorkerPool() {
 	pool.PeriodicallyEnqueue(cronCfg.AutoExportMobilePhones, "export_mobile_phones")
 	pool.PeriodicallyEnqueue(cronCfg.AutoExportOrderDetails, "export_order_details")
 	pool.PeriodicallyEnqueue(cronCfg.AutoExportOrderFollowUps, "export_order_followups")
+	pool.PeriodicallyEnqueue(cronCfg.AutoExportOrderFees, "export_order_fees")
 
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
 		pool.PeriodicallyEnqueue(cronCfg.AutoInquire, "auto_inquire")
@@ -79,6 +80,7 @@ func startWorkerPool() {
 	pool.Job("export_mobile_phones", ExportMobilePhones)
 	pool.Job("export_order_details", ExportOrderDetails)
 	pool.Job("export_order_followups", ExportOrderFollowUps)
+	pool.Job("export_order_fees", ExportOrderFees)
 
 	// Start processing jobs
 	pool.Start()
@@ -534,6 +536,48 @@ func ExportOrderFollowUps(job *work.Job) error {
 
 		defer rows.Close()
 
+		sqltocsv.Write(f, rows)
+	}
+
+	return nil
+}
+
+// ExportOrderFees 定时导出订单运费结算
+func ExportOrderFees(job *work.Job) error {
+	for i := -2; i <= 0; i++ {
+		n := time.Now()
+		m := n.AddDate(0, i, 0)
+
+		fileName := fmt.Sprintf("public/downloads/运费/%v.delivery_fees.csv", m.Format("200601"))
+		err := os.MkdirAll(filepath.Dir(fileName), 0777)
+		if err != nil {
+			fmt.Printf("mkdirall err : %v\n", err)
+		}
+
+		bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
+		f, err := os.Create(fileName)
+		defer f.Close()
+		f.Write(bomUtf8)
+		if err != nil {
+			panic(err)
+		}
+		rows, err := db.DB.DB().Query(`
+      SELECT to_char(orders.created_at, 'YYYY-MM-DD') AS 预约日, orders.order_no AS 订单号,
+      orders.customer_address AS 客户地址, order_items.item_name AS 商品名,
+      order_items.delivery_fee 配送费, order_items.quantity AS 数量,
+      order_items.delivery_fee * order_items.quantity AS 小计,
+      '' AS 配送师傅
+      FROM orders, order_items
+      WHERE orders.id = order_items.order_id AND
+            to_char(orders.created_at, 'YYYY-MM') = $1
+      ORDER BY orders.created_at`,
+			m.Format("2006-01"))
+
+		if err != nil {
+			panic(err)
+		}
+
+		defer rows.Close()
 		sqltocsv.Write(f, rows)
 	}
 
