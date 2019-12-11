@@ -138,11 +138,67 @@ rule Refrigerator3 "冰箱"  salience 5 {
       Item.SetDimension("超大件");
 }
 
+/*
+  洗衣机
+*/
 
+rule Washer "洗衣机"  salience 5 {
+  when
+      Pogo.Contains(Item.ItemName, "洗衣机")
+  then
+      Item.SetCategory("洗衣机");
+}
 
+rule Washer1 "洗衣机"  salience 5 {
+  when
+      Item.Category == "洗衣机" && Pogo.Contains(Item.ItemName, "滚筒洗衣机")
+  then
+      Item.SetDimension("大件");
+}
 
+rule Washer2 "洗衣机"  salience 5 {
+  when
+      Item.Category == "洗衣机" && 
+      Item.GetWeightUnit() > 3  
+  then
+      Item.SetDimension("中件");
+}
 
+rule Washer3 "洗衣机"  salience 5 {
+  when
+      Item.Category == "洗衣机" && 
+      Item.GetWeightUnit() <= 3  
+  then
+      Item.SetDimension("超小件");
+}
 
+/*
+  空调
+*/
+
+rule AirConditioner1 "空调"  salience 5 {
+  when
+      Item.Category == "空调" &&
+      Pogo.Contains(Item.ItemName, "挂机")
+  then
+      Item.SetCategory("中件");
+}
+
+rule AirConditioner20 "空调"  salience 5 {
+  when
+      Item.Category == "空调" &&
+      Item.GetPowerUnit() < 3
+  then
+      Item.SetCategory("大件");
+}
+
+rule AirConditioner21 "空调"  salience 5 {
+  when
+      Item.Category == "空调" &&
+      Pogo.ContainsAny(Item.ItemName, "家用中央空调|外机")
+  then
+      Item.SetCategory("中件");
+}
 
 
 /*
@@ -273,6 +329,7 @@ rule Beds {
 
 /*
   根据尺寸和配送范围定价
+*/
 
 rule Calculate1 "计算运费" salience 1 {
   when 
@@ -353,4 +410,3 @@ rule Calculate10 "计算运费" salience 1 {
   then
       Item.SetDeliveryFee(55.0);
 }
-*/

@@ -35,5 +35,6 @@ WORKDIR /qor
 COPY --from=build-step /go/bin/qor-demo ./qor
 COPY --from=build-step /go-app/tmp .
 # COPY --from=build-step /go/pkg/mod /go/pkg/mod
+COPY --from=build-step /go-app/rules.grl.tmpl .
 
 CMD ./qor
