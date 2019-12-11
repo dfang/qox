@@ -25,6 +25,7 @@ rule Service "服务" salience 100 {
 rule Range1 "When 配送范围是县城" salience 9 {
   when
         Pogo.Contains(Item.Order.CustomerAddress, "义宁镇") ||
+        Pogo.Contains(Item.Order.CustomerAddress, "宁州镇") ||
         Pogo.Contains(Item.Order.CustomerAddress, "县城内")
   then
         Item.SetRange(1);
@@ -33,6 +34,7 @@ rule Range1 "When 配送范围是县城" salience 9 {
 rule Range2 "When 配送范围是乡村" salience 9 {
   when
         Pogo.NotContains(Item.Order.CustomerAddress, "义宁镇") &&
+        Pogo.NotContains(Item.Order.CustomerAddress, "宁州镇") &&
         Pogo.NotContains(Item.Order.CustomerAddress, "县城内")
   then
         Item.SetRange(2);
