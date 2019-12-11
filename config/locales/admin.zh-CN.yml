@@ -209,6 +209,20 @@ zh-CN:
       Updated_at: 更新于
       Updated At: 更新于
 
+  rating:
+    attributes:
+      Type: "评价类型"
+      Amount: 金额
+      Reason: 原因
+      Remark: 备注
+
+  create_rating_action_arguments:
+    attributes:
+      Type: "评价类型"
+      Amount: 金额
+      Reason: 原因
+      Remark: 备注
+
   order_items:
     attributes:
       Order No: "订单编号"
@@ -273,6 +287,7 @@ zh-CN:
       "Orders": 订单
       "Order Items": 订单明细
       "Order Follow Ups": 订单回访
+      "Ratings": 评价
 
       "Store Management": 店面管理
 
@@ -326,8 +341,6 @@ zh-CN:
 
       show:
         title: "{{$1}}详情"
-
-
 
     pagination:
       first: " 首页 "

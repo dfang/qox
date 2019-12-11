@@ -70,6 +70,8 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	// Add Order
 	order := Admin.AddResource(&orders.Order{}, &admin.Config{Menu: []string{"Order Management"}})
 
+	Admin.AddResource(&orders.Rating{}, &admin.Config{Menu: []string{"Order Management"}})
+
 	oi := Admin.AddResource(&orders.OrderItem{}, &admin.Config{Menu: []string{"Order Management"}})
 	oi.IndexAttrs("Order", "ItemName", "Range", "Category", "Dimension", "DeliveryFee")
 	// oi.IndexAttrs("-SizeVariation", "-ColorVariation", "-Price", "-DiscountRate", "-ProductNo", "-Install")
@@ -561,6 +563,21 @@ func configureActions(Admin *admin.Admin, order *admin.Resource) {
 		ExceptionHandling string
 	}
 
+	type createRatingActionArgument struct {
+		// OrderID uint
+		// OrderNo string
+		// 好评还是差评
+		Type string
+
+		// 具体原因
+		Reason string
+
+		// 奖励或罚款金额
+		Amount int
+
+		Remark string
+	}
+
 	// type processingActionArgument struct {
 	// 	ShippingFee float32
 	// 	SetupFee    float32
@@ -835,6 +852,47 @@ func configureActions(Admin *admin.Admin, order *admin.Resource) {
 		},
 		// Resource: Admin.NewResource(&setupActionArgument{}),
 		Resource: followUpResource,
+		Modes:    []string{"show", "menu_item"},
+	})
+
+	ratingResource := Admin.NewResource(&createRatingActionArgument{})
+	ratingResource.Meta(&admin.Meta{
+		Name:       "Type",
+		Type:       "select_one",
+		Collection: []string{"好评", "差评"},
+	})
+	order.Action(&admin.Action{
+		Name: "创建评价",
+		Handler: func(argument *admin.ActionArgument) error {
+			var (
+				tx  = argument.Context.GetDB().Begin()
+				arg = argument.Argument.(*createRatingActionArgument)
+			)
+			var rating orders.Rating
+			// if order.OrderNo != "" {
+			for _, record := range argument.FindSelectedRecords() {
+				item := record.(*orders.Order)
+				rating.OrderID = item.ID
+				rating.Type = arg.Type
+				rating.Reason = arg.Reason
+				rating.Amount = arg.Amount
+				rating.Remark = arg.Remark
+
+				if err := tx.Save(&rating).Error; err != nil {
+					tx.Rollback()
+					return err
+				}
+			}
+			// } else {
+			// 	return errors.New("create follow up failed")
+			// }
+			tx.Commit()
+			return nil
+		},
+		Visible: func(record interface{}, context *admin.Context) bool {
+			return true
+		},
+		Resource: ratingResource,
 		Modes:    []string{"show", "menu_item"},
 	})
 }
