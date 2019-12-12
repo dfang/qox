@@ -143,11 +143,13 @@ zh-CN:
         "Delivery Scheduled": 已安排配送
         "Setup Scheduled": 已安排安装
         "Cancelled": 已取消
-        "Shipped": 已发货
         "Paided Cancelled": 付款后取消
         "Returned": 已退货
         "Pending": 待处理
         "Processing": 处理中
+        "Shipped": 已发货
+        "Delivered": 已妥投
+        "Followed Up": 已回访
       "Filter By DeliveryDate":
         "ToDeliverToday": "今天"
         "ToDeliverTomorrow": "明天"

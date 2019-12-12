@@ -2,6 +2,7 @@ package orders
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	// "net/http"
@@ -532,6 +533,7 @@ func configureScopes(order *admin.Resource) {
 			return db.Where("reserved_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02")).Where("order_no like ?", "Q%")
 		},
 	})
+
 	order.Filter(&admin.Filter{
 		Name: "created_at",
 		Config: &admin.DatetimeConfig{
@@ -540,12 +542,12 @@ func configureScopes(order *admin.Resource) {
 	})
 
 	// filter by order state
-	for _, state := range []string{"pending", "processing", "delivery_scheduled", "setup_scheduled", "pickup_scheduled", "cancelled", "shipped", "paid_cancelled", "returned"} {
+	// for _, state := range []string{"pending", "processing", "delivery_scheduled", "setup_scheduled", "pickup_scheduled", "cancelled", "shipped", "paid_cancelled", "returned"} {
+	for _, state := range []string{"pending", "delivery_scheduled", "setup_scheduled", "pickup_scheduled", "delivered", "followed_up"} {
 		var state = state
 		order.Scope(&admin.Scope{
-			Name: state,
-			// Label: strings.Title(strings.Replace(state, "_", " ", -1)),
-			// Label: "1111",
+			Name:  state,
+			Label: strings.Title(strings.Replace(state, "_", " ", -1)),
 			Group: "Order Status",
 			Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 				return db.Where(orders.Order{Transition: transition.Transition{State: state}})

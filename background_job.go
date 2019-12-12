@@ -48,6 +48,7 @@ func startWorkerPool() {
 	pool.PeriodicallyEnqueue(cronCfg.AutoExportOrderFollowUps, "export_order_followups")
 	pool.PeriodicallyEnqueue(cronCfg.AutoExportOrderFees, "export_order_fees")
 	pool.PeriodicallyEnqueue(cronCfg.AutoUpdateOrderItems, "update_order_items")
+	pool.PeriodicallyEnqueue(cronCfg.AutoDeliverOrders, "auto_deliver_orders")
 
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
 		pool.PeriodicallyEnqueue(cronCfg.AutoInquire, "auto_inquire")
@@ -83,6 +84,7 @@ func startWorkerPool() {
 	pool.Job("export_order_followups", ExportOrderFollowUps)
 	pool.Job("export_order_fees", ExportOrderFees)
 	pool.Job("update_order_items", UpdateOrderItems)
+	pool.Job("auto_deliver_orders", AutoDeliverOrders)
 
 	// Start processing jobs
 	pool.Start()
@@ -589,6 +591,15 @@ func ExportOrderFees(job *work.Job) error {
 // UpdateOrderItems 更新ordre_items 的 order_id
 func UpdateOrderItems(job *work.Job) error {
 	_, err := db.DB.DB().Exec(`update order_items set order_id=(select id from orders where order_no = order_items.order_no);`)
+	if err != nil {
+		panic(err)
+	}
+	return nil
+}
+
+// AutoDeliverOrders 自动妥投配送时间小于当前时间的订单
+func AutoDeliverOrders(job *work.Job) error {
+	_, err := db.DB.DB().Exec(`UPDATE orders SET state='delivered' WHERE TO_TIMESTAMP(reserved_delivery_time, 'YYYY-MM-DD') < NOW() AND state='pending';`)
 	if err != nil {
 		panic(err)
 	}

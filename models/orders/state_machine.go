@@ -25,6 +25,12 @@ func init() {
 	// Define Order's States
 	OrderState.Initial("draft")
 
+	// 已妥投
+	OrderState.State("delivered")
+	// delivered 之后 要创建回访
+	// 此状态表示已回访
+	OrderState.State("followed_up")
+
 	OrderState.State("pending").Enter(func(value interface{}, tx *gorm.DB) (err error) {
 		order := value.(*Order)
 		tx.Model(order).Association("OrderItems").Find(&order.OrderItems)

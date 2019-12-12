@@ -20,6 +20,7 @@ cron:
   autoexportorderdetails: "0 0 1 * * *"
   autoexportorderfollowups: "0 0 1 * * *"
   autoexportorderfees: "0 */1 * * * *"
+  autodeliverorders: "0 0 1 * *"
 
   autoinquire: "*/30 * * * * *"
   autoschedule: "0 */5 * * * *"
