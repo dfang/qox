@@ -38,7 +38,7 @@ func renderOrders(context *admin.Context) template.HTML {
 	case "day":
 		sqlStr = "select to_char(date_trunc('day', orders.created_at), 'YYYY-MM-DD') as time, count(*) as count from orders group by 1 order by time DESC;"
 	default:
-		sqlStr = "select to_char(date_trunc('day', orders.created_at), 'YYYY-MM') as time, count(*) as count from orders group by 1 order by time DESC;"
+		sqlStr = "select to_char(date_trunc('day', orders.created_at), 'YYYY-MM-DD') as time, count(*) as count from orders group by 1 order by time DESC;"
 	}
 	var ctx = context.NewResourceContext("OrdersCount")
 	var result []OrdersCount
