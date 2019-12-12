@@ -55,3 +55,9 @@ type OrderFollowUp struct {
 	// 异常处理结果
 	ExceptionHandling string `json:"exception_handling"`
 }
+
+// AfterCreate callback
+func (o *OrderFollowUp) AfterCreate(scope *gorm.DB) error {
+	scope.Model(&Order{}).Where("id = ?", o.OrderID).UpdateColumn("state", "followed_up")
+	return nil
+}
