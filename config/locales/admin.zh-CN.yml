@@ -132,7 +132,10 @@ zh-CN:
   orders:
     scopes:
       "Order Status": "按订单状态"
-      "Filter By Date": "按日期"
+      "Filter By Date": "按约单日期"
+      "Filter By DeliveryDate": "按预约配送日期"
+      "Filter By SetupDate": "按预约安装日期"
+      "Filter By PickupDate": "按预约取件日期"
       "Filter By Source": "按订单来源"
       "Filter By Order Type": "按订单类型"
       "Order Status":
@@ -145,6 +148,18 @@ zh-CN:
         "Returned": 已退货
         "Pending": 待处理
         "Processing": 处理中
+      "Filter By DeliveryDate":
+        "ToDeliverToday": "今天"
+        "ToDeliverTomorrow": "明天"
+        "ToDeliverTomorrow2": "后天"
+      "Filter By SetupDate":
+        "ToSetupToday": "今天"
+        "ToSetupTomorrow": "明天"
+        "ToSetupTomorrow2": "后天"
+      "Filter By PickupDate":
+        "ToPickupToday": "今天"
+        "ToPickUpTomorrow": "明天"
+        "ToPickUpTomorrow2": "后天"
       "Filter By Date":
         "Today": "今天"
         "Yesterday": "昨天"

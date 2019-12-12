@@ -93,8 +93,12 @@ func renderTodayOrders(context *admin.Context) template.HTML {
 	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", time.Now()).Where("order_no like ?", "Q%").Count(&t.ToPickUpTomorrow)
 	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -1)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -1)).Where("order_no like ?", "Q%").Count(&t.ToPickUpToday)
 
-	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", time.Now()).Count(&t.Reserved)
-	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -1)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -1)).Count(&t.ToDeliver)
+	// 今日预约了
+	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", now.EndOfDay()).Count(&t.Reserved)
+
+	// 今日需妥投
+	ctx.GetDB().Model(&orders.Order{}).Where("reserverd_delivery_time = ?", now.BeginningOfDay().Format("2006-01-02")).Count(&t.ToDeliver)
+
 	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -2)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -2)).Count(&t.YesterdayToDeliver)
 
 	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -3)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -3)).Count(&t.TheDayBeforeYesterdayToDeliver)

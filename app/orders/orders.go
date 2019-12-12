@@ -320,14 +320,14 @@ func configureMetas(order *admin.Resource) {
 	*/
 	order.Meta(&admin.Meta{Name: "Source", Type: "select_one", Config: &admin.SelectOneConfig{Collection: orders.SOURCES}})
 	order.Meta(&admin.Meta{Name: "OrderType", Type: "select_one", Config: &admin.SelectOneConfig{Collection: orders.ORDER_TYPES}})
-	order.Meta(&admin.Meta{Name: "CreatedAt", Type: "datetime", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
-		order := record.(*orders.Order)
-		return order.CreatedAt.Local().Format("2006-01-02 15:04:05")
-	}})
-	order.Meta(&admin.Meta{Name: "UpdatedAt", Type: "date", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
-		order := record.(*orders.Order)
-		return order.UpdatedAt.Local().Format("2006-01-02 15:04:05")
-	}})
+	// order.Meta(&admin.Meta{Name: "CreatedAt", Type: "datetime", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+	// 	order := record.(*orders.Order)
+	// 	return order.CreatedAt.Local().Format("2006-01-02 15:04:05")
+	// }})
+	// order.Meta(&admin.Meta{Name: "UpdatedAt", Type: "date", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
+	// 	order := record.(*orders.Order)
+	// 	return order.UpdatedAt.Local().Format("2006-01-02 15:04:05")
+	// }})
 	// order.Meta(&admin.Meta{Name: "customer_address", Type: "string", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
 	// 	order := record.(*orders.Order)
 	// 	return strings.Replace(order.CustomerAddress, "江西九江市修水县", "", -1)
@@ -452,6 +452,86 @@ func configureScopes(order *admin.Resource) {
 		},
 	})
 
+	order.Scope(&admin.Scope{
+		Name:  "ToDeliverToday",
+		Label: "ToDeliverToday",
+		Group: "Filter By DeliveryDate",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().Format("2006-01-02"))
+		},
+	})
+
+	order.Scope(&admin.Scope{
+		Name:  "ToDeliverTomorrow",
+		Label: "ToDeliverTomorrow",
+		Group: "Filter By DeliveryDate",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 1).Format("2006-01-02"))
+		},
+	})
+
+	order.Scope(&admin.Scope{
+		Name:  "ToDeliverTomorrow2",
+		Label: "ToDeliverTomorrow2",
+		Group: "Filter By DeliveryDate",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02"))
+		},
+	})
+
+	order.Scope(&admin.Scope{
+		Name:  "ToSetupToday",
+		Label: "ToSetupToday",
+		Group: "Filter By SetupDate",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("reserverd_setup_time = ?", now.BeginningOfDay().Format("2006-01-02"))
+		},
+	})
+
+	order.Scope(&admin.Scope{
+		Name:  "ToSetupTomorrow",
+		Label: "ToSetupTomorrow",
+		Group: "Filter By SetupDate",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("reserverd_setup_time = ?", now.BeginningOfDay().AddDate(0, 0, 1).Format("2006-01-02"))
+		},
+	})
+
+	order.Scope(&admin.Scope{
+		Name:  "ToSetupTomorrow2",
+		Label: "ToSetupTomorrow2",
+		Group: "Filter By SetupDate",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("reserverd_setup_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02"))
+		},
+	})
+
+	order.Scope(&admin.Scope{
+		Name:  "ToPickupToday",
+		Label: "ToPickupToday",
+		Group: "Filter By PickupDate",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().Format("2006-01-02")).Where("order_no like ?", "Q%")
+		},
+	})
+
+	order.Scope(&admin.Scope{
+		Name:  "ToPickupTomorrow",
+		Label: "ToPickupTomorrow",
+		Group: "Filter By PickupDate",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 1).Format("2006-01-02")).Where("order_no like ?", "Q%")
+		},
+	})
+
+	order.Scope(&admin.Scope{
+		Name:  "ToPickupTomorrow2",
+		Label: "ToPickupTomorrow2",
+		Group: "Filter By PickupDate",
+		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
+			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02")).Where("order_no like ?", "Q%")
+		},
+	})
 	order.Filter(&admin.Filter{
 		Name: "created_at",
 		Config: &admin.DatetimeConfig{
