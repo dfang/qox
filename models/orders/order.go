@@ -6,7 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/models/users"
+	"github.com/gocraft/work"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/audited"
 	"github.com/qor/transition"
@@ -136,9 +138,12 @@ func (order Order) Total() (total float32) {
 }
 
 // AfterCreate 初始状态
-func (o *Order) AfterCreate(scope *gorm.Scope) error {
-	if strings.Contains(o.OrderNo, "Q") {
-		scope.SetColumn("reserved_pickup_time", o.ReservedDeliveryTime)
+func (order *Order) AfterCreate(scope *gorm.Scope) error {
+	if strings.Contains(order.OrderNo, "Q") {
+		scope.SetColumn("reserved_pickup_time", order.ReservedDeliveryTime)
 	}
+
+	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
+	enqueuer.Enqueue("update_order_items", work.Q{})
 	return nil
 }
