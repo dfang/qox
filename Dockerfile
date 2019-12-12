@@ -27,8 +27,11 @@ RUN  mkdir tmp && cp -r app vendor config ./tmp && rm tmp/app/*/*.go && rm tmp/c
 # FROM golang:1.12.5-alpine3.9
 FROM alpine:3.9.4
 
-RUN apk update && apk add --no-cache openssl ca-certificates curl netcat-openbsd \
-  && rm -rf /var/cache/apk/*
+ENV TZ='Asia/Shanghai'
+
+RUN apk update && apk add --no-cache openssl ca-certificates curl netcat-openbsd tzdata && \
+  cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
+  rm -rf /var/cache/apk/*
 
 RUN mkdir /qor
 WORKDIR /qor
