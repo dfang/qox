@@ -38,7 +38,7 @@ steps:
     echo Build.SourceVersionMessage	is $(Build.SourceVersionMessage)
     echo Build.BuildId	is $(Build.BuildId)
     echo Build.BuildNumber is $(Build.BuildNumber)
-  displayName: 'echo'
+  displayName: 'echo versions message'
 - script: docker login -u $(dockerID) -p $(dockerPWD)
   displayName: 'docker login'
 - script: docker build -f Dockerfile -t $(imageName) .
