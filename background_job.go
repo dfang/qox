@@ -590,7 +590,7 @@ func ExportOrderFees(job *work.Job) error {
 
 // UpdateOrderItems 更新ordre_items 的 order_id
 func UpdateOrderItems(job *work.Job) error {
-	_, err := db.DB.DB().Exec(`update order_items set order_id=(select id from orders where order_no = order_items.order_no) AND order_id is NULL;`)
+	_, err := db.DB.DB().Exec(`UPDATE order_items SET order_id=(select id from orders where order_no = order_items.order_no) WHERE order_id is NULL;`)
 	if err != nil {
 		panic(err)
 	}
