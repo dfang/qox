@@ -14,14 +14,14 @@ func (App) ConfigureOrderFollowUpsAdmin(Admin *admin.Admin) {
 	followup := Admin.AddResource(&orders.OrderFollowUp{}, &admin.Config{Menu: []string{"Order Management"}})
 	configureVisibleFieldsForOrderFollowUps(followup)
 
-	followup.Action(&admin.Action{
-		Name:        "导出",
-		URLOpenType: "slideout",
-		URL: func(record interface{}, context *admin.Context) string {
-			return "/admin/workers/new?job=Export_FollowUps"
-		},
-		Modes: []string{"collection"},
-	})
+	// followup.Action(&admin.Action{
+	// 	Name:        "导出",
+	// 	URLOpenType: "slideout",
+	// 	URL: func(record interface{}, context *admin.Context) string {
+	// 		return "/admin/workers/new?job=Export_FollowUps"
+	// 	},
+	// 	Modes: []string{"collection"},
+	// })
 
 	followup.Meta(&admin.Meta{
 		Name:       "SatisfactionOfTimeliness",
