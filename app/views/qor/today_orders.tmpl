@@ -1,86 +1,95 @@
 {{$context := .}}
 {{$resource := .Resource}}
 
-<div class="mdl-cell mdl-cell--6-col">
-  <h5 class="qor-section-title">待办</h5>
+<div class="mdl-cell mdl-cell--4-col">
+  <h5 class="qor-section-title">今天</h5>
   <ul>
     <li>
       今天需取件
       <span style="float: right">
-        <a rel="nofollow" href="/admin/orders?scopes=Yesterday&keyword=q"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToPickUpToday }}</span></a>
+        <a rel="nofollow" href="/admin/orders?scopes=ToPickUpToday"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToPickUpToday }}</span></a>
         单
       </span>
     </li>
-    
     <li>
       今天需妥投
       <span style="float: right">
-        <a rel="nofollow" href="/admin/orders?scopes=Yesterday"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToDeliver }} </span></a>
+        <a rel="nofollow" href="/admin/orders?scopes=ToDeliverToday"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToDeliverToday }}</span></a>
         单
       </span>
     </li>
-
     <li>
-      今天待报单
+      今天需报单
       <span style="float: right">
-        <a rel="nofollow" href="/admin/aftersales?scopes=overdue"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.ToDeclare }}</span></a>
+        <a rel="nofollow" href="/admin/orders?scopes=ToSetupToday"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToDeclareToday }}</span></a>
         单
       </span>
     </li>
-
-    <li>
-      明天需取件
-      <span style="float: right">
-        <a rel="nofollow" href="/admin/orders?scopes=Today&keyword=q"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToPickUpTomorrow }}</span></a>
-        单
-      </span>
-    </li>
-
-    <li>
-      明天需妥投
-      <span style="float: right">
-        <a rel="nofollow" href="/admin/orders?scopes=Today"><span style="font-size:20px; float:left; margin-right:3px;">  {{ .Result.Reserved }} </span></a>
-        单
-      </span>
-    </li>
-  </ul>
-</div>
-
-<div class="mdl-cell mdl-cell--6-col">
-  <h5 class="qor-section-title">历史数据</h5>
-
-  <ul>
-    <li>
-      今天约了
-      <span style="float: right">
-        <a rel="nofollow" href="/admin/orders?scopes=Today"><span style="font-size:20px; float:left; margin-right:3px;">  {{ .Result.Reserved }} </span></a>
-        单
-      </span>
-    </li>
-
     <li>
       昨天预约了
       <span style="float: right">
-        <a rel="nofollow" href="/admin/orders?scopes=Yesterday"><span style="font-size:20px; float:left; margin-right:3px;">  {{ .Result.ToDeliver }} </span></a>
+        <a rel="nofollow" href="/admin/orders?scopes=ReservedYesterday"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ReservedYesterday }}</span></a>
         单
       </span>
     </li>
-
-    <li>
-      昨天妥投
-      <span style="float: right">
-        <a rel="nofollow" href="/admin/orders?scopes=The%20Day%20Before%20Yesterday"><span style="font-size:20px; float:left; margin-right:3px;">  {{ .Result.YesterdayToDeliver }} </span></a>
-        单
-      </span>
-    </li>
-
-    <li>
-      前天妥投
-      <span style="float: right">
-        <a rel="nofollow" href="/admin/orders?scopes=Last3Days"><span style="font-size:20px; float:left; margin-right:3px;"> {{ .Result.TheDayBeforeYesterdayToDeliver }} </span></a>
-        单
-      </span>
-    </li>
-  </ul>
+  <ul>
 </div>
-
+<div class="mdl-cell mdl-cell--4-col">
+  <h5 class="qor-section-title">明天</h5>
+  <ul>
+    <li>
+        明天需取件
+        <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=ToPickUpTomorrow"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToPickUpTomorrow }}</span></a>
+        单
+        </span>
+    </li>
+    <li>
+        明天需妥投
+        <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=ToDeliverTomorrow"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToDeliverTomorrow }}</span></a>
+        单
+        </span>
+    </li>
+    <li>
+        明天需报单
+        <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=ToSetupTomorrow"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToDeclareTomorrow }}</span></a>
+        单
+        </span>
+    </li>
+    <li>
+        今天预约了
+        <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=ReservedToday"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ReservedToday }}</span></a>
+        单
+        </span>
+    </li>
+  <ul>
+</div>
+<div class="mdl-cell mdl-cell--4-col">
+  <h5 class="qor-section-title">后天</h5>
+  <ul>
+    <li>
+        后天需取件
+        <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=ToPickUpTomorrow2"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToPickUpTomorrow2 }}</span></a>
+        单
+        </span>
+    </li>
+    <li>
+        后天需妥投
+        <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=ToDeliverTomorrow2"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToDeliverTomorrow2 }}</span></a>
+        单
+        </span>
+    </li>
+    <li>
+        后天需报单
+        <span style="float: right">
+        <a rel="nofollow" href="/admin/orders?scopes=ToSetupTomorrow2"><span style="font-size:20px; float:left; margin-right:3px;">{{ .Result.ToDeclareTomorrow2 }}</span></a>
+        单
+        </span>
+    </li>
+  <ul>
+</div>

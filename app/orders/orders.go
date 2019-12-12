@@ -362,9 +362,9 @@ func configureMetas(order *admin.Resource) {
 	// }})
 	// order.Meta(&admin.Meta{Name: "man_to_pickup_id", Type: "string", FormattedValuer: func(record interface{}, ctx *qor.Context) (result interface{}) {
 	// 	order := record.(*orders.Order)
-	// 	if order.ManToPickupID != "" {
+	// 	if order.ManToPickUpID != "" {
 	// 		var user users.User
-	// 		ctx.DB.Where("id = ?", order.ManToPickupID).Find(&user)
+	// 		ctx.DB.Where("id = ?", order.ManToPickUpID).Find(&user)
 	// 		return user.Name
 	// 	}
 	// 	return ""
@@ -374,7 +374,7 @@ func configureMetas(order *admin.Resource) {
 func configureScopes(order *admin.Resource) {
 	// define scopes for Order
 	order.Scope(&admin.Scope{
-		Name:  "Today",
+		Name:  "ReservedToday",
 		Label: "Today",
 		Group: "Filter By Date",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
@@ -382,7 +382,7 @@ func configureScopes(order *admin.Resource) {
 		},
 	})
 	order.Scope(&admin.Scope{
-		Name:  "Yesterday",
+		Name:  "ReservedYesterday",
 		Label: "Yesterday",
 		Group: "Filter By Date",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
@@ -507,8 +507,8 @@ func configureScopes(order *admin.Resource) {
 	})
 
 	order.Scope(&admin.Scope{
-		Name:  "ToPickupToday",
-		Label: "ToPickupToday",
+		Name:  "ToPickUpToday",
+		Label: "ToPickUpToday",
 		Group: "Filter By PickupDate",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().Format("2006-01-02")).Where("order_no like ?", "Q%")
@@ -516,8 +516,8 @@ func configureScopes(order *admin.Resource) {
 	})
 
 	order.Scope(&admin.Scope{
-		Name:  "ToPickupTomorrow",
-		Label: "ToPickupTomorrow",
+		Name:  "ToPickUpTomorrow",
+		Label: "ToPickUpTomorrow",
 		Group: "Filter By PickupDate",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 1).Format("2006-01-02")).Where("order_no like ?", "Q%")
@@ -525,8 +525,8 @@ func configureScopes(order *admin.Resource) {
 	})
 
 	order.Scope(&admin.Scope{
-		Name:  "ToPickupTomorrow2",
-		Label: "ToPickupTomorrow2",
+		Name:  "ToPickUpTomorrow2",
+		Label: "ToPickUpTomorrow2",
 		Group: "Filter By PickupDate",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
 			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02")).Where("order_no like ?", "Q%")

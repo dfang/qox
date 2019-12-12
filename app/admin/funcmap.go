@@ -2,7 +2,6 @@ package admin
 
 import (
 	"html/template"
-	"time"
 
 	"github.com/dfang/qor-demo/models/aftersales"
 	"github.com/dfang/qor-demo/models/orders"
@@ -89,47 +88,67 @@ func renderTodayOrders(context *admin.Context) template.HTML {
 	t := TodayOrdersCount{}
 	// var count1 int
 	// var count2 int
+	o := ctx.GetDB().Model(&orders.Order{})
 
-	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", time.Now()).Where("order_no like ?", "Q%").Count(&t.ToPickUpTomorrow)
-	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -1)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -1)).Where("order_no like ?", "Q%").Count(&t.ToPickUpToday)
+	// 需取件
+	o.Where("reserverd_delivery_time = ?", now.BeginningOfDay().Format("2006-01-02")).Where("order_no like ?", "Q%").Count(&t.ToPickUpToday)
+	o.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 1).Format("2006-01-02")).Where("order_no like ?", "Q%").Count(&t.ToPickUpTomorrow)
+	o.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02")).Where("order_no like ?", "Q%").Count(&t.ToPickUpTomorrow2)
 
-	// 今日预约了
-	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", now.EndOfDay()).Count(&t.Reserved)
+	// 预约了
+	o.Where("created_at >= ?", now.BeginningOfDay()).Where("created_at <=? ", now.EndOfDay()).Count(&t.ReservedToday)
+	o.Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -1)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -1)).Count(&t.ReservedYesterday)
 
-	// 今日需妥投
-	ctx.GetDB().Model(&orders.Order{}).Where("reserverd_delivery_time = ?", now.BeginningOfDay().Format("2006-01-02")).Count(&t.ToDeliver)
+	// 需妥投
+	o.Where("reserverd_delivery_time = ?", now.BeginningOfDay().Format("2006-01-02")).Count(&t.ToDeliverToday)
+	o.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 1).Format("2006-01-02")).Count(&t.ToDeliverTomorrow)
+	o.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02")).Count(&t.ToDeliverTomorrow2)
 
-	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -2)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -2)).Count(&t.YesterdayToDeliver)
+	// 安装
+	o.Where("reserverd_setup_time = ?", now.BeginningOfDay().Format("2006-01-02")).Count(&t.ToDeclareToday)
+	o.Where("reserverd_setup_time = ?", now.BeginningOfDay().AddDate(0, 0, 1).Format("2006-01-02")).Count(&t.ToDeclareTomorrow)
+	o.Where("reserverd_setup_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02")).Count(&t.ToDeclareTomorrow2)
 
-	ctx.GetDB().Model(&orders.Order{}).Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -3)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -3)).Count(&t.TheDayBeforeYesterdayToDeliver)
+	o.Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -2)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -2)).Count(&t.YesterdayToDeliver)
+	o.Where("created_at >= ?", now.BeginningOfDay().AddDate(0, 0, -3)).Where("created_at <=? ", now.EndOfDay().AddDate(0, 0, -3)).Count(&t.TheDayBeforeYesterdayToDeliver)
 
-	t.ToDeclare = "0"
-
+	// t.ToDeclare = "0"
+	// t.ToDeclareToday = "0"
+	// t.ToDeclareTomorrow = "0"
+	// t.ToDeclareTomorrow2 = "0"
 	// fmt.Println(t.ToReserve)
 	// fmt.Println(t.ToSchedule)
-
 	return ctx.Render("today_orders", t)
-
 	// return template.HTML("")
 }
 
 type TodayOrdersCount struct {
 	// 待取件
-	ToPickUpToday string
+	ToPickUpToday     string
+	ToPickUpTomorrow  string
+	ToPickUpTomorrow2 string
 
-	ToPickUpTomorrow string
+	// 待妥投
+	ToDeliverToday     string
+	ToDeliverTomorrow  string
+	ToDeliverTomorrow2 string
 
 	// 待妥投
 	ToDeliver string
 
 	// 待报单
-	ToDeclare string
+	ToDeclareToday     string
+	ToDeclareTomorrow  string
+	ToDeclareTomorrow2 string
 
-	YesterdayToDeliver string
+	// 约单
+	ReservedToday      string
+	ReservedYesterday  string
+	ReservedYesterday2 string
 
+	YesterdayToDeliver             string
 	TheDayBeforeYesterdayToDeliver string
-
-	Reserved string
+	Reserved                       string
 }
 
 type TodayAfterSalesCount struct {
