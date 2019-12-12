@@ -7,8 +7,8 @@ zh-CN:
       Customer_phone: 客户电话
       Customer_address: 客户地址
       Is_delivery_and_setup: "是否配送一体"
-      Reserverd_delivery_time: 预约配送时间
-      Reserverd_setup_time: 预约安装时间
+      Reserved_delivery_time: 预约配送时间
+      Reserved_setup_time: 预约安装时间
       Man_to_deliver_id: "配送师傅"
       Man_to_setup_id: "安装师傅"
       Man_to_pickup_id: "取件师傅"
@@ -198,11 +198,11 @@ zh-CN:
       Customer_address: 客户地址
       Customer Address: 客户地址
       Is_delivery_and_setup: "是否配送一体"
-      Reserverd_delivery_time: 预约配送时间
-      Reserverd Delivery Time: 预约配送时间
-      Reserverd_setup_time: 预约安装时间
-      Reserverd Setup Time: 预约安装时间
-      Reserverd Pickup Time: 预约取件时间
+      Reserved_delivery_time: 预约配送时间
+      Reserved Delivery Time: 预约配送时间
+      Reserved_setup_time: 预约安装时间
+      Reserved Setup Time: 预约安装时间
+      Reserved Pickup Time: 预约取件时间
       Man_to_deliver_id: "配送师傅"
       Man To Deliver: "配送师傅"
       Man_to_setup_id: "安装师傅"

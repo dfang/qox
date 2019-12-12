@@ -56,13 +56,13 @@ type Order struct {
 	CustomerPhone   string
 
 	// 预约配送时间
-	ReserverdDeliveryTime string
+	ReservedDeliveryTime string `gorm:"reserved_delivery_time"`
 
 	// 预约安装时间
-	ReserverdSetupTime string
+	ReservedSetupTime string `gorm:"reserved_setup_time"`
 
 	// 预约取件时间
-	ReserverdPickupTime string
+	ReservedPickupTime string `gorm:"reserved_pickup_time"`
 
 	// 是否送装一体（这个jd页面抓下来的是什么就存什么, 但是实际上有的订单是非送装一体，如果客户要求，也需要派人安装的，有些订单是取件单)
 	// 所以这个字段保持和京东抓下来的一致，另外还要个OrderType， 根据规则或者人工去改OrderType
@@ -138,7 +138,7 @@ func (order Order) Total() (total float32) {
 // AfterCreate 初始状态
 func (o *Order) AfterCreate(scope *gorm.Scope) error {
 	if strings.Contains(o.OrderNo, "Q") {
-		scope.SetColumn("reserverd_pickup_time", o.ReserverdDeliveryTime)
+		scope.SetColumn("reserved_pickup_time", o.ReservedDeliveryTime)
 	}
 	return nil
 }

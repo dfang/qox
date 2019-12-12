@@ -201,9 +201,9 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	// 		return db.Where("source IS NOT NULL")
 	// 	},
 	// })
-	// // installs.IndexAttrs("ID", "source", "order_no", "customer_name", "customer_address", "customer_phone", "is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "state")
+	// // installs.IndexAttrs("ID", "source", "order_no", "customer_name", "customer_address", "customer_phone", "is_delivery_and_setup", "reserved_delivery_time", "reserved_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "state")
 
-	// installs.IndexAttrs("ID", "source", "order_no", "customer_name", "customer_address", "customer_phone", "is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "state")
+	// installs.IndexAttrs("ID", "source", "order_no", "customer_name", "customer_address", "customer_phone", "is_delivery_and_setup", "reserved_delivery_time", "reserved_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "state")
 
 	// // define scopes for Order
 	// for _, state := range []string{"pending", "processing", "delivery_scheduled", "setup_scheduled", "pickup_scheduled", "cancelled", "shipped", "paid_cancelled", "returned"} {
@@ -225,8 +225,8 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 	o1.Meta(&exchange.Meta{Name: "customer_address"})
 	o1.Meta(&exchange.Meta{Name: "customer_phone"})
 	o1.Meta(&exchange.Meta{Name: "receivables"})
-	o1.Meta(&exchange.Meta{Name: "reserverd_delivery_time"})
-	o1.Meta(&exchange.Meta{Name: "reserverd_setup_time"})
+	o1.Meta(&exchange.Meta{Name: "reserved_delivery_time"})
+	o1.Meta(&exchange.Meta{Name: "reserved_setup_time"})
 
 }
 
@@ -239,7 +239,7 @@ func sizeVariationCollection(resource interface{}, context *qor.Context) (result
 
 func configureVisibleFields(order *admin.Resource) {
 	// order.IndexAttrs("ID", "User", "PaymentAmount", "ShippedAt", "CancelledAt", "State", "ShippingAddress")
-	// order.IndexAttrs("ID", "source", "order_no", "state", "order_type", "customer_name", "customer_address", "customer_phone", "receivables", "is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "shipping_fee", "setup_fee", "pickup_fee")
+	// order.IndexAttrs("ID", "source", "order_no", "state", "order_type", "customer_name", "customer_address", "customer_phone", "receivables", "is_delivery_and_setup", "reserved_delivery_time", "reserved_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id", "shipping_fee", "setup_fee", "pickup_fee")
 	// order.Meta(&admin.Meta{Name: "操作", Valuer: func(record interface{}, context *qor.Context) interface{} {
 	// 	if _, ok := record.(*orders.Order); ok {
 	// 		// return "<a href='#'>View</a>"
@@ -249,11 +249,11 @@ func configureVisibleFields(order *admin.Resource) {
 	// }})
 
 	// order.IndexAttrs("ID", "source", "order_no", "state", "order_type", "customer_name", "customer_address", "customer_phone", "receivables",
-	// 	"is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id",
+	// 	"is_delivery_and_setup", "reserved_delivery_time", "reserved_setup_time", "man_to_deliver_id", "man_to_setup_id", "man_to_pickup_id",
 	//   "shipping_fee", "setup_fee", "pickup_fee", "created_at", "updated_at")
 
 	order.IndexAttrs("ID", "source", "order_no", "customer_name", "customer_address", "customer_phone", "receivables",
-		"is_delivery_and_setup", "reserverd_delivery_time", "reserverd_setup_time", "created_at", "updated_at")
+		"is_delivery_and_setup", "reserved_delivery_time", "reserved_setup_time", "created_at", "updated_at")
 
 	// orderItems := order.GetAdmin().NewResource(&orders.OrderItem{})
 	// orderItems.IndexAttrs("Price", "Quantity")
@@ -286,9 +286,9 @@ func configureMetas(order *admin.Resource) {
 	// orderItemMeta := order.Meta(&admin.Meta{Name: "OrderItems"})
 	// orderItemMeta.Resource.Meta(&admin.Meta{Name: "SizeVariation", Config: &admin.SelectOneConfig{Collection: sizeVariationCollection}})
 	// order.NewAttrs("CustomerName", "CustomerAddress", "CustomerPhone", "Source", "OrderType", "Receivables", "PickupFee", "ShippingFee", "SetupFee")
-	order.Meta(&admin.Meta{Name: "ReserverdDeliveryTime", Type: "date"})
-	order.Meta(&admin.Meta{Name: "ReserverdSetupTime", Type: "date"})
-	order.Meta(&admin.Meta{Name: "ReserverdPickupTime", Type: "date"})
+	order.Meta(&admin.Meta{Name: "ReservedDeliveryTime", Type: "date"})
+	order.Meta(&admin.Meta{Name: "ReservedSetupTime", Type: "date"})
+	order.Meta(&admin.Meta{Name: "ReservedPickupTime", Type: "date"})
 
 	/*
 	   // order.Meta(&admin.Meta{Name: "ShippedAt", Type: "date"})
@@ -457,7 +457,7 @@ func configureScopes(order *admin.Resource) {
 		Label: "ToDeliverToday",
 		Group: "Filter By DeliveryDate",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().Format("2006-01-02"))
+			return db.Where("reserved_delivery_time = ?", now.BeginningOfDay().Format("2006-01-02"))
 		},
 	})
 
@@ -466,7 +466,7 @@ func configureScopes(order *admin.Resource) {
 		Label: "ToDeliverTomorrow",
 		Group: "Filter By DeliveryDate",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 1).Format("2006-01-02"))
+			return db.Where("reserved_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 1).Format("2006-01-02"))
 		},
 	})
 
@@ -475,7 +475,7 @@ func configureScopes(order *admin.Resource) {
 		Label: "ToDeliverTomorrow2",
 		Group: "Filter By DeliveryDate",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02"))
+			return db.Where("reserved_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02"))
 		},
 	})
 
@@ -484,7 +484,7 @@ func configureScopes(order *admin.Resource) {
 		Label: "ToSetupToday",
 		Group: "Filter By SetupDate",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("reserverd_setup_time = ?", now.BeginningOfDay().Format("2006-01-02"))
+			return db.Where("reserved_setup_time = ?", now.BeginningOfDay().Format("2006-01-02"))
 		},
 	})
 
@@ -493,7 +493,7 @@ func configureScopes(order *admin.Resource) {
 		Label: "ToSetupTomorrow",
 		Group: "Filter By SetupDate",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("reserverd_setup_time = ?", now.BeginningOfDay().AddDate(0, 0, 1).Format("2006-01-02"))
+			return db.Where("reserved_setup_time = ?", now.BeginningOfDay().AddDate(0, 0, 1).Format("2006-01-02"))
 		},
 	})
 
@@ -502,7 +502,7 @@ func configureScopes(order *admin.Resource) {
 		Label: "ToSetupTomorrow2",
 		Group: "Filter By SetupDate",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("reserverd_setup_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02"))
+			return db.Where("reserved_setup_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02"))
 		},
 	})
 
@@ -511,7 +511,7 @@ func configureScopes(order *admin.Resource) {
 		Label: "ToPickUpToday",
 		Group: "Filter By PickupDate",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().Format("2006-01-02")).Where("order_no like ?", "Q%")
+			return db.Where("reserved_delivery_time = ?", now.BeginningOfDay().Format("2006-01-02")).Where("order_no like ?", "Q%")
 		},
 	})
 
@@ -520,7 +520,7 @@ func configureScopes(order *admin.Resource) {
 		Label: "ToPickUpTomorrow",
 		Group: "Filter By PickupDate",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 1).Format("2006-01-02")).Where("order_no like ?", "Q%")
+			return db.Where("reserved_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 1).Format("2006-01-02")).Where("order_no like ?", "Q%")
 		},
 	})
 
@@ -529,7 +529,7 @@ func configureScopes(order *admin.Resource) {
 		Label: "ToPickUpTomorrow2",
 		Group: "Filter By PickupDate",
 		Handler: func(db *gorm.DB, context *qor.Context) *gorm.DB {
-			return db.Where("reserverd_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02")).Where("order_no like ?", "Q%")
+			return db.Where("reserved_delivery_time = ?", now.BeginningOfDay().AddDate(0, 0, 2).Format("2006-01-02")).Where("order_no like ?", "Q%")
 		},
 	})
 	order.Filter(&admin.Filter{
