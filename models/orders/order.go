@@ -3,6 +3,7 @@ package orders
 import (
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/dfang/qor-demo/models/users"
@@ -132,4 +133,12 @@ func (order Order) Total() (total float32) {
 	total = order.Amount() - float32(order.DiscountValue)
 	total = order.Amount() + float32(order.DeliveryMethod.Price)
 	return
+}
+
+// AfterCreate 初始状态
+func (o *Order) AfterCreate(scope *gorm.Scope) error {
+	if strings.Contains(o.OrderNo, "Q") {
+		scope.SetColumn("reserverd_pickup_time", o.ReserverdDeliveryTime)
+	}
+	return nil
 }
