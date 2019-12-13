@@ -27,29 +27,28 @@ import (
 // https://crontab.guru/
 // https://crontab.guru/examples.html
 func startWorkerPool() {
+	cronCfg := config.Config.Cron
+	// fmt.Println(cronCfg)
 
-	// Periodic Enqueueing (Cron)
 	pool := work.NewWorkerPool(Context{}, 10, "qor", db.RedisPool)
-	// pool.PeriodicallyEnqueue("30 * * * * *", "expire_aftersales") // This will enqueue a "expire_aftersales" job every minutes
-	// pool.PeriodicallyEnqueue("30 * * * * *", "freeze_audited_aftersales")
-	// pool.PeriodicallyEnqueue("5 * * * *", "unfreeze_aftersales")
-	// pool.PeriodicallyEnqueue("30 * * * * *", "update_balances")
 	pool.Middleware(Log)
 
-	cronCfg := config.Config.Cron
-	fmt.Println(cronCfg)
+	// 安装相关
+	// pool.PeriodicallyEnqueue(cronCfg.ExpireAftersales, "expire_aftersales")
+	// pool.PeriodicallyEnqueue(cronCfg.FreezeAuditedAftersales, "freeze_audited_aftersales")
+	// pool.PeriodicallyEnqueue(cronCfg.UnfreezeAftersales, "unfreeze_aftersales")
+	// pool.PeriodicallyEnqueue(cronCfg.UpdateBalances, "update_balances")
 
-	pool.PeriodicallyEnqueue(cronCfg.ExpireAftersales, "expire_aftersales")
-	pool.PeriodicallyEnqueue(cronCfg.FreezeAuditedAftersales, "freeze_audited_aftersales")
-	pool.PeriodicallyEnqueue(cronCfg.UnfreezeAftersales, "unfreeze_aftersales")
-	pool.PeriodicallyEnqueue(cronCfg.UpdateBalances, "update_balances")
+	// 配送相关
 	pool.PeriodicallyEnqueue(cronCfg.AutoExportMobilePhones, "export_mobile_phones")
 	pool.PeriodicallyEnqueue(cronCfg.AutoExportOrderDetails, "export_order_details")
 	pool.PeriodicallyEnqueue(cronCfg.AutoExportOrderFollowUps, "export_order_followups")
 	pool.PeriodicallyEnqueue(cronCfg.AutoExportOrderFees, "export_order_fees")
+
 	pool.PeriodicallyEnqueue(cronCfg.AutoUpdateOrderItems, "update_order_items")
 	pool.PeriodicallyEnqueue(cronCfg.AutoDeliverOrders, "auto_deliver_orders")
 
+	// 演示模式下自动创建订单，分配订单，完成订单，结算运费等
 	if os.Getenv("QOR_ENV") != "production" && os.Getenv("DEMO_MODE") == "true" {
 		pool.PeriodicallyEnqueue(cronCfg.AutoInquire, "auto_inquire")
 		pool.PeriodicallyEnqueue(cronCfg.AutoSchedule, "auto_schedule")
@@ -77,7 +76,6 @@ func startWorkerPool() {
 	pool.Job("unfreeze_aftersales", UnfreezeAftersales)
 	pool.Job("update_balances", UpdateBalances)
 	pool.Job("update_balance", UpdateBalance)
-
 	pool.Job("send_wechat_template_msg", SendWechatTemplateMsg)
 	pool.Job("export_mobile_phones", ExportMobilePhones)
 	pool.Job("export_order_details", ExportOrderDetails)
@@ -603,5 +601,21 @@ func AutoDeliverOrders(job *work.Job) error {
 	if err != nil {
 		panic(err)
 	}
+	return nil
+}
+
+// AutoCreateAftersale 创建order_items之后自动创建一个售后订单
+func AutoCreateAftersale(job *work.Job) error {
+	// If there's a order_no param, set it in the context for future middleware and handlers to use.
+	if _, ok := job.Args["order_no"]; ok {
+		// c.customerID = job.ArgInt64("order_no")
+		// if err := job.ArgError(); err != nil {
+		// 	return err
+		// }
+	}
+	// _, err := db.DB.DB().Exec(`UPDATE orders SET state='delivered' WHERE TO_TIMESTAMP(reserved_delivery_time, 'YYYY-MM-DD') < NOW() AND state='pending';`)
+	// if err != nil {
+	// 	panic(err)
+	// }
 	return nil
 }
