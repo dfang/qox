@@ -66,6 +66,7 @@ func main() {
 	debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
 	runMigration := cmdLine.Bool("migrate", false, "Run migration")
 	runSeeds := cmdLine.Bool("seeds", false, "Run seeds, never run this on production")
+	workerPool := cmdLine.Bool("workerPool", true, "Start gocraft/work worker pool")
 	ui := cmdLine.Bool("ui", false, "Serves gocraft/work ui")
 	// runSeed := cmdLine.Bool("seed", false, "Run seed")
 	eval := cmdLine.Bool("eval", false, "Evaluate rules")
@@ -116,19 +117,19 @@ func main() {
 		os.Exit(0)
 	}
 
-	// fmt.Println("start workerPool ......")
+	fmt.Println("start workerPool ......")
 	// if os.Getenv("ENV") == "development" {
-	// if false {
-	go startWorkerPool()
-	// }
+	if *workerPool {
+		go startWorkerPool()
+
+		if *ui || os.Getenv("UI") == "true" {
+			fmt.Println("serves gocraft/work web ui ......")
+			go startWorkWebUI()
+		}
+	}
 
 	fmt.Println("start health check ......")
 	go startHealthCheck()
-
-	if *ui || os.Getenv("UI") == "true" {
-		fmt.Println("serves gocraft/work web ui ......")
-		go startWorkWebUI()
-	}
 
 	if os.Getenv("HTTPS") == "true" && os.Getenv("DOMAIN") == "" {
 		log.Info().Msg("If set HTTPS=true, this app will get ssl certificates automatically and serve on 443,  so you must also set DOMAIN")
