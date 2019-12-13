@@ -199,6 +199,7 @@ func setupMiddlewaresAndRoutes() {
 	// 	bindatafs.AssetFS.RegisterPath(filepath.Join(config.Root, v))
 	// }
 
+	Router.Mount("/debug", middleware.Profiler())
 	Router.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("PONG"))
 	})
@@ -211,6 +212,10 @@ func setupMiddlewaresAndRoutes() {
 
 	// Router.Handle("/static/", http.RedirectHandler("http://baidu.com", 303))
 	// Router.Handle("/public/", http.StripPrefix("/public/", fs))
+
+	// https://www.alexedwards.net/blog/serving-static-sites-with-go
+	// https://github.com/go-chi/chi/blob/master/middleware/nocache.go
+	// https://github.com/go-chi/chi/blob/master/middleware/profiler.go
 
 	// workDir, _ := os.Getwd()
 	// filesDir := filepath.Join(workDir, "public")
