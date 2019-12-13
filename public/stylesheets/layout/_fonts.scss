@@ -14,6 +14,7 @@ Material design icons are the official [icon set](http://www.google.com/design/s
        url('/fonts/MaterialIcons-Regular.woff2') format('woff2'),
        url('/fonts/MaterialIcons-Regular.woff') format('woff'),
        url('/fonts/MaterialIcons-Regular.ttf') format('truetype');
+  font-display: swap;
 }
 .material-icons {
   font-family: 'Material Icons';
