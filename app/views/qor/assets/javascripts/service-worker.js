@@ -85,14 +85,19 @@ self.addEventListener('notificationclick', function (event) {
   console.log(event)
 });
 
+// https://developers.google.com/web/ilt/pwa/caching-files-with-service-worker
 // https://developers.google.com/web/fundamentals/primers/service-workers#cache_and_return_requests
 // https://github.com/GoogleChrome/samples/blob/gh-pages/service-worker/read-through-caching/service-worker.js
+// https://codelabs.developers.google.com/dev-pwa-training/
+// https://www.youtube.com/playlist?list=PLNYkxOF6rcIB2xHBZ7opgc2Mv009X87Hh
+// https://developers.google.com/web/ilt/pwa/caching-files-with-service-worker
 self.addEventListener('fetch', function (event) {
   event.respondWith(
     caches.match(event.request)
       .then(function (response) {
         // Cache hit - return response
         if (response) {
+          console.log("hit: ", event.request)
           return response;
         }
         return fetch(event.request);

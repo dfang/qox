@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -27,7 +26,6 @@ import (
 	"github.com/dfang/qor-demo/app/api"
 	"github.com/dfang/qor-demo/app/home"
 	"github.com/dfang/qor-demo/app/orders"
-	"github.com/dfang/qor-demo/app/pages"
 	"github.com/dfang/qor-demo/app/products"
 
 	"github.com/dfang/qor-demo/app/reports"
@@ -66,16 +64,15 @@ func main() {
 	debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
 	runMigration := cmdLine.Bool("migrate", false, "Run migration")
 	runSeeds := cmdLine.Bool("seeds", false, "Run seeds, never run this on production")
-	workerPool := cmdLine.Bool("workerPool", true, "Start gocraft/work worker pool")
+	workerPool := cmdLine.Bool("workerPool", false, "Start gocraft/work worker pool")
 	ui := cmdLine.Bool("ui", false, "Serves gocraft/work ui")
-	// runSeed := cmdLine.Bool("seed", false, "Run seed")
-	eval := cmdLine.Bool("eval", false, "Evaluate rules")
+	evalRules := cmdLine.Bool("eval", false, "Evaluate rules")
 
 	cmdLine.Parse(os.Args[1:])
 
 	Compile()
 
-	if *eval {
+	if *evalRules {
 		Evaluate()
 		os.Exit(0)
 	}
@@ -239,6 +236,9 @@ func setupMiddlewaresAndRoutes() {
 	Router.Use(middleware.RequestID)
 	Router.Use(middleware.Logger)
 	Router.Use(middleware.Recoverer)
+	Router.Use(middleware.Timeout(3 * time.Second))
+	// Router.Use(middleware.WithValue("k", "v"))
+	// Router.Use(middleware.StripSlashes)
 
 	// Use default options
 	Router.Use(cors.Default().Handler)
@@ -274,6 +274,17 @@ func setupMiddlewaresAndRoutes() {
 		})
 	}
 
+	// Router.NotFound(func(w http.ResponseWriter, r *http.Request) {
+	// 	// w.WriteHeader(404)
+	// 	// w.Write([]byte(r.URL.Path))
+	// 	// w.Write([]byte("nothing here"))
+	// 	// workDir, _ := os.Getwd()
+	// 	// filesDir := filepath.Join(workDir, "public")
+	// 	// fs := http.FileServer(http.Dir("public"))
+	// 	// fs.ServeHTTP(w, r)
+	// 	http.ServeFile(w, r, "favicon.ico")
+	// })
+
 	Application.Use(aftersale.NewWithDefault())
 	Application.Use(api.New(&api.Config{}))
 	Application.Use(adminapp.New(&adminapp.Config{}))
@@ -282,11 +293,9 @@ func setupMiddlewaresAndRoutes() {
 	Application.Use(home.NewWithDefault())
 	Application.Use(products.NewWithDefault())
 	Application.Use(orders.NewWithDefault())
-	Application.Use(pages.NewWithDefault())
+	// Application.Use(pages.NewWithDefault())
 	Application.Use(stores.NewWithDefault())
-
 	Application.Use(reports.NewWithDefault())
-
 	// Application.Use(enterprise.New(&enterprise.Config{}))
 
 	// views := []string{
@@ -307,16 +316,35 @@ func setupMiddlewaresAndRoutes() {
 		w.Write([]byte("PONG"))
 	})
 
-	// fs := http.FileServer(http.Dir("public/"))
+	// fs := http.FileServer(http.Dir("public"))
+	// Router.Handle("/", fs)
+
 	// http.Handle("/", http.StripPrefix("/", fs))
 	// Router.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// Router.Handle("/static/", http.RedirectHandler("http://baidu.com", 303))
 	// Router.Handle("/public/", http.StripPrefix("/public/", fs))
 
-	workDir, _ := os.Getwd()
-	filesDir := filepath.Join(workDir, "public")
-	FileServer(Router, "/", http.Dir(filesDir))
+	// workDir, _ := os.Getwd()
+	// filesDir := filepath.Join(workDir, "public")
+	// FileServer(Router, "/", http.Dir(filesDir))
+
+	// 用NotFound 来替代前面的三句
+	// Serve public 文件夹里的 favicon.ico 等文件
+	// 确保 /favicon.ico 等能直接访问
+	Router.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		// w.WriteHeader(404)
+		// w.Write([]byte(r.URL.Path))
+		// w.Write([]byte("nothing here"))
+
+		log.Debug().Msg("request path: " + r.URL.Path)
+
+		// workDir, _ := os.Getwd()
+		// filesDir := filepath.Join(workDir, "public")
+		fs := http.FileServer(http.Dir("./public"))
+		fs.ServeHTTP(w, r)
+		// http.ServeFile(w, r, "./public/favicon.ico")
+	})
 }
 
 // DumpHTTPRequest for debugging
@@ -337,7 +365,13 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 		panic("FileServer does not permit URL parameters.")
 	}
 
+	// https://stackoverflow.com/questions/27945310/why-do-i-need-to-use-http-stripprefix-to-access-my-static-files
 	fs := http.StripPrefix(path, http.FileServer(root))
+
+	// fmt.Println("fuck")
+	// fmt.Println(path)
+	// fmt.Println(len(path) - 1)
+	// fmt.Println(path[len(path)-1])
 
 	if path != "/" && path[len(path)-1] != '/' {
 		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
@@ -346,6 +380,12 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 	path += "*"
 
 	r.Get(path, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		log.Debug().Msg("FALLBACK")
+
+		fmt.Println("fallback to file server")
+		fmt.Println(path)
+
 		fs.ServeHTTP(w, r)
 	}))
 }
