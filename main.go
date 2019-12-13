@@ -64,7 +64,7 @@ func main() {
 	debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
 	runMigration := cmdLine.Bool("migrate", false, "Run migration")
 	runSeeds := cmdLine.Bool("seeds", false, "Run seeds, never run this on production")
-	workerPool := cmdLine.Bool("workerPool", false, "Start gocraft/work worker pool")
+	workerPool := cmdLine.Bool("workerPool", true, "Start gocraft/work worker pool")
 	ui := cmdLine.Bool("ui", false, "Serves gocraft/work ui")
 	evalRules := cmdLine.Bool("eval", false, "Evaluate rules")
 
