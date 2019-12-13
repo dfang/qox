@@ -35,7 +35,7 @@ type Order struct {
 	ShippingAddress   users.Address
 	BillingAddressID  uint `form:"billingaddress"`
 	BillingAddress    users.Address
-	OrderItems        []OrderItem
+	OrderItems        []OrderItem `json:"order_items"`
 	// AmazonAddressAccessToken string
 	// AmazonOrderReferenceID   string
 	// AmazonAuthorizationID    string
@@ -47,31 +47,31 @@ type Order struct {
 	Source string
 
 	// 订单号 面单号
-	OrderNo string `gorm:"unique;not null"`
+	OrderNo string `gorm:"unique;not null" json:"order_no"`
 
 	// -- ORDER_TYPE starts with Q 退货的取件单
 	OrderType string
 
 	// 客户信息, 从京东后台导入或者扫描枪扫入的
-	CustomerAddress string
-	CustomerName    string
-	CustomerPhone   string
+	CustomerAddress string `json:"customer_address"`
+	CustomerName    string `json:"customer_name"`
+	CustomerPhone   string `json:"customer_phone"`
 
 	// 预约配送时间
-	ReservedDeliveryTime string `gorm:"reserved_delivery_time"`
+	ReservedDeliveryTime string `gorm:"reserved_delivery_time" json:"reserved_delivery_time"`
 
 	// 预约安装时间
-	ReservedSetupTime string `gorm:"reserved_setup_time"`
+	ReservedSetupTime string `gorm:"reserved_setup_time" json:"reserved_setup_time"`
 
 	// 预约取件时间
-	ReservedPickupTime string `gorm:"reserved_pickup_time"`
+	ReservedPickupTime string `gorm:"reserved_pickup_time" json:"reserved_pickup_time"`
 
 	// 是否送装一体（这个jd页面抓下来的是什么就存什么, 但是实际上有的订单是非送装一体，如果客户要求，也需要派人安装的，有些订单是取件单)
 	// 所以这个字段保持和京东抓下来的一致，另外还要个OrderType， 根据规则或者人工去改OrderType
 	IsDeliveryAndSetup string
 
 	// 应收款项
-	Receivables float32
+	Receivables float32 `json:"receivables"`
 
 	// 配送员
 	ManToDeliverID string     `l10n:"sync"`

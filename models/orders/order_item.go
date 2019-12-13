@@ -7,21 +7,23 @@ import (
 	"strings"
 
 	"github.com/dfang/qor-demo/config/db"
+	"github.com/dfang/qor-demo/models/aftersales"
 	"github.com/dfang/qor-demo/models/products"
+	"github.com/gocraft/work"
 	"github.com/jinzhu/gorm"
 	"github.com/qor/transition"
 )
 
 type OrderItem struct {
 	gorm.Model
-	OrderID          uint
+	OrderID          uint `json: "order_id`
 	Order            Order
 	SizeVariationID  uint `cartitem:"SizeVariationID"`
 	SizeVariation    *products.SizeVariation
 	ColorVariationID uint `cartitem:"ColorVariationID"`
 	ColorVariation   *products.ColorVariation
-	Quantity         uint `cartitem:"Quantity"`
-	Price            float32
+	Quantity         uint    `cartitem:"Quantity"`
+	Price            float32 `json:"price"`
 	DiscountRate     uint
 
 	ProductNo string `json:"product_no"`
@@ -34,7 +36,7 @@ type OrderItem struct {
 	Dimension string `json:"dimension"`
 
 	// 单件商品的配送费 根据规则推断出来的
-	DeliveryFee float64
+	DeliveryFee float64 `json:"delivery_fee"`
 
 	transition.Transition
 }
@@ -239,4 +241,24 @@ func (item *OrderItem) IsService() bool {
 		}
 	}
 	return false
+}
+
+// AfterCreate 初始状态
+func (item *OrderItem) AfterCreate(scope *gorm.Scope) error {
+	if strings.Contains(item.OrderNo, "Q") {
+		scope.SetColumn("reserved_pickup_time", item.Order.ReservedDeliveryTime)
+	}
+	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
+	enqueuer.Enqueue("update_order_items", work.Q{})
+	// enqueuer.EnqueueIn("create_after_sale", 60, work.Q{"order_no": item.OrderNo})
+
+	a := aftersales.Aftersale{}
+	a.CustomerAddress = item.Order.CustomerAddress
+	a.CustomerName = item.Order.CustomerName
+	a.CustomerPhone = item.Order.CustomerPhone
+	a.ReservedServiceTime = item.Order.ReservedSetupTime
+	a.Source = "JD"
+	a.Remark = item.Order.OrderNo
+
+	return nil
 }
