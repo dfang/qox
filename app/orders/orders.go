@@ -914,7 +914,7 @@ func configureActions(Admin *admin.Admin, order *admin.Resource) {
 				followUp.PositionProperly = arg.PositionProperly
 				followUp.Feedback = arg.Feedback
 				followUp.ExceptionHandling = arg.ExceptionHandling
-				if err := tx.Save(&followUp).Error; err != nil {
+				if err := tx.Where(orders.OrderFollowUp{OrderNo: item.OrderNo}).FirstOrCreate(&followUp).Error; err != nil {
 					tx.Rollback()
 					return err
 				}
