@@ -126,3 +126,9 @@
 .qor-order_items .qor-table__content{
   max-width: 100%;
 }
+
+@media only screen and (max-width: 736px) and (min-width: 320px) {
+  .qor-table {
+    width: 100%;
+  }
+}
