@@ -16,6 +16,9 @@ import (
 	"github.com/qor/render"
 )
 
+// 修改密码
+// 如何直接改默认管理员或者其他用户的密码
+// https://play.golang.org/p/fEefNQ48-L9
 var (
 	// Auth initialize Auth for Authentication
 	Auth = clean.New(&auth.Config{
