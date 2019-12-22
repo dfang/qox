@@ -1,6 +1,7 @@
 .vscode/
 .idea/
 tmp/
+temp/
 data/
 *.sh
 gin-bin
