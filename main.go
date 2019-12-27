@@ -363,6 +363,8 @@ func main() {
 		os.Exit(0)
 	}
 
+	go startFaktoryWorker()
+
 	fmt.Println("start workerPool ......")
 	// if os.Getenv("ENV") == "development" {
 	if *workerPool {

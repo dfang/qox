@@ -10,6 +10,8 @@ require (
 	github.com/aws/aws-sdk-go v1.25.10 // indirect
 	github.com/azumads/faker v0.0.0-20150921074035-6cae71ddb107
 	github.com/braintree/manners v0.0.0-20160418043613-82a8879fc5fd // indirect
+	github.com/contribsys/faktory v1.0.1-1
+	github.com/contribsys/faktory_worker_go v0.8.0
 	github.com/dfang/wechat-work-go v0.0.0-20190622161907-748e836f69d3 // indirect
 	github.com/disintegration/imaging v1.6.1 // indirect
 	github.com/fatih/color v1.7.0 // indirect
@@ -31,6 +33,8 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/joho/sqltocsv v0.0.0-20190824231449-5650f27fd5b6
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible
+	github.com/juju/loggo v0.0.0-20190526231331-6e530bcce5d8 // indirect
+	github.com/juju/testing v0.0.0-20191001232224-ce9dec17d28b // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v1.2.0 // indirect
 	github.com/manveru/gobdd v0.0.0-20131210092515-f1a17fdd710b // indirect
@@ -89,6 +93,7 @@ require (
 	github.com/yosssi/gohtml v0.0.0-20190915184251-7ff6f235ecaf // indirect
 	golang.org/x/crypto v0.0.0-20191010185427-af544f31c8ac
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
+	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
 	qiniupkg.com/x v7.0.8+incompatible // indirect
 	syreclabs.com/go/faker v1.2.0
 )
