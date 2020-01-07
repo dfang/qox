@@ -26,7 +26,7 @@ require (
 	github.com/heptiolabs/healthcheck v0.0.0-20180807145615-6ff867650f40
 	github.com/jinzhu/configor v1.1.1
 	github.com/jinzhu/copier v0.0.0-20190924061706-b57f9002281a // indirect
-	github.com/jinzhu/gorm v1.9.11
+	github.com/jinzhu/gorm v1.9.12
 	github.com/jinzhu/now v1.1.1
 	github.com/joho/godotenv v1.3.0
 	github.com/joho/sqltocsv v0.0.0-20190824231449-5650f27fd5b6
