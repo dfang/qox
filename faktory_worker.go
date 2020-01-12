@@ -8,6 +8,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dfang/qor-demo/config/db"
@@ -87,15 +89,16 @@ func UpsertOrder(ctx worker.Context, args ...interface{}) error {
 		return errors.New("save json to file failed")
 	}
 
-	receivables, _ := obj.Order.Receivables.Float64()
+	normalized := normalizeOrder(obj)
+	receivables, _ := normalized.Order.Receivables.Float64()
 	o := orders.Order{
-		OrderNo:              obj.Order.OrderNo,
-		CustomerAddress:      obj.Order.CustomerAddress,
-		CustomerName:         obj.Order.CustomerName,
-		CustomerPhone:        obj.Order.CustomerPhone,
-		ReservedDeliveryTime: obj.Order.ReservedDeliveryTime,
-		ReservedSetupTime:    obj.Order.ReservedSetupTime,
-		IsDeliveryAndSetup:   obj.Order.IsDeliveryAndSetup,
+		OrderNo:              normalized.Order.OrderNo,
+		CustomerAddress:      normalized.Order.CustomerAddress,
+		CustomerName:         normalized.Order.CustomerName,
+		CustomerPhone:        normalized.Order.CustomerPhone,
+		ReservedDeliveryTime: normalized.Order.ReservedDeliveryTime,
+		ReservedSetupTime:    normalized.Order.ReservedSetupTime,
+		IsDeliveryAndSetup:   normalized.Order.IsDeliveryAndSetup,
 		// CreatedAt: obj.Order.CreatedAt,
 		// UpdatedAt: obj.Order.UpdatedAt,
 		Receivables: float32(receivables),
@@ -130,6 +133,41 @@ func UpsertOrder(ctx worker.Context, args ...interface{}) error {
 
 	fmt.Printf("%+v\n", o)
 	return nil
+}
+
+// 清洗数据
+func normalizeOrder(payload OrderPayload) OrderPayload {
+	item := payload.Order
+	// 预处理
+	var phone string
+	phones := strings.Split(strings.TrimSpace(item.CustomerPhone), "/")
+	if len(phones) > 1 && phones[0] == phones[1] {
+		phone = phones[0]
+	} else {
+		phone = item.CustomerPhone
+	}
+	item.OrderNo = strings.TrimSpace(item.OrderNo)
+	// 去掉首尾空格
+	item.CustomerAddress = strings.TrimSpace(item.CustomerAddress)
+	// 去掉"江西 九江市" 中间的空格
+	item.CustomerAddress = strings.Replace(item.CustomerAddress, " ", "", -1)
+	// 去掉 江西省,九江市,修水县, 中的逗号
+	item.CustomerAddress = strings.Replace(item.CustomerAddress, ",", "", -1)
+	item.CustomerAddress = strings.Replace(item.CustomerAddress, "，", "", -1)
+	// 江西省.九江市.修水县
+	item.CustomerAddress = strings.Replace(item.CustomerAddress, ".", "", -1)
+	// 去掉客户姓名的首尾空格
+	item.CustomerName = strings.TrimSpace(item.CustomerName)
+	// 15618903080/15618903080 这种格式的电话号码，如果/左右两边一样，取一个
+	item.CustomerPhone = phone
+	// if Receivables not convertable (eg. " "), set it to 0,
+	_, err := strconv.Atoi(item.Receivables.String())
+	if err != nil {
+		item.Receivables = "0"
+	}
+
+	payload.Order = item
+	return payload
 }
 
 func saveFile(filename string, content []byte) error {
