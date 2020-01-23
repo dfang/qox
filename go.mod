@@ -89,7 +89,7 @@ require (
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 // indirect
 	github.com/theplant/testingutils v0.0.0-20190603093022-26d8b4d95c61 // indirect
-	github.com/unrolled/render v1.0.1
+	github.com/unrolled/render v1.0.2
 	github.com/yosssi/gohtml v0.0.0-20190915184251-7ff6f235ecaf // indirect
 	golang.org/x/crypto v0.0.0-20191010185427-af544f31c8ac
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
