@@ -95,7 +95,7 @@ require (
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
 	qiniupkg.com/x v7.0.8+incompatible // indirect
-	syreclabs.com/go/faker v1.2.0
+	syreclabs.com/go/faker v1.2.1
 )
 
 replace github.com/qor/auth v0.0.0-20190603071357-709ba0ce943b => github.com/dfang/auth v0.0.0-20190711063714-408e41c1a2cc

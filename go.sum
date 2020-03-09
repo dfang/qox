@@ -405,3 +405,5 @@ qiniupkg.com/x v7.0.8+incompatible h1:Ek0ZVi5IyaWUAFkJbPRiqlh34xDM4uoKw7Kqdpankv
 qiniupkg.com/x v7.0.8+incompatible/go.mod h1:6sLxR5IZ03vMaRAQAY/5MvzofeoBIjO4XE0Njv6V1ms=
 syreclabs.com/go/faker v1.2.0 h1:fy5UfSu5bOFrVpBk8I1jSgPdOLMJxM7ulKFvkh673ow=
 syreclabs.com/go/faker v1.2.0/go.mod h1:NAXInmkPsC2xuO5MKZFe80PUXX5LU8cFdJIHGs+nSBE=
+syreclabs.com/go/faker v1.2.1 h1:yo7D8h2BiWzDZh1uKLR2ZzpHeJjpbYcGCI7P4dasj0w=
+syreclabs.com/go/faker v1.2.1/go.mod h1:NAXInmkPsC2xuO5MKZFe80PUXX5LU8cFdJIHGs+nSBE=
