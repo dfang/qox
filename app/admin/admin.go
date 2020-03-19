@@ -68,6 +68,8 @@ func (app App) ConfigureApplication(application *application.Application) {
 	// Hide some menus for operator role
 	Admin.AddMenu(&admin.Menu{Name: "Order Management", Priority: 2, Permission: roles.Deny(roles.Read, "operator")})
 	Admin.AddMenu(&admin.Menu{Name: "Aftersale Management", Priority: 3})
+
+	Admin.AddMenu(&admin.Menu{Name: "Settlement Management", Priority: 4})
 	Admin.AddMenu(&admin.Menu{Name: "Settlement Management", Priority: 4})
 	Admin.AddMenu(&admin.Menu{Name: "Reports Management", Priority: 4})
 	Admin.AddMenu(&admin.Menu{Name: "User Management", Priority: 4})

@@ -66,7 +66,7 @@ func (app App) ConfigureApplication(application *application.Application) {
 	Admin.AddMenu(&admin.Menu{Name: "统计来源", Link: "/admin/reports/by_sources", Ancestors: []string{"Reports Management"}})
 	Admin.AddMenu(&admin.Menu{Name: "统计师傅", Link: "/admin/reports/by_names", Ancestors: []string{"Reports Management"}})
 
-	Admin.AddMenu(&admin.Menu{Name: "统计订单", Link: "/admin/reports/orders", Ancestors: []string{"Reports Management"}})
+	Admin.AddMenu(&admin.Menu{Name: "统计约单", Link: "/admin/reports/orders", Ancestors: []string{"Reports Management"}})
 
 	// Admin.AddResource(AftersaleReportByName{}, &admin.Config{Menu: []string{"Reports Management"}, Priority: 1})
 	// Admin.AddResource(AftersaleReportByBrand{}, &admin.Config{Menu: []string{"Reports Management"}, Priority: 2})
