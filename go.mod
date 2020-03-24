@@ -16,7 +16,7 @@ require (
 	github.com/disintegration/imaging v1.6.1 // indirect
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/gin-gonic/gin v1.4.0 // indirect
-	github.com/go-chi/chi v4.0.2+incompatible
+	github.com/go-chi/chi v4.0.4+incompatible
 	github.com/gocraft/web v0.0.0-20190207150652-9707327fb69b // indirect
 	github.com/gocraft/work v0.5.1
 	github.com/gomodule/redigo v2.0.0+incompatible
