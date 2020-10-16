@@ -34,7 +34,7 @@ func startHealthCheck() {
 	// check worker
 	health.AddLivenessCheck("worker-ui", healthcheck.HTTPGetCheck("http://localhost:5040/worker_pools", 5*time.Second))
 
-	health.AddLivenessCheck("faktory-ui", healthcheck.HTTPGetCheck(fmt.Sprintf("http://%s:%s", config.Config.FaktoryHost, config.Config.FaktoryUIPort), 5*time.Second))
+	// health.AddLivenessCheck("faktory-ui", healthcheck.HTTPGetCheck(fmt.Sprintf("http://%s:%s", config.Config.FaktoryHost, config.Config.FaktoryUIPort), 5*time.Second))
 
 	//check web is live
 	health.AddLivenessCheck("web", healthcheck.HTTPGetCheck("http://localhost:7000/health", 5*time.Second))
