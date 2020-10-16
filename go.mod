@@ -43,8 +43,6 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.2
 	github.com/mrjones/oauth v0.0.0-20190623134757-126b35219450 // indirect
 	github.com/newm4n/grool v1.0.2
-	github.com/qiniu/api.v7 v7.2.5+incompatible // indirect
-	github.com/qiniu/x v7.0.8+incompatible // indirect
 	github.com/qor/action_bar v0.0.0-20190314070413-136e5e2c5b8c
 	github.com/qor/activity v0.0.0-20190717092745-b7d0527b3572
 	github.com/qor/admin v0.0.0-20190906081516-5593fc33b920
@@ -64,7 +62,7 @@ require (
 	github.com/qor/mailer v0.0.0-20180329083248-0555e49f99ac
 	github.com/qor/media v0.0.0-20190830035427-8c0c3e14880b
 	github.com/qor/notification v0.0.0-20181014061619-c4c002490b78
-	github.com/qor/oss v0.0.0-20190603071501-90a5bbaee07c
+	github.com/qor/oss v0.0.0-20191031055114-aef9ba66bf76 // indirect
 	github.com/qor/page_builder v0.0.0-20190619064344-2e4b0d81d42d
 	github.com/qor/publish v0.0.0-20181014061411-abfbacee9e0d // indirect
 	github.com/qor/publish2 v0.0.0-20190725063548-254d334938f2
@@ -91,10 +89,10 @@ require (
 	github.com/theplant/testingutils v0.0.0-20190603093022-26d8b4d95c61 // indirect
 	github.com/unrolled/render v1.0.1
 	github.com/yosssi/gohtml v0.0.0-20190915184251-7ff6f235ecaf // indirect
-	golang.org/x/crypto v0.0.0-20191010185427-af544f31c8ac
+	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/net v0.0.0-20201010224723-4f7140c49acb // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
-	qiniupkg.com/x v7.0.8+incompatible // indirect
 	syreclabs.com/go/faker v1.2.0
 )
 
