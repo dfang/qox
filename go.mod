@@ -43,6 +43,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.2
 	github.com/mrjones/oauth v0.0.0-20190623134757-126b35219450 // indirect
 	github.com/newm4n/grool v1.0.2
+	github.com/prometheus/client_golang v0.9.3-0.20190127221311-3c4408c8b829
 	github.com/qor/action_bar v0.0.0-20190314070413-136e5e2c5b8c
 	github.com/qor/activity v0.0.0-20190717092745-b7d0527b3572
 	github.com/qor/admin v0.0.0-20190906081516-5593fc33b920
