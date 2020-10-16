@@ -94,7 +94,7 @@ require (
 	golang.org/x/net v0.0.0-20201010224723-4f7140c49acb // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
-	syreclabs.com/go/faker v1.2.0
+	syreclabs.com/go/faker v1.2.2
 )
 
 replace github.com/qor/auth v0.0.0-20190603071357-709ba0ce943b => github.com/dfang/auth v0.0.0-20190711063714-408e41c1a2cc
