@@ -18,6 +18,7 @@ import (
 	"github.com/qor/location"
 	"github.com/qor/mailer"
 	"github.com/qor/mailer/logger"
+
 	// "github.com/qor/media/oss"
 
 	// "github.com/qor/oss/qiniu"
@@ -44,7 +45,10 @@ var Config = struct {
 		Host string `env:"REDIS_HOST" default:"localhost"`
 		Port string `env:"REDIS_PORT" default:"6379"`
 	}
-	DB struct {
+	FaktoryHost   string `env:"FAKTORY_HOST" default:"localhost"`
+	FaktoryPort   string `env:"FAKTORY_PORT" default:"7419"`
+	FaktoryUIPort string `env:"FAKTORY_UI_PORT" default:"7420"`
+	DB            struct {
 		Name     string `env:"DBName" default:"qor_example"`
 		Adapter  string `env:"DBAdapter" default:"postgres"`
 		Host     string `env:"DBHost" default:"localhost"`

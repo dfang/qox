@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/dfang/qor-demo/config"
@@ -34,7 +35,7 @@ func startHealthCheck() {
 	// check worker
 	health.AddLivenessCheck("worker-ui", healthcheck.HTTPGetCheck("http://localhost:5040/worker_pools", 5*time.Second))
 
-	health.AddLivenessCheck("faktory", healthcheck.HTTPGetCheck("http://localhost:7420", 5*time.Second))
+	health.AddLivenessCheck("faktory-ui", healthcheck.HTTPGetCheck(fmt.Sprintf("http://%s:%s", os.Getenv("FAKTORY_HOST"), os.Getenv("FAKTORY_UI_PORT")), 5*time.Second))
 
 	//check web is live
 	health.AddLivenessCheck("web", healthcheck.HTTPGetCheck("http://localhost:7000/health", 5*time.Second))
