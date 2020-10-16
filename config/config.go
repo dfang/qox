@@ -78,27 +78,27 @@ var Config = struct {
 	}
 
 	Cron struct {
-		ExpireAftersales         string `env:"EXPIRE_AFTERSALES"`
-		FreezeAuditedAftersales  string `env:"FREEZE_AUDITED_AFTERSALES"`
-		UnfreezeAftersales       string `env:"UNFREEZE_AFTERSALES"`
-		UpdateBalances           string `env:"UPDATE_BALANCES"`
-		AutoExportMobilePhones   string `env:"AUTO_EXPORT_MOBILE_PHONES"`
-		AutoExportOrderDetails   string `env:"AUTO_EXPORT_ORDER_DETAILS"`
-		AutoExportOrderFollowUps string `env:"AUTO_EXPORT_ORDER_FOLLOWUPS"`
-		AutoExportOrderFees      string `env:"AUTO_EXPORT_ORDER_FEES"`
-		AutoUpdateOrderItems     string `env:"AUTO_UPDATE_ORDER_ITEMS"`
-		AutoDeliverOrders        string `env:"AUTO_DELIVERY_ORDERS"`
+		ExpireAftersales         string `env:"EXPIRE_AFTERSALES" default:"*/60 * * * * *"`
+		FreezeAuditedAftersales  string `env:"FREEZE_AUDITED_AFTERSALES" default:"0 */2 * * * *"`
+		UnfreezeAftersales       string `env:"UNFREEZE_AFTERSALES" default:"0 */5 * * * *`
+		UpdateBalances           string `env:"UPDATE_BALANCES" default:"0 */5 * * * *`
+		AutoExportMobilePhones   string `env:"AUTO_EXPORT_MOBILE_PHONES" default:"0 0 1 * * *"`
+		AutoExportOrderDetails   string `env:"AUTO_EXPORT_ORDER_DETAILS" default:"0 0 1 * * *"`
+		AutoExportOrderFollowUps string `env:"AUTO_EXPORT_ORDER_FOLLOWUPS" default:"0 0 1 * * *"`
+		AutoExportOrderFees      string `env:"AUTO_EXPORT_ORDER_FEES" default:"0 */1 * * * *"`
+		AutoUpdateOrderItems     string `env:"AUTO_UPDATE_ORDER_ITEMS" default:"0 */5 * * * *"`
+		AutoDeliverOrders        string `env:"AUTO_DELIVERY_ORDERS" default:"0 0 1 * *"`
 
-		// DEMO_MODE = true 才用得到
-		AutoInquire            string `env:"AutoInquire"`
-		AutoSchedule           string
-		AutoProcess            string
-		AutoFinish             string
-		AutoAudit              string
-		AutoWithdraw           string
-		AutoAward              string
-		AutoFine               string
-		AutoGenerateAftersales string
+		// DEMO_MODE = true 才生效
+		AutoInquire            string `env:"AutoInquire", default:"*/30 * * * * *"`
+		AutoSchedule           string `env:"AutoSchedule", default:"0 */5 * * * *"`
+		AutoProcess            string `env:"AutoProcess", default:"0 */2 * * * *"`
+		AutoFinish             string `env:"AutoFinish", default:"0 */2 * * * *"`
+		AutoAudit              string `env:"AutoAudit", default:"0 */1 * * * *"`
+		AutoWithdraw           string `env:"AutoWithdraw", default:"0 */5 * * * *"`
+		AutoAward              string `env:"AutoAward", default:"0 */6 * * * *"`
+		AutoFine               string `env:"AutoFine", default:"0 */7 * * * *"`
+		AutoGenerateAftersales string `env:"AutoGenerateAftersales", default:"0 */30 * * * *"`
 	}
 
 	SMTP         SMTPConfig
