@@ -18,7 +18,7 @@ import (
 	"github.com/qor/location"
 	"github.com/qor/mailer"
 	"github.com/qor/mailer/logger"
-	"github.com/qor/media/oss"
+	// "github.com/qor/media/oss"
 
 	// "github.com/qor/oss/qiniu"
 	// "github.com/qor/oss/s3"
