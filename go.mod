@@ -3,7 +3,6 @@ module github.com/dfang/qor-demo
 go 1.13
 
 require (
-	github.com/PuerkitoBio/goquery v1.5.0 // indirect
 	github.com/Shaked/gomobiledetect v0.0.0-20171211181707-25f014f66568 // indirect
 	github.com/andybalholm/cascadia v1.1.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
@@ -28,7 +27,7 @@ require (
 	github.com/heptiolabs/healthcheck v0.0.0-20180807145615-6ff867650f40
 	github.com/jinzhu/configor v1.1.1
 	github.com/jinzhu/copier v0.0.0-20190924061706-b57f9002281a // indirect
-	github.com/jinzhu/gorm v1.9.11
+	github.com/jinzhu/gorm v1.9.16
 	github.com/jinzhu/now v1.1.1
 	github.com/joho/godotenv v1.3.0
 	github.com/joho/sqltocsv v0.0.0-20190824231449-5650f27fd5b6
