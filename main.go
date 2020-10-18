@@ -371,6 +371,23 @@ func runMainAction(c *cli.Context) error {
 	return nil
 }
 
+func printVersion() {
+	fmt.Printf("Version %s, BuildVersion %s\n", version, buildVersion)
+}
+
+func runMigrations() {
+	log.Info().Msg("just run migrations and exit ......")
+	migrations.Migrate()
+}
+
+func runSeeds() {
+	log.Info().Msg("start truncate tables ......")
+	seeds.TruncateTables()
+	log.Info().Msg("start seeding samples data for testing ......")
+	seeds.Run()
+	log.Info().Msg("seeding done, exit ......")
+}
+
 func fail(err error) {
 	log.Fatal().Msg(err.Error())
 	os.Exit(-1)
@@ -431,7 +448,7 @@ func main() {
 				Name:  "version",
 				Usage: "Show version",
 				Action: func(c *cli.Context) error {
-					fmt.Printf("Version %s, BuildVersion %s\n", version, buildVersion)
+					printVersion()
 					return nil
 				},
 			},
@@ -441,9 +458,7 @@ func main() {
 				Usage:   "Run migrations",
 				Action: func(c *cli.Context) error {
 					initialzeConfigs()
-
-					fmt.Println("just run migrations and exit ......")
-					migrations.Migrate()
+					runMigrations()
 					return nil
 				},
 			},
@@ -453,13 +468,7 @@ func main() {
 				Usage:   "Run seeding",
 				Action: func(c *cli.Context) error {
 					initialzeConfigs()
-
-					fmt.Println("just run seeds and exit ......")
-					fmt.Println("start truncate tables ......")
-					seeds.TruncateTables()
-					fmt.Println("start seeding samples data for testing ......")
-					seeds.Run()
-					fmt.Println("seeding done, exit ......")
+					runSeeds()
 					return nil
 				},
 			},
@@ -478,6 +487,7 @@ func main() {
 			}
 
 			runMainAction(c)
+
 			return nil
 		},
 	}
@@ -486,61 +496,4 @@ func main() {
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
-
-	os.Exit(1)
-
-	// cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
-	// compileTemplate := cmdLine.Bool("compile-templates", false, "Compile Templates")
-	// isDebug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
-	// debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
-	// runMigration := cmdLine.Bool("migrate", false, "Run migration")
-	// runSeeds := cmdLine.Bool("seeds", false, "Run seeds, never run this on production")
-	// workerPool := cmdLine.Bool("workerPool", true, "Start gocraft/work worker pool")
-	// ui := cmdLine.Bool("ui", false, "Serves gocraft/work ui")
-	// evalRules := cmdLine.Bool("eval", false, "Evaluate rules")
-	// cmdLine.Parse(os.Args[1:])
-	// cmd.Compile()
-
-	// if *evalRules {
-	// 	cmd.Evaluate()
-	// 	os.Exit(0)
-	// }
-
-	////////
-
-	// if *runMigration {
-	// 	fmt.Println("just run migrations and exit ......")
-	// 	migrations.Migrate()
-	// 	os.Exit(0)
-	// }
-
-	// fmt.Println("start auto migrations ......")
-	// migrations.Migrate()
-
-	// if *runSeeds && os.Getenv("QOR_ENV") != "production" {
-	// 	fmt.Println("just run seeds and exit ......")
-	// 	fmt.Println("start truncate tables ......")
-	// 	seeds.TruncateTables()
-	// 	fmt.Println("start seeding samples data for testing ......")
-	// 	seeds.Run()
-	// 	fmt.Println("seeding done, exit ......")
-	// 	os.Exit(0)
-	// }
-
-	// log.Info().Msg("setup middlewares and routes ......")
-	// setupMiddlewaresAndRoutes()
-
-	// if *compileTemplate {
-	// 	fmt.Println("just compile templates and exit ......")
-	// 	bindatafs.AssetFS.Compile()
-	// 	os.Exit(0)
-	// }
-
-	// if os.Getenv("ENV") == "development" {
-	// if *workerPool {
-	// 	if *ui || os.Getenv("UI") == "true" {
-	// 		fmt.Println("serves gocraft/work web ui ......")
-	// 		go StartWorkWebUI()
-	// 	}
-	// }
 }
