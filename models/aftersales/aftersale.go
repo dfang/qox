@@ -33,6 +33,16 @@ type Aftersale struct {
 
 	Fee float32
 
+	// 从物流单来的
+	// 商品名 order_items.item_name
+	// 数量 order_items.quantity
+	// 单价 单个商品售后价
+
+	ItemName     string  `json:"item_name"`
+	Quantity     uint    `json:"quantity"`
+	PricePerUnit float32 `json:"price_per_unit"`
+	FromOrderNo  string  `json:"from_order_no"`
+
 	// 备注
 	Remark string
 

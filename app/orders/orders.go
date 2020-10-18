@@ -90,6 +90,31 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 
 	Admin.AddResource(&orders.Condition{}, &admin.Config{Menu: []string{"Order Management"}})
 	Admin.AddResource(&orders.Execution{}, &admin.Config{Menu: []string{"Order Management"}})
+	pricing := Admin.AddResource(&orders.Pricing{}, &admin.Config{Menu: []string{"Order Management"}})
+	pricing.Meta(&admin.Meta{
+		Name:  "Category",
+		Type:  "select_one",
+		Label: "分类",
+		Config: &admin.SelectOneConfig{
+			Collection: []string{"冰箱", "洗衣机", "空调", "彩电", "电脑", "小家电", "厨卫"},
+			AllowBlank: false,
+		}})
+	pricing.Meta(&admin.Meta{
+		Name:  "VolumeType",
+		Type:  "select_one",
+		Label: "件型大小",
+		Config: &admin.SelectOneConfig{
+			Collection: []string{"超小件", "超小件", "小件", "中件", "大件", "超大件"},
+			AllowBlank: false,
+		}})
+	pricing.Meta(&admin.Meta{
+		Name:  "DeliveryArea",
+		Type:  "select_one",
+		Label: "配送范围",
+		Config: &admin.SelectOneConfig{
+			Collection: []string{"县城", "乡下"},
+			AllowBlank: false,
+		}})
 	rule.Meta(&admin.Meta{
 		Name:  "Category",
 		Type:  "select_one",

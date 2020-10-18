@@ -86,7 +86,7 @@ func (App) ConfigureAdmin(Admin *admin.Admin) {
 func configureMetasForAftersales(model *admin.Resource) {
 	// model.EditAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
 	// model.NewAttrs("-UserID", "-User", "-CreatedAt", "-UpdatedAt", "-CreatedBy", "-UpdatedBy", "-State")
-	model.IndexAttrs("ID", "CustomerName", "CustomerPhone", "CustomerAddress", "Source", "Brand", "ServiceType", "Fee", "User", "State", "UpdatedAt")
+	model.IndexAttrs("ID", "CustomerName", "CustomerPhone", "CustomerAddress", "Source", "Brand", "ServiceType", "ItemName", "Quantity", "PricePerUnit", "Fee", "User", "State", "UpdatedAt")
 	model.Meta(&admin.Meta{Name: "User", Type: "aftersale_user_field"})
 	model.Meta(&admin.Meta{Name: "UpdatedAt", Type: "datetime", FormattedValuer: func(record interface{}, _ *qor.Context) (result interface{}) {
 		m := record.(*aftersales.Aftersale)
@@ -159,6 +159,7 @@ func configureMetasForAftersales(model *admin.Resource) {
 		"Fee",
 		"ServiceContent",
 		"ReservedServiceTime",
+		"Remark",
 		"Images",
 		"CreatedAt",
 		"UpdatedAt",

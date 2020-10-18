@@ -3,12 +3,10 @@ package main
 import (
 	"context"
 	"crypto/tls"
-	"flag"
 	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -17,8 +15,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-
-	"github.com/dfang/qor-demo/config/bindatafs"
+	"github.com/urfave/cli/v2"
 
 	"github.com/dfang/qor-demo/app/account"
 	adminapp "github.com/dfang/qor-demo/app/admin"
@@ -27,6 +24,7 @@ import (
 	"github.com/dfang/qor-demo/app/home"
 	"github.com/dfang/qor-demo/app/orders"
 	"github.com/dfang/qor-demo/app/products"
+	"github.com/dfang/qor-demo/cmd"
 
 	"github.com/dfang/qor-demo/app/reports"
 	"github.com/dfang/qor-demo/app/stores"
@@ -45,6 +43,7 @@ import (
 	"github.com/rs/cors"
 
 	// https://github.com/qor/qor-example/issues/129
+
 	"github.com/dfang/qor-demo/config/db/migrations"
 	"github.com/dfang/qor-demo/config/db/seeds"
 )
@@ -80,9 +79,41 @@ func checkAvailableEnvs() {
 
 	for _, e := range envs {
 		if os.Getenv(e) != "" {
-			fmt.Printf("\tfound env var %s=%s\n", e, os.Getenv(e))
+			log.Debug().Msgf("\tfound env var %s=%s", e, os.Getenv(e))
 		}
 	}
+}
+
+func setLogLevel(level int) {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	log.Logger = log.With().Caller().Logger()
+
+	var l zerolog.Level
+	switch level {
+	case -1:
+		l = zerolog.InfoLevel
+	case 0:
+		l = zerolog.DebugLevel
+	case 1:
+		l = zerolog.InfoLevel
+	case 2:
+		l = zerolog.WarnLevel
+	case 3:
+		l = zerolog.ErrorLevel
+	case 4:
+		l = zerolog.FatalLevel
+	case 5:
+		l = zerolog.PanicLevel
+	default:
+		l = zerolog.NoLevel
+	}
+
+	log.Info().Msgf("set log level to %s ......", l.String())
+	zerolog.SetGlobalLevel(l)
+
+	// if debug {
+	// 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	// }
 }
 
 func setupLogLevel(debug bool) {
@@ -283,6 +314,18 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 }
 
 func listenAndServe() {
+	if os.Getenv("HTTPS") == "true" && os.Getenv("DOMAIN") == "" {
+		log.Info().Msg("If set HTTPS=true, this app will get ssl certificates automatically and serve on 443,  so you must also set DOMAIN")
+		log.Info().Msg("By default (HTTPS not set), you need to config caddy as reverse proxy to serve https requests")
+		log.Info().Msg("If you plan to use caddy as frontend (reverse proxy), you don't need to set HTTPS, or just set to false")
+		os.Exit(1)
+	}
+
+	// fmt.Println("NOW is ", time.Now().Format("2006-01-02 15:04:05"))
+	elapsed := time.Since(*config.StartUpStartTime)
+	log.Debug().Msgf("Startup took %s\n", elapsed)
+	log.Info().Msgf("Listening on: %v\n\n", config.Config.Port)
+
 	if config.Config.HTTPS {
 		certManager := autocert.Manager{
 			Prompt: autocert.AcceptTOS,
@@ -297,8 +340,11 @@ func listenAndServe() {
 				GetCertificate: certManager.GetCertificate,
 			},
 		}
+
 		go http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), certManager.HTTPHandler(nil))
+
 		server.ListenAndServeTLS("", "")
+
 	} else {
 		if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Config.Port), Application.NewServeMux()); err != nil {
 			panic(err)
@@ -307,92 +353,187 @@ func listenAndServe() {
 }
 
 func main() {
-	cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
-	compileTemplate := cmdLine.Bool("compile-templates", false, "Compile Templates")
-	isDebug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
-	debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
-	runMigration := cmdLine.Bool("migrate", false, "Run migration")
-	runSeeds := cmdLine.Bool("seeds", false, "Run seeds, never run this on production")
-	workerPool := cmdLine.Bool("workerPool", true, "Start gocraft/work worker pool")
-	ui := cmdLine.Bool("ui", false, "Serves gocraft/work ui")
-	evalRules := cmdLine.Bool("eval", false, "Evaluate rules")
+	app := &cli.App{
+		Name:  "qor",
+		Usage: "make an explosive entrance",
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:    "migrate",
+				Aliases: []string{"m"},
+				Value:   false,
+				Usage:   "Run migrations",
+			},
+			&cli.BoolFlag{
+				Name:    "seeds",
+				Aliases: []string{"s"},
+				Value:   false,
+				Usage:   "Run seeds",
+			},
+			&cli.BoolFlag{
+				Name:    "compile",
+				Aliases: []string{"c"},
+				Value:   false,
+				Usage:   "Compile grool templates",
+			},
+			&cli.BoolFlag{
+				Name:  "eval",
+				Value: false,
+				Usage: "Eval grool templates",
+			},
+			&cli.BoolFlag{
+				Name:  "ui",
+				Value: false,
+				Usage: "Start go worker ui",
+			},
+			&cli.BoolFlag{
+				Name:  "debug",
+				Value: false,
+				Usage: "DEBUG MODE (v=0)",
+			},
+			&cli.IntFlag{
+				Name:    "verbose",
+				Aliases: []string{"v"},
+				Value:   1,
+				Usage:   "Set log level",
+			},
+		},
+		Commands: []*cli.Command{
+			{
+				Name:    "migrate",
+				Aliases: []string{"m"},
+				Usage:   "Run migrations",
+				Action: func(c *cli.Context) error {
+					fmt.Println("just run migrations and exit ......")
+					migrations.Migrate()
+					return nil
+				},
+			},
+			{
+				Name:    "seed",
+				Aliases: []string{"s"},
+				Usage:   "Run seeding",
+				Action: func(c *cli.Context) error {
+					fmt.Println("just run seeds and exit ......")
+					fmt.Println("start truncate tables ......")
+					seeds.TruncateTables()
+					fmt.Println("start seeding samples data for testing ......")
+					seeds.Run()
+					fmt.Println("seeding done, exit ......")
+					return nil
+				},
+			},
+		},
 
-	cmdLine.Parse(os.Args[1:])
+		Action: func(c *cli.Context) error {
+			// fmt.Println("boom! I say!")
+			// fmt.Println(c.Bool("seeds"))
+			// fmt.Println(c.Bool("m"))
 
-	Compile()
+			level := c.Int("v")
+			setLogLevel(level)
 
-	if *evalRules {
-		Evaluate()
-		os.Exit(0)
+			if c.Bool("debug") {
+				setLogLevel(0)
+			}
+
+			runMainAction(c)
+			return nil
+		},
 	}
 
-	fmt.Println("check availables enviroments variables ......")
-	checkAvailableEnvs()
-
-	fmt.Println("initialze configurations ......")
-	initialzeConfigs()
-
-	fmt.Println("set log level ......")
-	setupLogLevel(*debug)
-
-	if *runMigration {
-		fmt.Println("just run migrations and exit ......")
-		migrations.Migrate()
-		os.Exit(0)
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal().Msg(err.Error())
 	}
+
+	os.Exit(1)
+
+	// cmdLine := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	// compileTemplate := cmdLine.Bool("compile-templates", false, "Compile Templates")
+	// isDebug, _ := strconv.ParseBool(os.Getenv("DEBUG"))
+	// debug := cmdLine.Bool("debug", isDebug, "Set log level to debug")
+	// runMigration := cmdLine.Bool("migrate", false, "Run migration")
+	// runSeeds := cmdLine.Bool("seeds", false, "Run seeds, never run this on production")
+	// workerPool := cmdLine.Bool("workerPool", true, "Start gocraft/work worker pool")
+	// ui := cmdLine.Bool("ui", false, "Serves gocraft/work ui")
+	// evalRules := cmdLine.Bool("eval", false, "Evaluate rules")
+	// cmdLine.Parse(os.Args[1:])
+	// cmd.Compile()
+
+	// if *evalRules {
+	// 	cmd.Evaluate()
+	// 	os.Exit(0)
+	// }
+
+	////////
+
+	// if *runMigration {
+	// 	fmt.Println("just run migrations and exit ......")
+	// 	migrations.Migrate()
+	// 	os.Exit(0)
+	// }
 
 	// fmt.Println("start auto migrations ......")
 	// migrations.Migrate()
 
-	if *runSeeds && os.Getenv("QOR_ENV") != "production" {
-		fmt.Println("just run seeds and exit ......")
-		fmt.Println("start truncate tables ......")
-		seeds.TruncateTables()
-		fmt.Println("start seeding samples data for testing ......")
-		seeds.Run()
-		fmt.Println("seeding done, exit ......")
-		os.Exit(0)
+	// if *runSeeds && os.Getenv("QOR_ENV") != "production" {
+	// 	fmt.Println("just run seeds and exit ......")
+	// 	fmt.Println("start truncate tables ......")
+	// 	seeds.TruncateTables()
+	// 	fmt.Println("start seeding samples data for testing ......")
+	// 	seeds.Run()
+	// 	fmt.Println("seeding done, exit ......")
+	// 	os.Exit(0)
+	// }
+
+	// log.Info().Msg("setup middlewares and routes ......")
+	// setupMiddlewaresAndRoutes()
+
+	// if *compileTemplate {
+	// 	fmt.Println("just compile templates and exit ......")
+	// 	bindatafs.AssetFS.Compile()
+	// 	os.Exit(0)
+	// }
+
+	// if os.Getenv("ENV") == "development" {
+	// if *workerPool {
+	// 	if *ui || os.Getenv("UI") == "true" {
+	// 		fmt.Println("serves gocraft/work web ui ......")
+	// 		go StartWorkWebUI()
+	// 	}
+	// }
+
+}
+
+func runMainAction(c *cli.Context) error {
+	log.Info().Msg("check availables enviroments variables ......")
+	checkAvailableEnvs()
+
+	log.Info().Msg("initialze configurations ......")
+	initialzeConfigs()
+
+	log.Info().Msg("start faktory worker")
+	go cmd.StartFaktoryWorker()
+
+	log.Info().Msg("start gocraft/work workerPool ......")
+	go cmd.StartWorkerPool()
+	if c.Bool("ui") || os.Getenv("UI") == "true" {
+		log.Info().Msg("start gocraft/work web ui ......")
+		go cmd.StartWorkWebUI()
 	}
 
-	fmt.Println("setup middlewares and routes ......")
+	log.Info().Msg("start health check ......")
+	go cmd.StartHealthCheck()
+
+	log.Info().Msg("start webhookd")
+	go cmd.StartWebhookd()
+
+	log.Info().Msg("setup middlewares and routes ......")
 	setupMiddlewaresAndRoutes()
 
-	if *compileTemplate {
-		fmt.Println("just compile templates and exit ......")
-		bindatafs.AssetFS.Compile()
-		os.Exit(0)
-	}
-
-	go startFaktoryWorker()
-
-	fmt.Println("start workerPool ......")
-	// if os.Getenv("ENV") == "development" {
-	if *workerPool {
-		go startWorkerPool()
-
-		if *ui || os.Getenv("UI") == "true" {
-			fmt.Println("serves gocraft/work web ui ......")
-			go startWorkWebUI()
-		}
-	}
-
-	fmt.Println("start health check ......")
-	go startHealthCheck()
-
-	go startWebhookd()
-
-	if os.Getenv("HTTPS") == "true" && os.Getenv("DOMAIN") == "" {
-		log.Info().Msg("If set HTTPS=true, this app will get ssl certificates automatically and serve on 443,  so you must also set DOMAIN")
-		log.Info().Msg("By default (HTTPS not set), you need to config caddy as reverse proxy to serve https requests")
-		log.Info().Msg("If you plan to use caddy as frontend (reverse proxy), you don't need to set HTTPS, or just set to false")
-		os.Exit(1)
-	}
-
-	// fmt.Println("NOW is ", time.Now().Format("2006-01-02 15:04:05"))
-	elapsed := time.Since(*config.StartUpStartTime)
-	log.Info().Msgf("Startup took %s\n", elapsed)
-	log.Info().Msgf("Listening on: %v\n\n", config.Config.Port)
 	listenAndServe()
+
+	return nil
 }
 
 func fail(err error) {

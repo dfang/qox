@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -112,12 +112,45 @@ func check(err error) {
 	}
 }
 
+func RandomString(n int) string {
+	var letter = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letter[rand.Intn(len(letter))]
+	}
+	return string(b)
+}
+
+func randomRuleName() string {
+	return fmt.Sprintf("Rule%s", RandomString(10))
+}
+
+func isRuleForRange(r orders.Rule) bool {
+	return r.Effect == "判断配送范围"
+}
+
+func isRuleForCategory(r orders.Rule) bool {
+	return r.Effect == "判断分类"
+}
+
 func Compile() {
 	// resultB := template.ProcessFile("templates/got.tmpl", vars)
-	tmpl, err := template.ParseFiles("./rules.grl.tmpl")
+	funcMap := template.FuncMap{
+		// The name "title" is what the function will be called in the template text.
+		"title":             strings.Title,
+		"isRuleForRange":    isRuleForRange,
+		"isRuleForCategory": isRuleForCategory,
+		"randomRuleName":    randomRuleName,
+	}
+
+	tmpl, err := template.New("rules.grl.tmpl").Funcs(funcMap).ParseFiles("./rules.grl.tmpl")
 	if err != nil {
 		panic(err)
 	}
+
+	// tmpl.Funcs(funcMap)
+
 	// t := template.Must(template.New("rules").
 	// 	Parse("Dot:{{.}}\n"))
 
@@ -130,7 +163,16 @@ func Compile() {
 
 	fmt.Printf("模版开始:\n\n")
 	// tmpl.Execute(os.Stdout, nil)
-	tmpl.Execute(f, nil)
+
+	// tmpl.Funcs(funcMap).Execute(f, nil)
+	// tmpl.Execute(os.Stdout, "the go programming language")
+
+	var rules []orders.Rule
+	db.DB.Limit(100).Find(&rules)
+
+	tmpl.Execute(f, rules)
+
+	log.Printf("aaa")
 	fmt.Printf("模版结束\n\n")
 }
 
@@ -149,10 +191,10 @@ func Evaluate() {
 	eng := engine.NewGroolEngine()
 
 	var ordersToEvaluate []orders.Order
-	// db.DB.Order("ID DESC").Limit(100).Find(&ordersToEvaluate)
+	db.DB.Order("ID DESC").Find(&ordersToEvaluate)
 	// db.DB.Order("random()").Limit(100).Find(&ordersToEvaluate)
 	// db.DB.LogMode(true)
-	db.DB.Order("random()").Find(&ordersToEvaluate)
+	// db.DB.Order("random()").Find(&ordersToEvaluate)
 	// db.DB.Order("random()").Limit(10).Find(&ordersToEvaluate)
 
 	// db.DB.Where("item_name LIKE $1", "%电视%").Find(&ordersToEvaluate)
@@ -202,6 +244,7 @@ func EvaluateOrder(order orders.Order, knowledgeBase *model.KnowledgeBase, engin
 		}
 
 		fmt.Println("输入如下: ")
+		fmt.Println("订单号: " + v.Order.OrderNo)
 		fmt.Println("客户地址: " + v.Order.CustomerAddress)
 		fmt.Println("商品名: " + v.ItemName)
 		fmt.Println("-------------------------------")

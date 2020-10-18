@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"bytes"
@@ -14,6 +14,7 @@ import (
 	"github.com/dfang/qor-demo/config/db"
 	"github.com/dfang/qor-demo/config/db/seeds"
 	"github.com/dfang/qor-demo/models/aftersales"
+	"github.com/dfang/qor-demo/models/orders"
 	"github.com/dfang/qor-demo/models/users"
 	"github.com/gocraft/work"
 	"github.com/joho/sqltocsv"
@@ -21,12 +22,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// just run `go startWorkerPool()` in main.go
+// StartWorkerPool start gocraft/work worker pool
+// just run `go StartWorkerPool()` in main.go
 // run workwebui -redis="redis:6379" -ns="qor" -listen=":5040"
 // open localhost:5040 to view jobs ui
 // https://crontab.guru/
 // https://crontab.guru/examples.html
-func startWorkerPool() {
+func StartWorkerPool() {
 	cronCfg := config.Config.Cron
 	// fmt.Println(cronCfg)
 
@@ -83,6 +85,7 @@ func startWorkerPool() {
 	pool.Job("export_order_fees", ExportOrderFees)
 	pool.Job("update_order_items", UpdateOrderItems)
 	pool.Job("auto_deliver_orders", AutoDeliverOrders)
+	pool.Job("create_aftersale", AutoCreateAftersale)
 
 	// Start processing jobs
 	pool.Start()
@@ -507,7 +510,6 @@ func ExportOrderFollowUps(job *work.Job) error {
 	for i := -7; i <= 0; i++ {
 		n := time.Now()
 		m := n.AddDate(0, 0, i)
-		fmt.Println(m)
 
 		fileName := fmt.Sprintf("public/downloads/订单回访/%v.order_followups.csv", m.Format("20060102"))
 		err := os.MkdirAll(filepath.Dir(fileName), 0777)
@@ -609,13 +611,34 @@ func AutoCreateAftersale(job *work.Job) error {
 	// If there's a order_no param, set it in the context for future middleware and handlers to use.
 	if _, ok := job.Args["order_no"]; ok {
 		// c.customerID = job.ArgInt64("order_no")
-		// if err := job.ArgError(); err != nil {
-		// 	return err
-		// }
+		orderNo := job.ArgString("order_no")
+		var order orders.Order
+		db.DB.Model(&orders.Order{}).Where("order_no = ?", orderNo).Preload("OrderItems").First(&order)
+
+		for _, item := range order.OrderItems {
+			a := aftersales.Aftersale{}
+			a.CustomerAddress = order.CustomerAddress
+			a.CustomerName = keepFirst(order.CustomerName, 3)
+			a.CustomerPhone = keepFirst(order.CustomerPhone, 11)
+			a.ReservedServiceTime = order.ReservedSetupTime
+			a.Source = "JD"
+			a.Remark = "来自订单: " + order.OrderNo
+			a.Quantity = item.Quantity
+			a.ItemName = item.ItemName
+
+			fmt.Println(item.ItemName)
+
+			db.DB.Model(&orders.Order{}).Save(&a)
+		}
 	}
 	// _, err := db.DB.DB().Exec(`UPDATE orders SET state='delivered' WHERE TO_TIMESTAMP(reserved_delivery_time, 'YYYY-MM-DD') < NOW() AND state='pending';`)
 	// if err != nil {
 	// 	panic(err)
 	// }
 	return nil
+}
+
+func keepFirst(s string, n int) string {
+	runes := []rune(s)
+	return string(runes[0:n])
 }

@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"time"
@@ -16,9 +16,9 @@ var (
 // webHostPort    = flag.String("listen", ":5040", "hostport to listen for HTTP JSON API")
 )
 
-// startWorkWebUI serves gocraft/work UI
+// StartWorkWebUI serves gocraft/work UI
 // https://github.com/gocraft/work/blob/master/cmd/workwebui/main.go
-func startWorkWebUI() {
+func StartWorkWebUI() {
 	// flag.Parse()
 
 	// redisDatabase = flag.String("database", "0", "redis database")

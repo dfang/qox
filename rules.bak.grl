@@ -1,4 +1,21 @@
-rule Service "服务" salience 100 {
+/*
+  判断配送范围
+*/
+
+/*
+  判断分类
+*/
+
+/*
+  判断大小
+*/
+
+/*
+  根据规则定价
+*/
+
+
+rule Service "服务" salience 0 {
   when
         Pogo.ContainsAny(Item.ItemName, "延保|服务|安心享|延误补贴|礼包|只换不修")
   then
@@ -6,32 +23,55 @@ rule Service "服务" salience 100 {
         Item.SetDeliveryFee(0.0);
 }
 
-rule Range1 "When 配送范围是县城" salience 9 {
+rule Range1 "When 配送范围是县城" salience 999 {
   when
         Pogo.Contains(Item.Order.CustomerAddress, "义宁镇") ||
+        Pogo.Contains(Item.Order.CustomerAddress, "宁州镇") ||
         Pogo.Contains(Item.Order.CustomerAddress, "县城内")
   then
         Item.SetRange(1);
 }
 
-rule Range2 "When 配送范围是乡村" salience 9 {
+rule Range2 "When 配送范围是乡村" salience 999 {
   when
         Pogo.NotContains(Item.Order.CustomerAddress, "义宁镇") &&
+        Pogo.NotContains(Item.Order.CustomerAddress, "宁州镇") &&
         Pogo.NotContains(Item.Order.CustomerAddress, "县城内")
   then
         Item.SetRange(2);
 }
 
+rule IsRunningMachine salience 50 {
+    when
+        Pogo.ContainsAny(Item.ItemName, "跑步机")
+    then
+        Item.SetCategory("跑步机");
+}
+
+rule IsForBed salience 50 {
+    when
+        Pogo.ContainsAny(Item.ItemName, "床垫")
+    then
+        Item.SetCategory("床垫");
+}
+
+rule IsTV salience 50 {
+    when
+        Pogo.ContainsAny(Item.ItemName, "彩电|电视机|电视")
+    then
+        Item.SetCategory("彩电");
+}
+
 rule IsRefrigerator salience 50 {
     when
-        Pogo.ContainsAny(Item.ItemName, "冰箱|冰柜")
+        Pogo.ContainsAny(Item.ItemName, "冰箱|冰柜|冷柜")
     then
         Item.SetCategory("冰箱");
 }
 
 rule IsAirConditioner salience 50 {
     when
-        Pogo.ContainsAny(Item.ItemName, "空调")
+        Pogo.ContainsAny(Item.ItemName, "空调|室外机|室内机|对应外机|对应內机|柜机|外机|内机|挂机")
     then
         Item.SetCategory("空调");
 }
@@ -65,94 +105,91 @@ rule IsKitchen salience 50 {
 }
 
 
-
-
 /*
-  电脑规则比较简单, 要么台式（小件）要么非台式(非小件)
+  冰箱
 */
-
-rule Computer1 "电脑"  salience 5 {
+rule Refrigerator1 "冰箱"  salience 5 {
   when
-      Pogo.Contains(Item.ItemName, "笔记本") ||
-      Pogo.Contains(Item.ItemName, "液晶显示器") 
+      Item.Category == "冰箱" && Pogo.Contains(Item.ItemName, "对开门")
   then
-      Item.SetCategory("电脑");
-      Item.SetDimension("超小件");
-}
-
-rule Computer2 "电脑"  salience 5 {
-  when
-      Pogo.Contains(Item.ItemName, "台式机")
-  then
-      Item.SetCategory("电脑");
-      Item.SetDimension("小件");
-}
-
-/*
-小家电
-*/
-
-rule Appliance1 salience 5 {
-  when
-        Pogo.Contains(Item.ItemName, "微波炉") ||
-        Pogo.Contains(Item.ItemName, "台式饮水机") ||
-        Pogo.Contains(Item.ItemName, "立式饮水机") ||
-        Pogo.Contains(Item.ItemName, "净水桶")
-  then
-        Item.SetCategory("小家电");
-        Item.SetDimension("超小件");
-}
-
-rule Appliance2 salience 5 {
-  when
-      Pogo.Contains(Item.ItemName, "干衣机") ||
-      Pogo.Contains(Item.ItemName, "机架") ||
-      Pogo.Contains(Item.ItemName, "机柜")
-  then
-      Item.SetCategory("小家电");
-      Item.SetDimension("超小件");
-}
-
-/*
-   特殊类
-*/
-
-rule RunningMachine {
-  when
-      Pogo.Contains(Item.ItemName, "跑步机")
-  then
-      Item.SetCategory("跑步机");
-      Item.SetDeliveryFee(60.0);
-}
-
-rule Bike {
-  when
-      Pogo.Contains(Item.ItemName, "电动车")
-  then
-      Item.SetCategory("电动车");
       Item.SetDeliveryFee(100.0);
 }
 
-rule Beds {
+rule Refrigerator2 "冰箱"  salience 5 {
   when
-      Pogo.Contains(Item.ItemName, "床垫")
+      Item.Category == "冰箱" && 
+      Item.GetVolumeUnit() <= 50
   then
-      Item.SetCategory("床垫");
-      Item.SetDeliveryFee(100.0);
+      Item.SetDimension("超小件");
+}
+
+rule Refrigerator3 "冰箱"  salience 5 {
+  when
+      Item.Category == "冰箱" && 
+      Item.GetVolumeUnit() > 300
+  then
+      Item.SetDimension("超大件");
+}
+
+/*
+  洗衣机
+*/
+
+rule Washer1 "洗衣机"  salience 5 {
+  when
+      Item.Category == "洗衣机" && Pogo.Contains(Item.ItemName, "滚筒洗衣机")
+  then
+      Item.SetDimension("大件");
+}
+
+rule Washer2 "洗衣机"  salience 5 {
+  when
+      Item.Category == "洗衣机" && 
+      Item.GetWeightUnit() > 3  
+  then
+      Item.SetDimension("中件");
+}
+
+rule Washer3 "洗衣机"  salience 5 {
+  when
+      Item.Category == "洗衣机" && 
+      Item.GetWeightUnit() <= 3  
+  then
+      Item.SetDimension("超小件");
+}
+
+/*
+  空调
+*/
+
+rule AirConditioner1 "空调"  salience 5 {
+  when
+      Item.Category == "空调" &&
+      Pogo.Contains(Item.ItemName, "挂机")
+  then
+      Item.SetCategory("中件");
+}
+
+rule AirConditioner20 "空调"  salience 5 {
+  when
+      Item.Category == "空调" &&
+      Item.GetPowerUnit() < 3
+  then
+      Item.SetCategory("大件");
+}
+
+rule AirConditioner21 "空调"  salience 5 {
+  when
+      Item.Category == "空调" &&
+      Pogo.ContainsAny(Item.ItemName, "家用中央空调|外机")
+  then
+      Item.SetCategory("中件");
 }
 
 
 /*
   电视机
 */
-
-rule TV "彩电"  salience 5 {
-  when
-      Pogo.Contains(Item.ItemName, "彩电") ||
-      Pogo.Contains(Item.ItemName, "电视") 
-  then
-      Item.SetCategory("彩电");
-}
 
 rule TVDimension1 "彩电" salience 5 {
   when 
@@ -198,187 +235,88 @@ rule TVDimension5 "彩电" salience 5 {
 }
 
 
+
 /*
-  洗衣机
+  电脑规则比较简单, 要么台式（小件）要么非台式(非小件)
 */
 
-rule Washer "洗衣机"  salience 5 {
+rule Computer1 "电脑"  salience 5 {
   when
-      Pogo.Contains(Item.ItemName, "洗衣机")
+      Pogo.Contains(Item.ItemName, "笔记本") ||
+      Pogo.Contains(Item.ItemName, "液晶显示器") 
   then
-      Item.SetCategory("洗衣机");
-}
-
-rule Washer1 "洗衣机"  salience 5 {
-  when
-      Item.Category == "洗衣机" && Pogo.Contains(Item.ItemName, "滚筒洗衣机")
-  then
-      Item.SetDimension("大件");
-}
-
-rule Washer2 "洗衣机"  salience 5 {
-  when
-      Item.Category == "洗衣机" && 
-      Item.GetWeightUnit() > 3  
-  then
-      Item.SetDimension("中件");
-}
-
-rule Washer3 "洗衣机"  salience 5 {
-  when
-      Item.Category == "洗衣机" && 
-      Item.GetWeightUnit() <= 3  
-  then
+      Item.SetCategory("电脑");
       Item.SetDimension("超小件");
+}
+
+rule Computer2 "电脑"  salience 5 {
+  when
+      Pogo.Contains(Item.ItemName, "台式机")
+  then
+      Item.SetCategory("电脑");
+      Item.SetDimension("小件");
 }
 
 
 /*
-厨卫
+小家电
 */
 
-rule Kitchen "厨卫" salience 5 {
+rule Appliance1 salience 5 {
   when
-      Pogo.Contains(Item.ItemName, "电热水器") ||
-      Pogo.Contains(Item.ItemName, "消毒柜") 
+        Pogo.Contains(Item.ItemName, "微波炉") ||
+        Pogo.Contains(Item.ItemName, "台式饮水机") ||
+        Pogo.Contains(Item.ItemName, "立式饮水机") ||
+        Pogo.Contains(Item.ItemName, "净水桶")
   then
-      Item.SetCategory("厨卫");
+        Item.SetCategory("小家电");
+        Item.SetDimension("超小件");
 }
 
-rule Kitchen1 "厨卫" salience 5 {
+rule Appliance2 salience 5 {
   when
-      Pogo.Contains(Item.ItemName, "燃气灶") ||
-      Pogo.Contains(Item.ItemName, "燃气热水器") 
+      Pogo.Contains(Item.ItemName, "干衣机") ||
+      Pogo.Contains(Item.ItemName, "机架") ||
+      Pogo.Contains(Item.ItemName, "机柜")
   then
-      Item.SetCategory("厨卫");
+      Item.SetCategory("小家电");
       Item.SetDimension("超小件");
 }
 
-rule Kitchen2 "厨卫" salience 5 {
-  when
-      Pogo.Contains(Item.ItemName, "洗碗机")
-  then
-      Item.SetCategory("厨卫");
-      Item.SetDimension("小件");
-}
 
-rule Kitchen3 "厨卫" salience 5 {
-  when
-      // 200L以上消毒柜、30-60L(含)电热水器
-      Pogo.Contains(Item.ItemName, "吸油烟机") ||
-      Pogo.Contains(Item.ItemName, "厨卫套装") 
-  then
-      Item.SetCategory("厨卫");
-      Item.SetDimension("中件");
-}
-
-rule Kitchen4 "厨卫" salience 5 {
-  when
-      Item.Category == "厨卫" &&
-      Pogo.Contains(Item.ItemName, "消毒柜") &&
-      Item.GetVolumeUnit() <= 200
-  then
-      Item.SetCategory("厨卫");
-      Item.SetDimension("小件");
-}
-
-rule Kitchen5 "厨卫" salience 5 {
-  when
-      Item.Category == "厨卫" &&
-      Pogo.Contains(Item.ItemName, "消毒柜") &&
-      Item.GetVolumeUnit() > 200
-  then
-      Item.SetCategory("厨卫");
-      Item.SetDimension("中件");
-}
-
-rule Kitchen6 "厨卫" salience 5 {
-  when
-      Item.Category == "厨卫" &&
-      Pogo.Contains(Item.ItemName, "电热水器") &&
-      Item.GetVolumeUnit() <= 10
-  then
-      Item.SetCategory("厨卫");
-      Item.SetDimension("超小件");
-}
-
-rule Kitchen7 "厨卫" salience 5 {
-  when
-      Item.Category == "厨卫" &&
-      Pogo.Contains(Item.ItemName, "电热水器") &&
-      Item.GetVolumeUnit() > 10 &&
-      Item.GetVolumeUnit() <= 30
-  then
-      Item.SetCategory("厨卫");
-      Item.SetDimension("小件");
-}
-
-rule Kitchen8 "厨卫" salience 5 {
-  when
-      Item.Category == "厨卫" &&
-      Pogo.Contains(Item.ItemName, "电热水器") &&
-      Item.GetVolumeUnit() > 30 &&
-      Item.GetVolumeUnit() <= 60
-  then
-      Item.SetCategory("厨卫");
-      Item.SetDimension("中件");
-}
-
-rule Kitchen9 "厨卫" salience 5 {
-  when
-      Item.Category == "厨卫" &&
-      Pogo.Contains(Item.ItemName, "电热水器") &&
-      Item.GetVolumeUnit() > 60
-  then
-      Item.SetCategory("厨卫");
-      Item.SetDimension("大件");
-}
 
 /*
-  冰箱
+特殊种类
 */
-
-rule Refrigerator "冰箱"  salience 5 {
+rule RunningMachine {
   when
-      Pogo.Contains(Item.ItemName, "冰箱") ||
-      Pogo.Contains(Item.ItemName, "冰柜")
+      Pogo.Contains(Item.ItemName, "跑步机")
   then
-      Item.SetCategory("冰箱");
+      Item.SetCategory("跑步机");
+      Item.SetDeliveryFee(60.0);
 }
 
-rule Refrigerator1 "冰箱"  salience 5 {
+rule Bike {
   when
-      Item.Category == "冰箱" && Pogo.Contains(Item.ItemName, "对开门")
+      Pogo.Contains(Item.ItemName, "电动车")
   then
+      Item.SetCategory("电动车");
       Item.SetDeliveryFee(100.0);
 }
 
-rule Refrigerator2 "冰箱"  salience 5 {
+rule Beds {
   when
-      Item.Category == "冰箱" && 
-      Item.GetVolumeUnit() <= 50
+      Pogo.Contains(Item.ItemName, "床垫")
   then
-      Item.SetDimension("超小件");
+      Item.SetCategory("床垫");
+      Item.SetDeliveryFee(100.0);
 }
-
-rule Refrigerator3 "冰箱"  salience 5 {
-  when
-      Item.Category == "冰箱" && 
-      Item.GetVolumeUnit() > 300
-  then
-      Item.SetDimension("超大件");
-}
-
-
-
-
-
-
 
 
 /*
   根据尺寸和配送范围定价
 */
+
 rule Calculate1 "计算运费" salience 1 {
   when 
       Item.Dimension == "超小件" &&

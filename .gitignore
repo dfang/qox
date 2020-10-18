@@ -45,4 +45,5 @@ charts
 runner.conf
 .air.conf
 bin
+qox
 .env.local

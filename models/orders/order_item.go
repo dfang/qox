@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/dfang/qor-demo/config/db"
-	"github.com/dfang/qor-demo/models/aftersales"
 	"github.com/dfang/qor-demo/models/products"
 	"github.com/gocraft/work"
 	"github.com/jinzhu/gorm"
@@ -252,13 +251,13 @@ func (item *OrderItem) AfterCreate(scope *gorm.Scope) error {
 	enqueuer.Enqueue("update_order_items", work.Q{})
 	// enqueuer.EnqueueIn("create_after_sale", 60, work.Q{"order_no": item.OrderNo})
 
-	a := aftersales.Aftersale{}
-	a.CustomerAddress = item.Order.CustomerAddress
-	a.CustomerName = item.Order.CustomerName
-	a.CustomerPhone = item.Order.CustomerPhone
-	a.ReservedServiceTime = item.Order.ReservedSetupTime
-	a.Source = "JD"
-	a.Remark = item.Order.OrderNo
+	// a := aftersales.Aftersale{}
+	// a.CustomerAddress = item.Order.CustomerAddress
+	// a.CustomerName = item.Order.CustomerName
+	// a.CustomerPhone = item.Order.CustomerPhone
+	// a.ReservedServiceTime = item.Order.ReservedSetupTime
+	// a.Source = "JD"
+	// a.Remark = item.Order.OrderNo
 
 	return nil
 }

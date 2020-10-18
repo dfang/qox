@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"encoding/json"
@@ -21,8 +21,9 @@ import (
 	worker "github.com/contribsys/faktory_worker_go"
 )
 
-// just run `go startFaktoryWorker()` in main.go
-func startFaktoryWorker() {
+// StartFaktoryWorker start faktory worker
+// just run `go StartFaktoryWorker()` in main.go
+func StartFaktoryWorker() {
 	// - FAKTORY_URL=tcp://:admin@faktory:7419
 	if os.Getenv("FAKTORY_URL") == "" {
 		panic("Please set FAKTORY_URL")
@@ -39,7 +40,7 @@ func startFaktoryWorker() {
 	})
 
 	// register job types and the function to execute them
-	mgr.Register("upsert_order", UpsertOrder)
+	mgr.Register("upsert_order", upsertOrder)
 
 	// use up to N goroutines to execute jobs
 	mgr.Concurrency = 10
@@ -54,7 +55,7 @@ func startFaktoryWorker() {
 	mgr.Run()
 }
 
-func UpsertOrder(ctx worker.Context, args ...interface{}) error {
+func upsertOrder(ctx worker.Context, args ...interface{}) error {
 	// log.Printf("Working on job %s\n", ctx.Jid())
 	// log.Printf("Context %v\n", ctx)
 	// log.Printf("Args %v\n", args)
@@ -133,7 +134,7 @@ func UpsertOrder(ctx worker.Context, args ...interface{}) error {
 		return err
 	}
 
-	fmt.Printf("%+v\n", o)
+	log.Info().Msg("order upserted")
 	return nil
 }
 
@@ -214,4 +215,9 @@ type OrderPayload struct {
 			UpdatedAt   time.Time   `json:"updated_at"`
 		} `json:"order_items"`
 	} `json:"order"`
+}
+
+func fail(err error) {
+	log.Fatal().Msg(err.Error())
+	os.Exit(-1)
 }

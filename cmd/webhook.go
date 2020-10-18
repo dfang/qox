@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -10,9 +10,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// just run `go startWebhookd()` in main.go
-// startWebhookd start webhookd
-func startWebhookd() {
+// StartWebhookd start webhookd
+// just run `go StartWebhookd()` in main.go
+func StartWebhookd() {
 	// - FAKTORY_URL=tcp://:admin@faktory:7419
 	if os.Getenv("FAKTORY_URL") == "" {
 		panic("Please set FAKTORY_URL")
@@ -30,10 +30,10 @@ func startWebhookd() {
 	}
 
 	svr := data["server"].(map[string]interface{})
-	fmt.Printf("Connected to %s %s\n", svr["description"], svr["faktory_version"])
+	log.Info().Msgf("Connected to %s %s", svr["description"], svr["faktory_version"])
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Info().Msg("webhook received data")
+		log.Info().Msg("webhook received a request")
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			fail(err)
@@ -41,10 +41,14 @@ func startWebhookd() {
 
 		msg := string(body)
 		log.Debug().Msg(msg)
-		// fmt.Fprint(w, string(body))
 
 		job := faktory.NewJob("upsert_order", msg)
-		cl.Push(job)
+		if err := cl.Push(job); err != nil {
+			log.Info().Msgf("push job to faktory failed")
+		}
+
+		log.Info().Msgf("pushed a job with job id: %s, job type: %s, queue: %s", job.Jid, job.Type, job.Queue)
+		fmt.Fprintln(w, "ok")
 	})
 
 	port := os.Getenv("WEBHOOKD_PORT")
@@ -52,6 +56,6 @@ func startWebhookd() {
 		port = "9876"
 	}
 
-	log.Info().Msg(fmt.Sprintf("Handling HTTP requests on %s.", port))
+	log.Info().Msg(fmt.Sprintf("Webhook listens on %s.", port))
 	log.Fatal().Msg(http.ListenAndServe(fmt.Sprintf(":%s", port), nil).Error())
 }

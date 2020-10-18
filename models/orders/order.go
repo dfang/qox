@@ -144,6 +144,8 @@ func (order *Order) AfterCreate(scope *gorm.Scope) error {
 	}
 
 	var enqueuer = work.NewEnqueuer("qor", db.RedisPool)
-	enqueuer.Enqueue("update_order_items", work.Q{})
+	// enqueuer.Enqueue("update_order_items", work.Q{})
+
+	enqueuer.EnqueueIn("create_aftersale", 10, work.Q{"order_no": order.OrderNo})
 	return nil
 }

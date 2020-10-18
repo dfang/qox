@@ -14,15 +14,16 @@
   根据规则定价
 */
 
-rule Service "服务" salience 100 {
+
+rule Service "服务" salience 0 {
   when
-        Pogo.ContainsAny(Item.ItemName, "延保|服务|安心享|延误补贴|礼包|只换不修")
+        Pogo.ContainsAny(Item.ItemName, "延保|服务|安心享|延误补贴|礼包|只换不修|换新保")
   then
         Item.SetCategory("服务");
         Item.SetDeliveryFee(0.0);
 }
 
-rule Range1 "When 配送范围是县城" salience 9 {
+rule Range1 "When 配送范围是县城" salience 999 {
   when
         Pogo.Contains(Item.Order.CustomerAddress, "义宁镇") ||
         Pogo.Contains(Item.Order.CustomerAddress, "宁州镇") ||
@@ -31,7 +32,7 @@ rule Range1 "When 配送范围是县城" salience 9 {
         Item.SetRange(1);
 }
 
-rule Range2 "When 配送范围是乡村" salience 9 {
+rule Range2 "When 配送范围是乡村" salience 999 {
   when
         Pogo.NotContains(Item.Order.CustomerAddress, "义宁镇") &&
         Pogo.NotContains(Item.Order.CustomerAddress, "宁州镇") &&
@@ -39,7 +40,6 @@ rule Range2 "When 配送范围是乡村" salience 9 {
   then
         Item.SetRange(2);
 }
-
 
 rule IsRunningMachine salience 50 {
     when
@@ -108,15 +108,6 @@ rule IsKitchen salience 50 {
 /*
   冰箱
 */
-
-rule Refrigerator "冰箱"  salience 5 {
-  when
-      Pogo.Contains(Item.ItemName, "冰箱") ||
-      Pogo.Contains(Item.ItemName, "冰柜")
-  then
-      Item.SetCategory("冰箱");
-}
-
 rule Refrigerator1 "冰箱"  salience 5 {
   when
       Item.Category == "冰箱" && Pogo.Contains(Item.ItemName, "对开门")
@@ -143,13 +134,6 @@ rule Refrigerator3 "冰箱"  salience 5 {
 /*
   洗衣机
 */
-
-rule Washer "洗衣机"  salience 5 {
-  when
-      Pogo.Contains(Item.ItemName, "洗衣机")
-  then
-      Item.SetCategory("洗衣机");
-}
 
 rule Washer1 "洗衣机"  salience 5 {
   when
@@ -412,3 +396,32 @@ rule Calculate10 "计算运费" salience 1 {
   then
       Item.SetDeliveryFee(55.0);
 }
+
+
+
+{{ range . }}
+
+  {{ if isRuleForRange . }}
+/*
+  判断配送范围
+*/
+rule {{randomRuleName}} "{{.Category}}" salience {{.Priority}} {
+  when  
+        Pogo.ContainsAny(Item.Order.CustomerAddress, "义宁镇|宁州镇|县城内")
+  then
+        Item.SetRange(1);
+}
+  {{ end }}
+
+
+{{ if isRuleForCategory . }}
+/* 判断分类 */
+rule {{randomRuleName}} "{{.Category}}" salience {{.Priority}} {
+  when  
+      Pogo.ContainsAny(Item.ItemName, "{{.Description}}")
+  then
+        Item.SetCategory("{{.Description}}");
+}
+{{ end }}
+
+{{ end }}

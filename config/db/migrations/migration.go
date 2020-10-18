@@ -45,6 +45,7 @@ func Migrate() {
 	AutoMigrate(&orders.Condition{})
 	// AutoMigrate(&orders.Action{})
 	AutoMigrate(&orders.Execution{})
+	AutoMigrate(&orders.Pricing{})
 
 	AutoMigrate(&orders.DeliveryMethod{})
 

@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -12,8 +12,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-// just run go startHealthCheck() in main.go
-func startHealthCheck() {
+// StartHealthCheck start health check
+// just run go StartHealthCheck() in main.go
+func StartHealthCheck() {
 	registry := prometheus.NewRegistry()
 	health := healthcheck.NewMetricsHandler(registry, "qor")
 

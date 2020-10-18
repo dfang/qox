@@ -133,11 +133,14 @@ var (
 func Initialize() {
 	start := time.Now()
 	StartUpStartTime = &start
-	fmt.Println("STARTUP begins at", start.Format("2006-01-02 15:04:05"))
+
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	log.Logger = log.With().Caller().Logger()
 
 	if os.Getenv("DEBUG") != "true" {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
+	log.Debug().Msgf("Startup begins at %s", start.Format("2006-01-02 15:04:05"))
 
 	// // Auto Reload
 	if err := configor.New(&configor.Config{AutoReload: true, AutoReloadInterval: time.Minute, AutoReloadCallback: func(config interface{}) {
