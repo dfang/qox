@@ -84,7 +84,7 @@ func Initialize() {
 	}
 }
 
-func init() {
-	config.Initialize()
-	Initialize()
-}
+// func init() {
+// 	config.Initialize()
+// 	Initialize()
+// }

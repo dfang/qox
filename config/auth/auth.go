@@ -20,6 +20,13 @@ import (
 // 如何直接改默认管理员或者其他用户的密码
 // https://play.golang.org/p/fEefNQ48-L9
 var (
+	Auth      *auth.Auth
+	Authority *authority.Authority
+)
+
+// Initialize changed init to Initialize
+func Initialize() {
+
 	// Auth initialize Auth for Authentication
 	Auth = clean.New(&auth.Config{
 		DB:         db.DB,
@@ -34,10 +41,7 @@ var (
 	Authority = authority.New(&authority.Config{
 		Auth: Auth,
 	})
-)
 
-// Initialize changed init to Initialize
-func Initialize() {
 	// Auth.RegisterProvider(github.New(&config.Config.Github))
 	// Auth.RegisterProvider(google.New(&config.Config.Google))
 	// Auth.RegisterProvider(facebook.New(&config.Config.Facebook))

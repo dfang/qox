@@ -150,38 +150,8 @@ func Initialize() {
 		panic(err)
 	}
 
-	// if Config.Cron.ExpireAftersales == "" {
-	// 	// every 60 seconds
-	// 	Config.Cron.ExpireAftersales = "*/60 * * * * *"
-	// }
-
-	// if Config.Cron.FreezeAuditedAftersales == "" {
-	// 	// every 2 minutes
-	// 	Config.Cron.FreezeAuditedAftersales = "0 */2 * * * *"
-	// }
-
-	// if Config.Cron.UnfreezeAftersales == "" {
-	// 	// every 5 minutes
-	// 	Config.Cron.UnfreezeAftersales = "0 */5 * * * *"
-	// }
-
-	// if Config.Cron.UpdateBalances == "" {
-	// 	// every 5 minutes
-	// 	Config.Cron.UpdateBalances = "0 */5 * * * *"
-	// }
-
-	// if Config.Cron.AutoExportMobilePhones == "" {
-	// 	// 1:00 AM every day
-	// 	Config.Cron.AutoExportMobilePhones = "0 0 1 * * *"
-	// }
-
 	log.Debug().Msg("Cron settings: ")
 	log.Debug().Msgf("Cron settings: %+v", Config.Cron)
-	// log.Debug().Msgf("ExpireAftersales: %s", Config.Cron.ExpireAftersales)
-	// log.Debug().Msgf("FreezeAuditedAftersales: %s", Config.Cron.FreezeAuditedAftersales)
-	// log.Debug().Msgf("UnfreezeAftersales: %s", Config.Cron.UnfreezeAftersales)
-	// log.Debug().Msgf("UpdateBalances: %s", Config.Cron.UpdateBalances)
-	// log.Debug().Msgf("AutoExportMobilePhones: %s", Config.Cron.AutoExportMobilePhones)
 
 	location.GoogleAPIKey = Config.GoogleAPIKey
 	location.BaiduAPIKey = Config.BaiduAPIKey
