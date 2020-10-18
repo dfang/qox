@@ -379,6 +379,8 @@ func main() {
 	fmt.Println("start health check ......")
 	go startHealthCheck()
 
+	go startWebhookd()
+
 	if os.Getenv("HTTPS") == "true" && os.Getenv("DOMAIN") == "" {
 		log.Info().Msg("If set HTTPS=true, this app will get ssl certificates automatically and serve on 443,  so you must also set DOMAIN")
 		log.Info().Msg("By default (HTTPS not set), you need to config caddy as reverse proxy to serve https requests")

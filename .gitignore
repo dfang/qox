@@ -44,3 +44,5 @@ charts
 
 runner.conf
 .air.conf
+bin
+.env.local

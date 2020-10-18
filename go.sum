@@ -32,6 +32,7 @@ github.com/chanxuehong/wechat v0.0.0-20190521093015-fafb751f9916/go.mod h1:BO4IX
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/contribsys/faktory v1.0.1-1 h1:4kNQojQ2Z9wDX0DmvXj6H/qDOTdXn3xFuub1cpWgQhA=
 github.com/contribsys/faktory v1.0.1-1/go.mod h1:f7QV8TCzZB3O4BToF6WMuhGACIDgneOA4HprJQO75bc=
+github.com/contribsys/faktory v1.4.1-1 h1:wEzkQkYshSbMI6oSn6SnKvM4ADzQw+BN8bVXom/poNg=
 github.com/contribsys/faktory_worker_go v0.8.0 h1:4O8mKPMjVj0UFWO/5DBUG5z+MnARlyN90Oi5nu8cLCQ=
 github.com/contribsys/faktory_worker_go v0.8.0/go.mod h1:eYn03mwUJ4p4FHijzHp1+7/DE+WBVD/z2Yv5L6bmEN8=
 github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
