@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 
 	faktory "github.com/contribsys/faktory/client"
+	"github.com/rs/zerolog/log"
 )
 
 // just run `go startWebhookd()` in main.go
@@ -28,18 +28,22 @@ func startWebhookd() {
 	if err != nil {
 		fail(err)
 	}
+
 	svr := data["server"].(map[string]interface{})
 	fmt.Printf("Connected to %s %s\n", svr["description"], svr["faktory_version"])
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		log.Info().Msg("webhook received data")
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			fail(err)
 		}
-		log.Println(string(body))
-		fmt.Fprint(w, string(body))
 
-		job := faktory.NewJob("upsert_order", string(body))
+		msg := string(body)
+		log.Debug().Msg(msg)
+		// fmt.Fprint(w, string(body))
+
+		job := faktory.NewJob("upsert_order", msg)
 		cl.Push(job)
 	})
 
@@ -48,11 +52,6 @@ func startWebhookd() {
 		port = "9876"
 	}
 
-	log.Printf("Handling HTTP requests on %s.", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
-}
-
-func fail(err error) {
-	fmt.Println(err.Error())
-	os.Exit(-1)
+	log.Info().Msg(fmt.Sprintf("Handling HTTP requests on %s.", port))
+	log.Fatal().Msg(http.ListenAndServe(fmt.Sprintf(":%s", port), nil).Error())
 }

@@ -388,10 +388,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("NOW is ", time.Now().Format("2006-01-02 15:04:05"))
+	// fmt.Println("NOW is ", time.Now().Format("2006-01-02 15:04:05"))
 	elapsed := time.Since(*config.StartUpStartTime)
-	fmt.Printf("Startup took %s\n", elapsed)
-
-	fmt.Printf("Listening on: %v\n\n", config.Config.Port)
+	log.Info().Msgf("Startup took %s\n", elapsed)
+	log.Info().Msgf("Listening on: %v\n\n", config.Config.Port)
 	listenAndServe()
+}
+
+func fail(err error) {
+	log.Fatal().Msg(err.Error())
+	os.Exit(-1)
 }

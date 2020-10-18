@@ -5,12 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/dfang/qor-demo/config/db"
 
@@ -30,9 +31,9 @@ func startFaktoryWorker() {
 	mgr := worker.NewManager()
 	mgr.Use(func(perform worker.Handler) worker.Handler {
 		return func(ctx worker.Context, job *client.Job) error {
-			log.Printf("Starting work on job %s of type %s with custom %v\n", ctx.Jid(), ctx.JobType(), job.Custom)
+			log.Debug().Msgf("Starting work on job %s of type %s with custom %v", ctx.Jid(), ctx.JobType(), job.Custom)
 			err := perform(ctx, job)
-			log.Printf("Finished work on job %s with error %v\n", ctx.Jid(), err)
+			log.Debug().Msgf("Finished work on job %s with error %v\n", ctx.Jid(), err)
 			return err
 		}
 	})
@@ -60,7 +61,8 @@ func UpsertOrder(ctx worker.Context, args ...interface{}) error {
 	var s string
 	switch v := args[0].(type) {
 	case string:
-		fmt.Println("args[0] is", v) // here v has type string
+		log.Debug().Msg("args[0] is")
+		log.Debug().Msg(v) // here v has type string
 		s = args[0].(string)
 	default:
 		return errors.New("参数正确")
@@ -79,7 +81,7 @@ func UpsertOrder(ctx worker.Context, args ...interface{}) error {
 
 	var obj OrderPayload
 	if err := json.Unmarshal([]byte(s), &obj); err != nil {
-		panic(err)
+		fail(err)
 	}
 
 	filename := fmt.Sprintf("%s/%s/%s.json", "./public/data", obj.Order.CreatedAt.Format("2006/01/02"), obj.Order.OrderNo)
@@ -126,7 +128,7 @@ func UpsertOrder(ctx worker.Context, args ...interface{}) error {
 
 	db.DB.Where("order_no = ?", obj.Order.OrderNo).Assign(o).FirstOrInit(&o)
 	if err := db.DB.Save(&o).Error; err != nil {
-		log.Println(err)
+		log.Debug().Msg(err.Error())
 		// return errors.New("uncomsued")
 		return err
 	}
