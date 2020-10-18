@@ -33,22 +33,28 @@ func StartWebhookd() {
 	log.Info().Msgf("Connected to %s %s", svr["description"], svr["faktory_version"])
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Info().Msg("webhook received a request")
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			fail(err)
+		if r.Method == "GET" {
+			fmt.Fprintln(w, "ok")
+		} else if r.Method == "POST" {
+			log.Info().Msg("webhook received a request")
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				fail(err)
+			}
+
+			msg := string(body)
+			log.Debug().Msg(msg)
+
+			job := faktory.NewJob("upsert_order", msg)
+			if err := cl.Push(job); err != nil {
+				log.Info().Msgf("push job to faktory failed")
+			}
+
+			log.Info().Msgf("pushed a job with job id: %s, job type: %s, queue: %s", job.Jid, job.Type, job.Queue)
+			fmt.Fprintln(w, "ok")
+		} else {
+			http.Error(w, "Invalid request method.", 405)
 		}
-
-		msg := string(body)
-		log.Debug().Msg(msg)
-
-		job := faktory.NewJob("upsert_order", msg)
-		if err := cl.Push(job); err != nil {
-			log.Info().Msgf("push job to faktory failed")
-		}
-
-		log.Info().Msgf("pushed a job with job id: %s, job type: %s, queue: %s", job.Jid, job.Type, job.Queue)
-		fmt.Fprintln(w, "ok")
 	})
 
 	port := os.Getenv("WEBHOOKD_PORT")
@@ -56,6 +62,6 @@ func StartWebhookd() {
 		port = "9876"
 	}
 
-	log.Info().Msg(fmt.Sprintf("Webhook listens on %s.", port))
+	log.Info().Msgf("Webhook listens on: 0.0.0.0:%s", port)
 	log.Fatal().Msg(http.ListenAndServe(fmt.Sprintf(":%s", port), nil).Error())
 }

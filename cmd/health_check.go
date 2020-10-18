@@ -10,6 +10,7 @@ import (
 	"github.com/heptiolabs/healthcheck"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/rs/zerolog/log"
 )
 
 // StartHealthCheck start health check
@@ -33,7 +34,9 @@ func StartHealthCheck() {
 	health.AddLivenessCheck("redis", healthcheck.TCPDialCheck(fmt.Sprintf("%s:%s", config.Config.Redis.Host, config.Config.Redis.Port), 5*time.Second))
 
 	// check worker
-	health.AddLivenessCheck("worker-ui", healthcheck.HTTPGetCheck("http://localhost:5040/worker_pools", 5*time.Second))
+	// health.AddLivenessCheck("worker-ui", healthcheck.HTTPGetCheck("http://localhost:5040/worker_pools", 5*time.Second))
+
+	health.AddLivenessCheck("webhook", healthcheck.HTTPGetCheck("http://localhost:9876", 5*time.Second))
 
 	// health.AddLivenessCheck("faktory-ui", healthcheck.HTTPGetCheck(fmt.Sprintf("http://%s:%s", config.Config.FaktoryHost, config.Config.FaktoryUIPort), 5*time.Second))
 
@@ -48,9 +51,16 @@ func StartHealthCheck() {
 
 	// Expose a readiness check on /ready
 	adminMux.HandleFunc("/ready", health.ReadyEndpoint)
+
 	go http.ListenAndServe("0.0.0.0:9402", adminMux)
+	log.Info().Msgf("prometheous metrics endpoint on: %v", "0.0.0.0:9042/metrics")
+	log.Info().Msgf("Healthcheck, liveness probe on: %v", "0.0.0.0:8086/live?full=1")
+	log.Info().Msgf("Healthcheck, readiness probe on: %v", "0.0.0.0:8086/ready?full=1")
 
 	// Expose the /live and /ready endpoints over HTTP (on port 8086):
 	// go http.ListenAndServe("0.0.0.0:8086", health)
-	http.ListenAndServe("0.0.0.0:8086", health)
+	if err := http.ListenAndServe("0.0.0.0:8086", health); err != nil {
+		log.Warn().Msg(err.Error())
+	}
+
 }
