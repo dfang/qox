@@ -113,15 +113,6 @@ func setLogLevel(level int) {
 	zerolog.SetGlobalLevel(l)
 }
 
-func setupLogLevel(debug bool) {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	log.Logger = log.With().Caller().Logger()
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	if debug {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	}
-}
-
 func initialzeConfigs() {
 	config.Initialize()
 	db.Initialize()
@@ -349,6 +340,42 @@ func listenAndServe() {
 	}
 }
 
+func runMainAction(c *cli.Context) error {
+	log.Info().Msg("check availables enviroments variables ......")
+	checkAvailableEnvs()
+
+	log.Info().Msg("initialze configurations ......")
+	initialzeConfigs()
+
+	log.Info().Msg("start faktory worker")
+	go cmd.StartFaktoryWorker()
+
+	log.Info().Msg("start gocraft/work workerPool ......")
+	go cmd.StartWorkerPool()
+	if c.Bool("ui") || os.Getenv("UI") == "true" {
+		log.Info().Msg("start gocraft/work web ui ......")
+		go cmd.StartWorkWebUI()
+	}
+
+	log.Info().Msg("start health check ......")
+	go cmd.StartHealthCheck()
+
+	log.Info().Msg("start webhookd")
+	go cmd.StartWebhookd()
+
+	log.Info().Msg("setup middlewares and routes ......")
+	setupMiddlewaresAndRoutes()
+
+	listenAndServe()
+
+	return nil
+}
+
+func fail(err error) {
+	log.Fatal().Msg(err.Error())
+	os.Exit(-1)
+}
+
 func main() {
 	app := &cli.App{
 		Name:  "qor",
@@ -413,6 +440,8 @@ func main() {
 				Aliases: []string{"m"},
 				Usage:   "Run migrations",
 				Action: func(c *cli.Context) error {
+					initialzeConfigs()
+
 					fmt.Println("just run migrations and exit ......")
 					migrations.Migrate()
 					return nil
@@ -423,6 +452,8 @@ func main() {
 				Aliases: []string{"s"},
 				Usage:   "Run seeding",
 				Action: func(c *cli.Context) error {
+					initialzeConfigs()
+
 					fmt.Println("just run seeds and exit ......")
 					fmt.Println("start truncate tables ......")
 					seeds.TruncateTables()
@@ -512,41 +543,4 @@ func main() {
 	// 		go StartWorkWebUI()
 	// 	}
 	// }
-
-}
-
-func runMainAction(c *cli.Context) error {
-	log.Info().Msg("check availables enviroments variables ......")
-	checkAvailableEnvs()
-
-	log.Info().Msg("initialze configurations ......")
-	initialzeConfigs()
-
-	log.Info().Msg("start faktory worker")
-	go cmd.StartFaktoryWorker()
-
-	log.Info().Msg("start gocraft/work workerPool ......")
-	go cmd.StartWorkerPool()
-	if c.Bool("ui") || os.Getenv("UI") == "true" {
-		log.Info().Msg("start gocraft/work web ui ......")
-		go cmd.StartWorkWebUI()
-	}
-
-	log.Info().Msg("start health check ......")
-	go cmd.StartHealthCheck()
-
-	log.Info().Msg("start webhookd")
-	go cmd.StartWebhookd()
-
-	log.Info().Msg("setup middlewares and routes ......")
-	setupMiddlewaresAndRoutes()
-
-	listenAndServe()
-
-	return nil
-}
-
-func fail(err error) {
-	log.Fatal().Msg(err.Error())
-	os.Exit(-1)
 }

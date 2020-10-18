@@ -13,7 +13,7 @@ var Fake *faker.Faker
 
 var (
 	Root, _ = os.Getwd()
-	DraftDB = db.DB
+	// DraftDB = db.DB
 )
 
 var Seeds = struct {
@@ -181,10 +181,10 @@ func init() {
 // TruncateTables Truncate tables
 func TruncateTables(tables ...interface{}) {
 	for _, table := range tables {
-		if err := DraftDB.DropTableIfExists(table).Error; err != nil {
+		if err := db.DB.DropTableIfExists(table).Error; err != nil {
 			panic(err)
 		}
 
-		DraftDB.AutoMigrate(table)
+		db.DB.AutoMigrate(table)
 	}
 }

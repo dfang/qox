@@ -30,7 +30,7 @@ var DB *gorm.DB
 var RedisPool *redis.Pool
 
 // Initialize changed init to Initialize
-func Initialize() {
+func Initialize() error {
 	var err error
 
 	// Make a redis pool
@@ -82,6 +82,8 @@ func Initialize() {
 	} else {
 		panic(err)
 	}
+
+	return nil
 }
 
 // func init() {

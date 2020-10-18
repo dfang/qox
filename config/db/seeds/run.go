@@ -146,7 +146,7 @@ func CreateSources() {
 			Name: sources[i],
 		}
 
-		if err := DraftDB.Create(&a).Error; err != nil {
+		if err := db.DB.Create(&a).Error; err != nil {
 			log.Fatalf("create source (%v) failure, got err %v", a, err)
 		}
 	}
@@ -166,7 +166,7 @@ func CreateServiceTypes() {
 			Name: serviceTypes[i],
 		}
 
-		if err := DraftDB.Create(&a).Error; err != nil {
+		if err := db.DB.Create(&a).Error; err != nil {
 			log.Fatalf("create service type (%v) failure, got err %v", a, err)
 		}
 	}
@@ -188,7 +188,7 @@ func CreateBrands() {
 			Name: brands[i],
 		}
 
-		if err := DraftDB.Create(&a).Error; err != nil {
+		if err := db.DB.Create(&a).Error; err != nil {
 			log.Fatalf("create brand (%v) failure, got err %v", a, err)
 		}
 	}
@@ -256,7 +256,7 @@ func CreateAftersales() {
 	}
 
 	for _, s := range afs {
-		if err := DraftDB.Create(&s).Error; err != nil {
+		if err := db.DB.Create(&s).Error; err != nil {
 			log.Fatalf("create aftersale (%v) failure, got err %v", s, err)
 		}
 	}
@@ -279,7 +279,7 @@ func CreateWorkman() {
 	names = append(names, b)
 
 	for i := 0; i < len(names); i++ {
-		if err := DraftDB.Create(&names[i]).Error; err != nil {
+		if err := db.DB.Create(&names[i]).Error; err != nil {
 			log.Fatalf("create workman (%v) failure, got err %v", a, err)
 		}
 	}
@@ -291,7 +291,7 @@ func CreateWorkman() {
 		MobilePhone: "15618903080",
 	}
 
-	if err := DraftDB.Create(&wp1).Error; err != nil {
+	if err := db.DB.Create(&wp1).Error; err != nil {
 		log.Fatalf("create wechat profiles (%v) failure, got err %v", a, err)
 	}
 
@@ -302,7 +302,7 @@ func CreateWorkman() {
 		MobilePhone: "18970278113",
 	}
 
-	if err := DraftDB.Create(&wp2).Error; err != nil {
+	if err := db.DB.Create(&wp2).Error; err != nil {
 		log.Fatalf("create wechat profiles (%v) failure, got err %v", a, err)
 	}
 }
@@ -326,7 +326,7 @@ func importUsers() {
 		emailRegexp := regexp.MustCompile(".*(@.*)")
 		user.Email = emailRegexp.ReplaceAllString(Fake.Email(), strings.Replace(strings.ToLower(Fake.Name()), " ", "_", -1)+"@example.com")
 
-		if err := DraftDB.Create(&user).Error; err != nil {
+		if err := db.DB.Create(&user).Error; err != nil {
 			log.Fatalf("Save user (%v) failure, got err %v", user, err)
 		}
 		provider := auth.Auth.GetProvider("password").(*password.Provider)
@@ -339,7 +339,7 @@ func importUsers() {
 		authIdentity.UserID = fmt.Sprint(user.ID)
 		authIdentity.ConfirmedAt = &now
 
-		DraftDB.Create(authIdentity)
+		db.DB.Create(authIdentity)
 
 		// Send welcome notification
 		Notification.Send(&notification.Message{
@@ -348,7 +348,7 @@ func importUsers() {
 			Title:       "Welcome To QOR Admin",
 			Body:        "Welcome To QOR Admin",
 			MessageType: "info",
-		}, &qor.Context{DB: DraftDB})
+		}, &qor.Context{DB: db.DB})
 
 	}
 }
@@ -415,7 +415,7 @@ func CreateRootUser() {
 	AdminUser.Confirmed = true
 	AdminUser.Name = "QOR Admin"
 	AdminUser.Role = "Admin"
-	DraftDB.FirstOrCreate(AdminUser)
+	db.DB.FirstOrCreate(AdminUser)
 
 	provider := auth.Auth.GetProvider("password").(*password.Provider)
 	hashedPassword, _ := provider.Encryptor.Digest("admin")
@@ -428,7 +428,7 @@ func CreateRootUser() {
 	authIdentity.UserID = fmt.Sprint(AdminUser.ID)
 	authIdentity.ConfirmedAt = &now
 
-	DraftDB.FirstOrCreate(authIdentity)
+	db.DB.FirstOrCreate(authIdentity)
 }
 
 func createSetting() {
@@ -446,7 +446,7 @@ func createSetting() {
 	setting.Latitude = Seeds.Setting.Latitude
 	setting.Longitude = Seeds.Setting.Longitude
 
-	if err := DraftDB.Create(&setting).Error; err != nil {
+	if err := db.DB.Create(&setting).Error; err != nil {
 		log.Fatalf("create setting (%v) failure, got err %v", setting, err)
 	}
 }
@@ -486,7 +486,7 @@ func createSeo() {
 	// seoSetting.HomePage = seo.Setting{Title: Seeds.Seo.HomePage.Title, Description: Seeds.Seo.HomePage.Description, Keywords: Seeds.Seo.HomePage.Keywords}
 	// seoSetting.ProductPage = seo.Setting{Title: Seeds.Seo.ProductPage.Title, Description: Seeds.Seo.ProductPage.Description, Keywords: Seeds.Seo.ProductPage.Keywords}
 
-	// if err := DraftDB.Create(&seoSetting).Error; err != nil {
+	// if err := db.DB.Create(&seoSetting).Error; err != nil {
 	// 	log.Fatalf("create seo (%v) failure, got err %v", seoSetting, err)
 	// }
 }
@@ -499,7 +499,7 @@ func createUsers() {
 		user.Name = Fake.Name()
 		user.Email = emailRegexp.ReplaceAllString(Fake.Email(), strings.Replace(strings.ToLower(user.Name), " ", "_", -1)+"@example.com")
 		user.Gender = []string{"Female", "Male"}[i%2]
-		if err := DraftDB.Create(&user).Error; err != nil {
+		if err := db.DB.Create(&user).Error; err != nil {
 			log.Fatalf("create user (%v) failure, got err %v", user, err)
 		}
 
@@ -508,7 +508,7 @@ func createUsers() {
 		if user.CreatedAt.After(time.Now()) {
 			user.CreatedAt = time.Now()
 		}
-		if err := DraftDB.Save(&user).Error; err != nil {
+		if err := db.DB.Save(&user).Error; err != nil {
 			log.Fatalf("Save user (%v) failure, got err %v", user, err)
 		}
 
@@ -521,13 +521,13 @@ func createUsers() {
 		authIdentity.UserID = fmt.Sprint(user.ID)
 		authIdentity.ConfirmedAt = &user.CreatedAt
 
-		DraftDB.Create(authIdentity)
+		db.DB.Create(authIdentity)
 	}
 }
 
 func createAddresses() {
 	var Users []users.User
-	if err := DraftDB.Find(&Users).Error; err != nil {
+	if err := db.DB.Find(&Users).Error; err != nil {
 		log.Fatalf("query users (%v) failure, got err %v", Users, err)
 	}
 
@@ -539,7 +539,7 @@ func createAddresses() {
 		address.City = Fake.City()
 		address.Address1 = Fake.StreetAddress()
 		address.Address2 = Fake.SecondaryAddress()
-		if err := DraftDB.Create(&address).Error; err != nil {
+		if err := db.DB.Create(&address).Error; err != nil {
 			log.Fatalf("create address (%v) failure, got err %v", address, err)
 		}
 	}
@@ -550,7 +550,7 @@ func createCategories() {
 		category := products.Category{}
 		category.Name = c.Name
 		category.Code = strings.ToLower(c.Code)
-		if err := DraftDB.Create(&category).Error; err != nil {
+		if err := db.DB.Create(&category).Error; err != nil {
 			log.Fatalf("create category (%v) failure, got err %v", category, err)
 		}
 	}
@@ -560,7 +560,7 @@ func createCollections() {
 	for _, c := range Seeds.Collections {
 		collection := products.Collection{}
 		collection.Name = c.Name
-		if err := DraftDB.Create(&collection).Error; err != nil {
+		if err := db.DB.Create(&collection).Error; err != nil {
 			log.Fatalf("create collection (%v) failure, got err %v", collection, err)
 		}
 	}
@@ -572,7 +572,7 @@ func createColors() {
 		color.Name = c.Name
 		color.Code = c.Code
 		color.PublishReady = true
-		if err := DraftDB.Create(&color).Error; err != nil {
+		if err := db.DB.Create(&color).Error; err != nil {
 			log.Fatalf("create color (%v) failure, got err %v", color, err)
 		}
 	}
@@ -584,7 +584,7 @@ func createSizes() {
 		size.Name = s.Name
 		size.Code = s.Code
 		size.PublishReady = true
-		if err := DraftDB.Create(&size).Error; err != nil {
+		if err := db.DB.Create(&size).Error; err != nil {
 			log.Fatalf("create size (%v) failure, got err %v", size, err)
 		}
 	}
@@ -595,7 +595,7 @@ func createMaterial() {
 		material := products.Material{}
 		material.Name = s.Name
 		material.Code = s.Code
-		if err := DraftDB.Create(&material).Error; err != nil {
+		if err := db.DB.Create(&material).Error; err != nil {
 			log.Fatalf("create material (%v) failure, got err %v", material, err)
 		}
 	}
@@ -620,7 +620,7 @@ func createProducts() {
 			product.Collections = append(product.Collections, *collection)
 		}
 
-		if err := DraftDB.Create(&product).Error; err != nil {
+		if err := db.DB.Create(&product).Error; err != nil {
 			log.Fatalf("create product (%v) failure, got err %v", product, err)
 		}
 
@@ -640,7 +640,7 @@ func createProducts() {
 					defer file.Close()
 					image.File.Scan(file)
 				}
-				if err := DraftDB.Create(&image).Error; err != nil {
+				if err := db.DB.Create(&image).Error; err != nil {
 					log.Fatalf("create color_variation_image (%v) failure, got err %v when %v", image, err, i.URL)
 				} else {
 					colorVariation.Images.Files = append(colorVariation.Images.Files, media_library.File{
@@ -654,7 +654,7 @@ func createProducts() {
 						DB:       db.DB.Set(publish2.VisibleMode, publish2.ModeOff).Set(publish2.ScheduleMode, publish2.ModeOff),
 					})
 
-					colorVariation.Images.Crop(Admin.NewResource(&products.ProductImage{}), DraftDB, media_library.MediaOption{
+					colorVariation.Images.Crop(Admin.NewResource(&products.ProductImage{}), db.DB, media_library.MediaOption{
 						Sizes: map[string]*media.Size{
 							"main":    {Width: 560, Height: 700},
 							"icon":    {Width: 50, Height: 50},
@@ -668,12 +668,12 @@ func createProducts() {
 							ID:  json.Number(fmt.Sprint(image.ID)),
 							Url: image.File.URL(),
 						}}
-						DraftDB.Save(&product)
+						db.DB.Save(&product)
 					}
 				}
 			}
 
-			if err := DraftDB.Create(&colorVariation).Error; err != nil {
+			if err := db.DB.Create(&colorVariation).Error; err != nil {
 				log.Fatalf("create color_variation (%v) failure, got err %v", colorVariation, err)
 			}
 		}
@@ -686,7 +686,7 @@ func createProducts() {
 			sizeVariation.SizeID = size.ID
 			// sizeVariation.Name = size.Name
 
-			if err := DraftDB.Create(&sizeVariation).Error; err != nil {
+			if err := db.DB.Create(&sizeVariation).Error; err != nil {
 				log.Fatalf("create color_variation (%v) failure, got err %v", sizeVariation, err)
 			}
 		}
@@ -695,7 +695,7 @@ func createProducts() {
 		product.Description = p.ZhDescription
 		product.MadeCountry = p.ZhMadeCountry
 		product.Gender = p.ZhGender
-		DraftDB.Set("l10n:locale", "zh-CN").Create(&product)
+		db.DB.Set("l10n:locale", "zh-CN").Create(&product)
 
 		if idx%3 == 0 {
 			start := time.Now().AddDate(0, 0, idx-7)
@@ -707,7 +707,7 @@ func createProducts() {
 			product.Gender = p.Gender
 			product.SetScheduledStartAt(&start)
 			product.SetScheduledEndAt(&end)
-			DraftDB.Save(&product)
+			db.DB.Save(&product)
 		}
 
 		if idx%2 == 0 {
@@ -720,7 +720,7 @@ func createProducts() {
 			product.Gender = p.ZhGender
 			product.SetScheduledStartAt(&start)
 			product.SetScheduledEndAt(&end)
-			DraftDB.Set("l10n:locale", "zh-CN").Save(&product)
+			db.DB.Set("l10n:locale", "zh-CN").Save(&product)
 		}
 	}
 }
@@ -738,7 +738,7 @@ func createStores() {
 		store.Zip = s.Zip
 		store.Latitude = s.Latitude
 		store.Longitude = s.Longitude
-		if err := DraftDB.Create(&store).Error; err != nil {
+		if err := db.DB.Create(&store).Error; err != nil {
 			log.Fatalf("create store (%v) failure, got err %v", store, err)
 		}
 	}
@@ -746,17 +746,17 @@ func createStores() {
 
 func createOrders() {
 	var Users []users.User
-	if err := DraftDB.Preload("Addresses").Find(&Users).Error; err != nil {
+	if err := db.DB.Preload("Addresses").Find(&Users).Error; err != nil {
 		log.Fatalf("query users (%v) failure, got err %v", Users, err)
 	}
 
 	var sizeVariations []products.SizeVariation
-	if err := DraftDB.Find(&sizeVariations).Error; err != nil {
+	if err := db.DB.Find(&sizeVariations).Error; err != nil {
 		log.Fatalf("query sizeVariations (%v) failure, got err %v", sizeVariations, err)
 	}
 
 	var colorVariations []products.ColorVariation
-	if err := DraftDB.Find(&colorVariations).Error; err != nil {
+	if err := db.DB.Find(&colorVariations).Error; err != nil {
 		log.Fatalf("query colorVariations (%v) failure, got err %v", colorVariations, err)
 	}
 
@@ -793,7 +793,7 @@ func createOrders() {
 			if rand.Intn(15)%15 == 3 && state == "checkout" || state == "processing" || state == "paid_cancelled" {
 				order.AbandonedReason = abandonedReason
 			}
-			if err := DraftDB.Create(&order).Error; err != nil {
+			if err := db.DB.Create(&order).Error; err != nil {
 				log.Fatalf("create order (%v) failure, got err %v", order, err)
 			}
 
@@ -812,7 +812,7 @@ func createOrders() {
 			orderItem.Price = product.Price
 			orderItem.State = state
 			orderItem.DiscountRate = discountRate
-			if err := DraftDB.Create(&orderItem).Error; err != nil {
+			if err := db.DB.Create(&orderItem).Error; err != nil {
 				log.Fatalf("create orderItem (%v) failure, got err %v", orderItem, err)
 			}
 
@@ -820,7 +820,7 @@ func createOrders() {
 			order.CreatedAt = user.CreatedAt.Add(1 * time.Hour)
 			order.PaymentAmount = order.Amount()
 			order.PaymentMethod = orders.COD
-			if err := DraftDB.Save(&order).Error; err != nil {
+			if err := db.DB.Save(&order).Error; err != nil {
 				log.Fatalf("Save order (%v) failure, got err %v", order, err)
 			}
 
@@ -840,7 +840,7 @@ func createOrders() {
 					Body:        fmt.Sprintf("Order #%v has been cancelled, its amount %.2f", order.ID, order.Amount()),
 					MessageType: "order_paid_cancelled",
 					ResolvedAt:  resolvedAt,
-				}, &qor.Context{DB: DraftDB})
+				}, &qor.Context{DB: db.DB})
 			case "processed":
 				Notification.Send(&notification.Message{
 					From:        user,
@@ -849,7 +849,7 @@ func createOrders() {
 					Body:        fmt.Sprintf("Order #%v has been prepared to ship", order.ID),
 					MessageType: "order_processed",
 					ResolvedAt:  resolvedAt,
-				}, &qor.Context{DB: DraftDB})
+				}, &qor.Context{DB: db.DB})
 			case "returned":
 				Notification.Send(&notification.Message{
 					From:        user,
@@ -858,7 +858,7 @@ func createOrders() {
 					Body:        fmt.Sprintf("Order #%v has been returned, its amount %.2f", order.ID, order.Amount()),
 					MessageType: "order_returned",
 					ResolvedAt:  resolvedAt,
-				}, &qor.Context{DB: DraftDB})
+				}, &qor.Context{DB: db.DB})
 			}
 		}
 	}
@@ -876,7 +876,7 @@ func createMediaLibraries() {
 			medialibrary.File.Scan(file)
 		}
 
-		if err := DraftDB.Create(&medialibrary).Error; err != nil {
+		if err := db.DB.Create(&medialibrary).Error; err != nil {
 			log.Fatalf("create medialibrary (%v) failure, got err %v", medialibrary, err)
 		}
 	}
@@ -918,7 +918,7 @@ func createWidgets() {
 	}
 
 	topBannerSetting.SetSerializableArgumentValue(topBannerValue)
-	if err := DraftDB.Create(&topBannerSetting).Error; err != nil {
+	if err := db.DB.Create(&topBannerSetting).Error; err != nil {
 		log.Fatalf("Save widget (%v) failure, got err %v", topBannerSetting, err)
 	}
 
@@ -950,7 +950,7 @@ func createWidgets() {
 		slideshowValue.SlideImages = append(slideshowValue.SlideImages, slide)
 	}
 	slideshowSetting.SetSerializableArgumentValue(slideshowValue)
-	if err := DraftDB.Create(&slideshowSetting).Error; err != nil {
+	if err := db.DB.Create(&slideshowSetting).Error; err != nil {
 		fmt.Printf("Save widget (%v) failure, got err %v", slideshowSetting, err)
 	}
 
@@ -966,7 +966,7 @@ func createWidgets() {
 		Products:       []string{"1", "2", "3", "4", "5", "6", "7", "8"},
 		ProductsSorter: sorting.SortableCollection{PrimaryKeys: []string{"1", "2", "3", "4", "5", "6", "7", "8"}},
 	})
-	if err := DraftDB.Create(&featureProducts).Error; err != nil {
+	if err := db.DB.Create(&featureProducts).Error; err != nil {
 		log.Fatalf("Save widget (%v) failure, got err %v", featureProducts, err)
 	}
 
@@ -977,7 +977,7 @@ func createWidgets() {
 		setting.ID = uint(id)
 		setting.Kind = s.Kind
 		setting.Value.SerializedValue = s.Value
-		if err := DraftDB.Create(&setting).Error; err != nil {
+		if err := db.DB.Create(&setting).Error; err != nil {
 			log.Fatalf("Save QorBannerEditorSetting (%v) failure, got err %v", setting, err)
 		}
 	}
@@ -988,7 +988,7 @@ func createWidgets() {
 	menCollectionWidget.Description = "Men collection baner"
 	menCollectionWidget.WidgetType = "FullWidthBannerEditor"
 	menCollectionWidget.Value.SerializedValue = `{"Value":"%3Cdiv+class%3D%22qor-bannereditor__html%22+style%3D%22position%3A+relative%3B+height%3A+100%25%3B%22+data-image-width%3D%221280%22+data-image-height%3D%22480%22%3E%3Cspan+class%3D%22qor-bannereditor-image%22%3E%3Cimg+src%3D%22http%3A%2F%2Fqor3.s3.amazonaws.com%2Fmedialibrary%2Fmen-collection.jpg%22%3E%3C%2Fspan%3E%3Cspan+class%3D%22qor-bannereditor__draggable%22+data-edit-id%3D%2212%22+style%3D%22position%3A+absolute%3B+left%3A+10.0781%25%3B+top%3A+18.125%25%3B+right%3A+auto%3B+bottom%3A+auto%3B%22+data-position-left%3D%22129%22+data-position-top%3D%2287%22%3E%3Ch1+class%3D%22banner-title%22+style%3D%22color%3A+%3B%22%3EMEN+COLLECTION%3C%2Fh1%3E%3C%2Fspan%3E%3Cspan+class%3D%22qor-bannereditor__draggable%22+data-edit-id%3D%2210%22+style%3D%22position%3A+absolute%3B+left%3A+9.92188%25%3B+top%3A+29.7917%25%3B+right%3A+auto%3B+bottom%3A+auto%3B%22+data-position-left%3D%22127%22+data-position-top%3D%22143%22%3E%3Ch2+class%3D%22banner-sub-title%22+style%3D%22color%3A+%3B%22%3ECheck+the+newcomming+collection%3C%2Fh2%3E%3C%2Fspan%3E%3Cspan+class%3D%22qor-bannereditor__draggable+qor-bannereditor__draggable-left%22+data-edit-id%3D%2211%22+style%3D%22position%3A+absolute%3B+left%3A+9.92188%25%3B+top%3A+47.0833%25%3B+right%3A+auto%3B+bottom%3A+auto%3B%22+data-position-left%3D%22127%22+data-position-top%3D%22226%22%3E%3Ca+class%3D%22button+button__primary+banner-button%22+href%3D%22%2Fmen%22%3Eview+more%3C%2Fa%3E%3C%2Fspan%3E%3C%2Fdiv%3E"}`
-	if err := DraftDB.Create(&menCollectionWidget).Error; err != nil {
+	if err := db.DB.Create(&menCollectionWidget).Error; err != nil {
 		log.Fatalf("Save widget (%v) failure, got err %v", menCollectionWidget, err)
 	}
 
@@ -998,7 +998,7 @@ func createWidgets() {
 	womenCollectionWidget.Description = "Women collection banner"
 	womenCollectionWidget.WidgetType = "FullWidthBannerEditor"
 	womenCollectionWidget.Value.SerializedValue = `{"Value":"%3Cdiv+class%3D%22qor-bannereditor__html%22+style%3D%22position%3A+relative%3B+height%3A+100%25%3B%22+data-image-width%3D%221280%22+data-image-height%3D%22480%22%3E%3Cspan+class%3D%22qor-bannereditor-image%22%3E%3Cimg+src%3D%22http%3A%2F%2Fqor3.s3.amazonaws.com%2Fmedialibrary%2Fwomen-collection.jpg%22%3E%3C%2Fspan%3E%3Cspan+class%3D%22qor-bannereditor__draggable%22+data-edit-id%3D%2223%22+style%3D%22position%3A+absolute%3B+left%3A+10.0781%25%3B+top%3A+18.125%25%3B+right%3A+auto%3B+bottom%3A+auto%3B%22+data-position-left%3D%22129%22+data-position-top%3D%2287%22%3E%3Ch1+class%3D%22banner-title%22+style%3D%22color%3A+%3B%22%3EWOMEN+COLLECTION%3C%2Fh1%3E%3C%2Fspan%3E%3Cspan+class%3D%22qor-bannereditor__draggable%22+data-edit-id%3D%2221%22+style%3D%22position%3A+absolute%3B+left%3A+9.92188%25%3B+top%3A+29.7917%25%3B+right%3A+auto%3B+bottom%3A+auto%3B%22+data-position-left%3D%22127%22+data-position-top%3D%22143%22%3E%3Ch2+class%3D%22banner-sub-title%22+style%3D%22color%3A+%3B%22%3ECheck+the+newcomming+collection%3C%2Fh2%3E%3C%2Fspan%3E%3Cspan+class%3D%22qor-bannereditor__draggable+qor-bannereditor__draggable-left%22+data-edit-id%3D%2222%22+style%3D%22position%3A+absolute%3B+left%3A+9.92188%25%3B+top%3A+47.0833%25%3B+right%3A+auto%3B+bottom%3A+auto%3B%22+data-position-left%3D%22127%22+data-position-top%3D%22226%22%3E%3Ca+class%3D%22button+button__primary+banner-button%22+href%3D%22%2Fwomen%22%3Eview+more%3C%2Fa%3E%3C%2Fspan%3E%3C%2Fdiv%3E"}`
-	if err := DraftDB.Create(&womenCollectionWidget).Error; err != nil {
+	if err := db.DB.Create(&womenCollectionWidget).Error; err != nil {
 		log.Fatalf("Save widget (%v) failure, got err %v", womenCollectionWidget, err)
 	}
 
@@ -1008,7 +1008,7 @@ func createWidgets() {
 	newArrivalsCollectionWidget.Description = "New arrivals promotion banner"
 	newArrivalsCollectionWidget.WidgetType = "FullWidthBannerEditor"
 	newArrivalsCollectionWidget.Value.SerializedValue = `{"Value":"%3Cdiv%20class%3D%22qor-bannereditor__html%22%20style%3D%22position%3A%20relative%3B%20height%3A%20100%25%3B%22%20data-image-width%3D%221172%22%20data-image-height%3D%22300%22%3E%3Cspan%20class%3D%22qor-bannereditor-image%22%3E%3Cimg%20src%3D%22http%3A%2F%2Fqor3.s3.amazonaws.com%2Fmedialibrary%2Fnew-arrivals-bg.jpg%22%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%20qor-bannereditor__draggable-left%22%20data-edit-id%3D%2233%22%20style%3D%22position%3A%20absolute%3B%20left%3A%209.47099%25%3B%20top%3A%2030%25%3B%20right%3A%20auto%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%22111%22%20data-position-top%3D%2290%22%3E%3Ch1%20class%3D%22banner-title%22%20style%3D%22color%3A%20%3B%22%3ENew%20Arrivals%3C%2Fh1%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%20qor-bannereditor__draggable-left%22%20data-edit-id%3D%2231%22%20style%3D%22position%3A%20absolute%3B%20left%3A%208.61775%25%3B%20top%3A%20auto%3B%20right%3A%20auto%3B%20bottom%3A%2030.6667%25%3B%22%20data-position-left%3D%22101%22%20data-position-top%3D%22173%22%3E%3Ca%20class%3D%22button%20button__primary%20banner-button%22%20href%3D%22%23%22%3ESHOP%20COLLECTION%3C%2Fa%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%22%20data-edit-id%3D%2232%22%20style%3D%22position%3A%20absolute%3B%20left%3A%209.55631%25%3B%20top%3A%2016%25%3B%20right%3A%20auto%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%22112%22%20data-position-top%3D%2248%22%3E%3Cp%20class%3D%22banner-text%22%20style%3D%22color%3A%20%3B%22%3ETHE%20STYLE%20THAT%20FITS%20EVERYTHING%3C%2Fp%3E%3C%2Fspan%3E%3C%2Fdiv%3E"}`
-	if err := DraftDB.Create(&newArrivalsCollectionWidget).Error; err != nil {
+	if err := db.DB.Create(&newArrivalsCollectionWidget).Error; err != nil {
 		log.Fatalf("Save widget (%v) failure, got err %v", newArrivalsCollectionWidget, err)
 	}
 
@@ -1018,7 +1018,7 @@ func createWidgets() {
 	modelCollectionWidget.Description = "Model products banner"
 	modelCollectionWidget.WidgetType = "FullWidthBannerEditor"
 	modelCollectionWidget.Value.SerializedValue = `{"Value":"%3Cdiv%20class%3D%22qor-bannereditor__html%22%20style%3D%22position%3A%20relative%3B%20height%3A%20100%25%3B%22%20data-image-width%3D%221100%22%20data-image-height%3D%221200%22%3E%3Cspan%20class%3D%22qor-bannereditor-image%22%3E%3Cimg%20src%3D%22http%3A%2F%2Fqor3.s3.amazonaws.com%2Fmedialibrary%2Fmodel-products.jpg%22%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%22%20data-edit-id%3D%2249%22%20style%3D%22position%3A%20absolute%3B%20left%3A%2026.4545%25%3B%20top%3A%204.41667%25%3B%20right%3A%20auto%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%22291%22%20data-position-top%3D%2253%22%3E%3Ch1%20class%3D%22banner-title%22%20style%3D%22color%3A%20%3B%22%3EENJOY%20THE%20NEW%20FASHION%20EXPERIENCE%3C%2Fh1%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%22%20data-edit-id%3D%2242%22%20style%3D%22position%3A%20absolute%3B%20left%3A%2043.2727%25%3B%20top%3A%208.41667%25%3B%20right%3A%20auto%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%22476%22%20data-position-top%3D%22101%22%3E%3Cp%20class%3D%22banner-text%22%20style%3D%22color%3A%20%3B%22%3ENew%20look%20of%202017%3C%2Fp%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%20qor-bannereditor__draggable-left%22%20data-edit-id%3D%2243%22%20style%3D%22position%3A%20absolute%3B%20left%3A%205.45455%25%3B%20top%3A%2044.25%25%3B%20right%3A%20auto%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%2260%22%20data-position-top%3D%22531%22%3E%3Cdiv%20class%3D%22model-buy-block%22%3E%3Ch2%20class%3D%22banner-sub-title%22%3ETOP%3C%2Fh2%3E%3Cp%20class%3D%22banner-text%22%3E%2429.99%3C%2Fp%3E%3Ca%20class%3D%22button%20button__primary%20banner-button%22%20href%3D%22%23%22%3EVIEW%20DETAILS%3C%2Fa%3E%3C%2Fdiv%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%22%20data-edit-id%3D%2244%22%20style%3D%22position%3A%20absolute%3B%20left%3A%20auto%3B%20top%3A%2050.8333%25%3B%20right%3A%209.58527%25%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%22841%22%20data-position-top%3D%22610%22%3E%3Cdiv%20class%3D%22model-buy-block%22%3E%3Ch2%20class%3D%22banner-sub-title%22%3EPINK%20JACKET%3C%2Fh2%3E%3Cp%20class%3D%22banner-text%22%3E%2469.99%3C%2Fp%3E%3Ca%20class%3D%22button%20button__primary%20banner-button%22%20href%3D%22%23%22%3EVIEW%20DETAILS%3C%2Fa%3E%3C%2Fdiv%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%20qor-bannereditor__draggable-left%22%20data-edit-id%3D%2247%22%20style%3D%22position%3A%20absolute%3B%20left%3A%2012.3636%25%3B%20top%3A%20auto%3B%20right%3A%20auto%3B%20bottom%3A%2014.2032%25%3B%22%20data-position-left%3D%22136%22%20data-position-top%3D%22903%22%3E%3Cdiv%20class%3D%22model-buy-block%22%3E%3Ch2%20class%3D%22banner-sub-title%22%3EBOTTOM%3C%2Fh2%3E%3Cp%20class%3D%22banner-text%22%3E%2432.99%3C%2Fp%3E%3Ca%20class%3D%22button%20button__primary%20banner-button%22%20href%3D%22%23%22%3EVIEW%20DETAILS%3C%2Fa%3E%3C%2Fdiv%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%22%20data-edit-id%3D%2245%22%20style%3D%22position%3A%20absolute%3B%20left%3A%2053.2727%25%3B%20top%3A%2048.5%25%3B%20right%3A%20auto%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%22586%22%20data-position-top%3D%22582%22%3E%3Cimg%20src%3D%22%2F%2Fqor3.s3.amazonaws.com%2Fmedialibrary%2Farrow-left.png%22%20class%3D%22banner-image%22%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%22%20data-edit-id%3D%2246%22%20style%3D%22position%3A%20absolute%3B%20left%3A%2015.5455%25%3B%20top%3A%2043.0833%25%3B%20right%3A%20auto%3B%20bottom%3A%20auto%3B%22%20data-position-left%3D%22171%22%20data-position-top%3D%22517%22%3E%3Cimg%20src%3D%22%2F%2Fqor3.s3.amazonaws.com%2Fmedialibrary%2Farrow-right.png%22%20class%3D%22banner-image%22%3E%3C%2Fspan%3E%3Cspan%20class%3D%22qor-bannereditor__draggable%22%20data-edit-id%3D%2248%22%20style%3D%22position%3A%20absolute%3B%20left%3A%2019.2727%25%3B%20top%3A%20auto%3B%20right%3A%20auto%3B%20bottom%3A%2024.8333%25%3B%22%20data-position-left%3D%22212%22%20data-position-top%3D%22879%22%3E%3Cimg%20src%3D%22%2F%2Fqor3.s3.amazonaws.com%2Fmedialibrary%2Farrow-right.png%22%20class%3D%22banner-image%22%3E%3C%2Fspan%3E%3C%2Fdiv%3E"}`
-	if err := DraftDB.Create(&modelCollectionWidget).Error; err != nil {
+	if err := db.DB.Create(&modelCollectionWidget).Error; err != nil {
 		log.Fatalf("Save widget (%v) failure, got err %v", modelCollectionWidget, err)
 	}
 }
@@ -1057,7 +1057,7 @@ func createHelps() {
 				Categories: value,
 			},
 		}
-		DraftDB.Create(&helpEntry)
+		db.DB.Create(&helpEntry)
 	}
 }
 
@@ -1066,7 +1066,7 @@ func createArticles() {
 		title := fmt.Sprintf("Article %v", idx)
 		article := blogs.Article{Title: title}
 		article.PublishReady = true
-		DraftDB.Create(&article)
+		db.DB.Create(&article)
 
 		for i := 1; i <= idx-5; i++ {
 			article.SetVersionName(fmt.Sprintf("v%v", i))
@@ -1074,14 +1074,14 @@ func createArticles() {
 			end := time.Now().AddDate(0, 0, i*2-1)
 			article.SetScheduledStartAt(&start)
 			article.SetScheduledEndAt(&end)
-			DraftDB.Save(&article)
+			db.DB.Save(&article)
 		}
 	}
 }
 
 func findCategoryByName(name string) *products.Category {
 	category := &products.Category{}
-	if err := DraftDB.Where(&products.Category{Name: name}).First(category).Error; err != nil {
+	if err := db.DB.Where(&products.Category{Name: name}).First(category).Error; err != nil {
 		log.Fatalf("can't find category with name = %q, got err %v", name, err)
 	}
 	return category
@@ -1089,7 +1089,7 @@ func findCategoryByName(name string) *products.Category {
 
 func findCollectionByName(name string) *products.Collection {
 	collection := &products.Collection{}
-	if err := DraftDB.Where(&products.Collection{Name: name}).First(collection).Error; err != nil {
+	if err := db.DB.Where(&products.Collection{Name: name}).First(collection).Error; err != nil {
 		log.Fatalf("can't find collection with name = %q, got err %v", name, err)
 	}
 	return collection
@@ -1097,7 +1097,7 @@ func findCollectionByName(name string) *products.Collection {
 
 func findColorByName(name string) *products.Color {
 	color := &products.Color{}
-	if err := DraftDB.Where(&products.Color{Name: name}).First(color).Error; err != nil {
+	if err := db.DB.Where(&products.Color{Name: name}).First(color).Error; err != nil {
 		log.Fatalf("can't find color with name = %q, got err %v", name, err)
 	}
 	return color
@@ -1105,7 +1105,7 @@ func findColorByName(name string) *products.Color {
 
 func findSizeByName(name string) *products.Size {
 	size := &products.Size{}
-	if err := DraftDB.Where(&products.Size{Name: name}).First(size).Error; err != nil {
+	if err := db.DB.Where(&products.Size{Name: name}).First(size).Error; err != nil {
 		log.Fatalf("can't find size with name = %q, got err %v", name, err)
 	}
 	return size
@@ -1115,11 +1115,11 @@ func findProductByColorVariationID(colorVariationID uint) *products.Product {
 	colorVariation := products.ColorVariation{}
 	product := products.Product{}
 
-	if err := DraftDB.Find(&colorVariation, colorVariationID).Error; err != nil {
+	if err := db.DB.Find(&colorVariation, colorVariationID).Error; err != nil {
 		log.Fatalf("query colorVariation (%v) failure, got err %v", colorVariation, err)
 		return &product
 	}
-	if err := DraftDB.Find(&product, colorVariation.ProductID).Error; err != nil {
+	if err := db.DB.Find(&product, colorVariation.ProductID).Error; err != nil {
 		log.Fatalf("query product (%v) failure, got err %v", product, err)
 		return &product
 	}
