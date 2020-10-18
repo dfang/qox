@@ -453,8 +453,9 @@ func main() {
 		},
 		Commands: []*cli.Command{
 			{
-				Name:  "version",
-				Usage: "Show version",
+				Name:    "version",
+				Aliases: []string{"v"},
+				Usage:   "Show version",
 				Action: func(c *cli.Context) error {
 					printVersion()
 					return nil
@@ -480,27 +481,35 @@ func main() {
 					return nil
 				},
 			},
+			{
+				Name:    "start",
+				Aliases: []string{"s"},
+				Usage:   "start",
+				Action: func(c *cli.Context) error {
+					if c.String("uuid") != "" {
+						TenantID = c.String("uuid")
+						log.Info().Msgf("set tenant id to %s", c.String("uuid"))
+					}
+
+					if c.Bool("V") {
+						fmt.Printf("Version %s, BuildVersion %s\n", version, buildVersion)
+						os.Exit(0)
+					}
+
+					level := c.Int("v")
+					setLogLevel(level)
+
+					if c.Bool("debug") {
+						setLogLevel(0)
+					}
+
+					runMainAction(c)
+					return nil
+				},
+			},
 		},
 		Action: func(c *cli.Context) error {
-			if c.String("uuid") != "" {
-				TenantID = c.String("uuid")
-				log.Info().Msgf("set tenant id to %s", c.String("uuid"))
-			}
-
-			if c.Bool("V") {
-				fmt.Printf("Version %s, BuildVersion %s\n", version, buildVersion)
-				os.Exit(0)
-			}
-
-			level := c.Int("v")
-			setLogLevel(level)
-
-			if c.Bool("debug") {
-				setLogLevel(0)
-			}
-
-			runMainAction(c)
-
+			cli.ShowAppHelp(c)
 			return nil
 		},
 	}
