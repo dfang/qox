@@ -10,7 +10,7 @@ require (
 	github.com/aws/aws-sdk-go v1.25.10 // indirect
 	github.com/azumads/faker v0.0.0-20150921074035-6cae71ddb107
 	github.com/braintree/manners v0.0.0-20160418043613-82a8879fc5fd // indirect
-	github.com/contribsys/faktory v1.0.1-1
+	github.com/contribsys/faktory v1.4.1-1
 	github.com/contribsys/faktory_worker_go v0.8.0
 	github.com/dfang/wechat-work-go v0.0.0-20190622161907-748e836f69d3 // indirect
 	github.com/disintegration/imaging v1.6.1 // indirect
