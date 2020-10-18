@@ -50,7 +50,6 @@ import (
 
 var version = "0.0.1" // must follow semver spec, https://github.com/motemen/gobump
 var buildVersion = "development"
-
 var (
 	// Router Chi Router
 	Router *chi.Mux
@@ -58,6 +57,9 @@ var (
 	Admin *admin.Admin
 	// Application Qor Application (前端)
 	Application *application.Application
+
+	// Tenant ID
+	TenantID string
 )
 
 func checkAvailableEnvs() {
@@ -86,9 +88,6 @@ func checkAvailableEnvs() {
 }
 
 func setLogLevel(level int) {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	log.Logger = log.With().Caller().Logger()
-
 	var l zerolog.Level
 	switch level {
 	case -1:
@@ -394,10 +393,19 @@ func fail(err error) {
 }
 
 func main() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	log.Logger = log.With().Caller().Logger()
+
 	app := &cli.App{
 		Name:  "qor",
 		Usage: "make an explosive entrance",
 		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "uuid",
+				Aliases: []string{"i"},
+				Value:   "",
+				Usage:   "Set tenant uuid",
+			},
 			&cli.BoolFlag{
 				Name:    "migrate",
 				Aliases: []string{"m"},
@@ -474,6 +482,11 @@ func main() {
 			},
 		},
 		Action: func(c *cli.Context) error {
+			if c.String("uuid") != "" {
+				TenantID = c.String("uuid")
+				log.Info().Msgf("set tenant id to %s", c.String("uuid"))
+			}
+
 			if c.Bool("V") {
 				fmt.Printf("Version %s, BuildVersion %s\n", version, buildVersion)
 				os.Exit(0)
