@@ -397,7 +397,7 @@ func main() {
 	log.Logger = log.With().Caller().Logger()
 
 	app := &cli.App{
-		Name:  "qor",
+		Name:  "qox",
 		Usage: "make an explosive entrance",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
