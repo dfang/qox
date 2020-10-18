@@ -48,7 +48,8 @@ import (
 	"github.com/dfang/qor-demo/config/db/seeds"
 )
 
-const version = "0.0.1" // must follow semver spec, https://github.com/motemen/gobump
+var version = "0.0.1" // must follow semver spec, https://github.com/motemen/gobump
+var buildVersion = "development"
 
 var (
 	// Router Chi Router
@@ -110,10 +111,6 @@ func setLogLevel(level int) {
 
 	log.Info().Msgf("set log level to %s ......", l.String())
 	zerolog.SetGlobalLevel(l)
-
-	// if debug {
-	// 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	// }
 }
 
 func setupLogLevel(debug bool) {
@@ -396,8 +393,21 @@ func main() {
 				Value:   1,
 				Usage:   "Set log level",
 			},
+			&cli.BoolFlag{
+				Name:    "version",
+				Aliases: []string{"V"},
+				Usage:   "Show version",
+			},
 		},
 		Commands: []*cli.Command{
+			{
+				Name:  "version",
+				Usage: "Show version",
+				Action: func(c *cli.Context) error {
+					fmt.Printf("Version %s, BuildVersion %s\n", version, buildVersion)
+					return nil
+				},
+			},
 			{
 				Name:    "migrate",
 				Aliases: []string{"m"},
@@ -423,11 +433,11 @@ func main() {
 				},
 			},
 		},
-
 		Action: func(c *cli.Context) error {
-			// fmt.Println("boom! I say!")
-			// fmt.Println(c.Bool("seeds"))
-			// fmt.Println(c.Bool("m"))
+			if c.Bool("V") {
+				fmt.Printf("Version %s, BuildVersion %s\n", version, buildVersion)
+				os.Exit(0)
+			}
 
 			level := c.Int("v")
 			setLogLevel(level)
