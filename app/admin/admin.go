@@ -81,7 +81,7 @@ func (app App) ConfigureApplication(application *application.Application) {
 	Admin.AddMenu(&admin.Menu{Name: "Publishing", Priority: 8, Permission: roles.Deny(roles.Read, "operator")})
 
 	SetupNotification(Admin)
-	SetupWorker(Admin)
+	// SetupWorker(Admin)
 	SetupSEO(Admin)
 	SetupWidget(Admin)
 	SetupDashboard(Admin)

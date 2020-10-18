@@ -123,8 +123,8 @@ func setupLogLevel(debug bool) {
 }
 
 func initialzeConfigs() {
-	// config.Initialize()
-	// db.Initialize()
+	config.Initialize()
+	db.Initialize()
 	i18n.Initialize()
 	auth.Initialize()
 }
@@ -321,7 +321,7 @@ func listenAndServe() {
 	// fmt.Println("NOW is ", time.Now().Format("2006-01-02 15:04:05"))
 	elapsed := time.Since(*config.StartUpStartTime)
 	log.Debug().Msgf("Startup took %s\n", elapsed)
-	log.Info().Msgf("Listening on: %v\n\n", config.Config.Port)
+	log.Info().Msgf("Listening on: %v\n", config.Config.Port)
 
 	if config.Config.HTTPS {
 		certManager := autocert.Manager{

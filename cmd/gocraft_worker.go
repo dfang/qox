@@ -471,7 +471,7 @@ func ExportOrderDetails(job *work.Job) error {
 	for i := -60; i < 0; i++ {
 		n := time.Now()
 		m := n.AddDate(0, 0, i)
-		fmt.Println(m)
+		// fmt.Println(m)
 
 		fileName := fmt.Sprintf("public/downloads/订单/%v.orders.csv", m.Format("20060102"))
 		err := os.MkdirAll(filepath.Dir(fileName), 0777)
