@@ -10,7 +10,7 @@ require (
 	github.com/aws/aws-sdk-go v1.25.10 // indirect
 	github.com/azumads/faker v0.0.0-20150921074035-6cae71ddb107
 	github.com/braintree/manners v0.0.0-20160418043613-82a8879fc5fd // indirect
-	github.com/contribsys/faktory v1.0.1-1
+	github.com/contribsys/faktory v1.5.0
 	github.com/contribsys/faktory_worker_go v0.8.0
 	github.com/dfang/wechat-work-go v0.0.0-20190622161907-748e836f69d3 // indirect
 	github.com/disintegration/imaging v1.6.1 // indirect
@@ -92,7 +92,6 @@ require (
 	github.com/urfave/cli/v2 v2.2.0
 	github.com/yosssi/gohtml v0.0.0-20190915184251-7ff6f235ecaf // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
-	golang.org/x/net v0.0.0-20201010224723-4f7140c49acb // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
 	syreclabs.com/go/faker v1.2.0
